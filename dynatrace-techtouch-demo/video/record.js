@@ -34,20 +34,31 @@ function fontLinks() {
 
 const VIDEO_CSS = `
 :root { --font: Roboto, "Noto Sans JP", sans-serif; --font-demo: "Noto Sans JP", sans-serif; }
-.topbar, .foot, .notes, .ask, .lede, .tag, .disclaimer, .ov-brand { display: none !important; }
-.wrap { padding-block: 12px 170px !important; gap: 10px !important; }
-.scene { gap: 10px !important; }
-.scene-head h1 { font-size: 22px !important; }
-.overlay { font-size: 14px !important; line-height: 1.55 !important; gap: 9px !important; padding: 14px 16px 16px !important; }
-.ov-title { font-size: 17px !important; }
+.topbar, .foot, .notes, .ask, .disclaimer, .story-tags { display: none !important; }
+.wrap { padding-block: 10px 170px !important; gap: 8px !important; }
+.jn { padding: 5px 10px !important; }
+.jn .jl { font-size: 13px !important; }
+.jn .jt { font-size: 11px !important; }
+.jn .no { width: 22px !important; height: 22px !important; }
+.story { padding: 8px 16px !important; gap: 0 16px !important; }
+.story-time { font-size: 22px !important; min-width: 3.8em !important; padding-right: 14px !important; }
+.story h1 { font-size: 19px !important; }
+.story-text { font-size: 13.5px !important; }
+.overlay { font-size: 14px !important; line-height: 1.55 !important; gap: 8px !important; padding: 12px 16px 14px !important; }
+.ov-title { font-size: 16.5px !important; }
 .ov-text, .refs { font-size: 12.5px !important; }
-.steps li { padding: 2px 8px !important; font-size: 13.5px !important; }
-.explain dd { margin-bottom: 4px !important; }
-.soft, .part, .alert { padding: 8px 12px !important; font-size: 13.5px !important; }
+.steps.compact li { padding: 1px 8px !important; font-size: 13px !important; }
+.soft, .part, .alert { padding: 7px 12px !important; font-size: 13px !important; }
+.now-box { font-size: 14px !important; }
 .btn { padding: 8px 14px !important; font-size: 14px !important; }
 .v-legend { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 17px; color: #2f2f4f; }
 .v-legend span { display: inline-flex; align-items: center; gap: 8px; }
 .v-legend i { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
+.v-journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.v-journey div { border: 1px solid #dadbe4; border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.v-journey .t { font-size: 26px; font-weight: 700; color: #2f2f4f; }
+.v-journey b { font-size: 19px; line-height: 1.45; }
+.v-journey span { font-size: 15px; color: #595a7d; line-height: 1.5; }
 .is-target { animation: none !important; }
 html { scroll-behavior: auto !important; }
 #v-cursor { position: fixed; left: 1100px; top: 640px; width: 26px; height: 26px; z-index: 10002; pointer-events: none; margin: -2px 0 0 -3px; }
@@ -215,14 +226,7 @@ async function hideCard() {
     document.getElementById("v-cursor").style.visibility = "visible";
   });
 }
-async function showScene(id) {
-  await page.evaluate((s) => document.getElementById("tab-" + s).click(), id);
-}
 const ask = (q, accent) => card('<span class="v-pill">伺いたいこと</span><p class="v-ask">' + q + "</p>", { dim: true, accent });
-const sceneCard = (eyebrow, title, sub, accent) => card(
-  '<p class="v-eyebrow">' + eyebrow + '</p><p class="v-title">' + title + '</p><p class="v-sub">' + sub + "</p>" +
-  '<p class="v-note">' + FIXED_NOTE + "</p>", { accent });
-
 async function main() {
   const browser = await chromium.launch();
   page = await browser.newPage({ viewport: VIEW, deviceScaleFactor: SCALE, colorScheme: "light", reducedMotion: "reduce" });
@@ -241,109 +245,177 @@ async function main() {
   // 表紙
   await card(
     '<p class="v-eyebrow">構想デモ</p><p class="v-title">Dynatrace × テックタッチ</p>' +
-    '<p class="v-sub">専門家の「着眼点」を、全員の画面に。</p>' +
+    '<p class="v-sub">運用担当者の一日（架空）：問い合わせから、再発への備えまで</p>' +
     '<p class="v-text">観測はDynatrace。利用者が迷う画面での介入はテックタッチ。</p>' +
     '<p class="v-legend"><span><i style="background:#fff;border:1px solid #464cce"></i>監視画面（Dynatraceの画面イメージ・架空）</span>' +
-    '<span><i style="background:#0B7FB5"></i>テックタッチ 操作ガイド（案）</span><span><i style="background:#6A4C9C"></i>AI Hub 理解支援（構想）</span></p>' +
-    '<p class="v-note">' + FIXED_NOTE + "<br>監視画面はDynatraceの画面イメージを踏襲した架空画面です。</p>");
+    '<span><i style="background:#0B7FB5"></i>テックタッチ ガイド（案）</span><span><i style="background:#6A4C9C"></i>AI Hub 理解支援（構想）</span></p>' +
+    '<p class="v-note">' + FIXED_NOTE + "<br>監視画面はDynatraceの画面イメージを踏襲した架空画面です。登場する人物・部署・手順も架空です。</p>");
   await hold(7);
 
-  // デモ①
-  await sceneCard("デモ①・仮説1　画面・操作で迷う", "担当サービスの状況を確認する", "支援案1：テックタッチ 操作ガイド案", "#0B7FB5");
-  await hold(3.5);
-  await hideCard();
-  await caption("テックタッチの操作ガイドが、次に操作する場所をハイライトと吹き出しで示します。");
+  // 業務の流れの全体像
+  await card(
+    '<p class="v-eyebrow">今日の業務の流れ（架空）</p><p class="v-title">一つの問い合わせを、業務の流れに沿って進める</p>' +
+    '<div class="v-journey">' +
+    '<div><span class="t">10:16</span><b>第1章　問い合わせを受けて状況を確認</b><span>デモ①・仮説1</span></div>' +
+    '<div><span class="t">10:18</span><b>第2章　障害の一次確認と連絡</b><span>デモ②・仮説4・5</span></div>' +
+    '<div><span class="t">14:05</span><b>第3章　再発に備えてダッシュボードを作る</b><span>デモ③・仮説3</span></div>' +
+    '<div><span class="t">まとめ</span><b>振り返り</b><span>本日伺いたいこと・最初の一歩</span></div></div>' +
+    '<p class="v-note">担当者がDynatraceを使うのは月に数回、という想定の人物像です。</p>');
+  await hold(7);
+
+  // 第1章（デモ①）
+  await card('<p class="v-eyebrow">第1章・デモ①・仮説1　画面・操作で迷う</p><p class="v-title">10:16　問い合わせを受けて、担当サービスの状況を確認する</p>' +
+    '<p class="v-sub">支援：テックタッチのガイド（案）</p><p class="v-note">' + FIXED_NOTE + "</p>", { accent: "#0B7FB5" });
   await hold(4);
-  await caption("① 調査したいサービスを選びます。");
-  await choose("#a1-f-service", "#a1-service", "契約照会サービス（架空）");
+  await hideCard();
+  await caption("業務部門から「10時過ぎから契約照会の画面が遅い」と連絡が入りました。", "担当者がDynatraceを使うのは月に数回です（想定の人物像）。");
+  await hold(5);
+  await caption("テックタッチのガイド一覧から「担当サービスの状況を確認する」を選びます。");
   await hold(1.5);
-  await caption("② 事象が起きた時間帯を「時間枠」で選びます。");
-  await choose("#a1-f-period", "#a1-period", "10:00–10:15");
-  await hold(1.5);
-  await caption("③ 比較期間を選びます。");
-  await choose("#a1-f-compare", "#a1-compare", "09:00–10:00");
-  await caption("対象期間（15分）と長さが違う比較期間を選ぶと、ガイドが選び直しを案内します。", "選び直しの案内は構想の表現です。");
+  await click("#g-start", { maxHalf: 120 });
+  await hold(1.2);
+  await caption("① どの画面を開けばよいかを、Dockの位置で示します。");
+  await hold(2.5);
+  await click('.dock [data-arg="services"]', { maxHalf: 60 });
+  await hold(1.2);
+  await caption("② 問い合わせのあったサービスを選びます。");
+  await choose("#f-c1-service", "#c1-service", "契約照会サービス（架空）");
+  await hold(1.2);
+  await caption("③ 問い合わせの「10時過ぎ」に合わせて、時間枠を選びます。");
+  await choose("#f-c1-period", "#c1-period", "10:00–10:15");
+  await hold(1.2);
+  await caption("④ 比べる時間帯を選びます。");
+  await choose("#f-c1-compare", "#c1-compare", "09:00–10:00");
+  await caption("長さの違う期間を選ぶと、ガイドが選び直しを案内します。", "選び直しの案内は構想の表現です。");
   await hold(4.5);
-  await caption("③ 直前の同じ長さ「09:45–10:00」を選び、比較の条件をそろえます。");
-  await choose("#a1-f-compare", "#a1-compare", "09:45–10:00");
-  await hold(1.5);
-  await caption("④ 条件を確認して「適用」を押します。");
+  await caption("直前の同じ長さ（09:45–10:00）を選び、比較の条件をそろえます。");
+  await choose("#f-c1-compare", "#c1-compare", "09:45–10:00");
+  await hold(1.2);
+  await caption("⑤ 3つの条件を見直してから「適用」を押します。");
   await hold(2);
-  await click("#a1-apply");
-  await hold(1);
-  await caption("平均応答時間は、比較期間の420 msから980 msへ上昇しています。", "数値は架空です。");
-  await scrollToEl("#a1-metrics", 150);
-  await hold(4.5);
+  await click('[data-act="c1-apply"]', { maxHalf: 40 });
+  await hold(1.2);
+  await caption("⑥ 平均応答時間が 420 ms から 980 ms に上がっています。「?」で社内の指標の定義（架空）を表示します。");
+  await hold(2.5);
+  await click('.tt-q[data-arg="rt"]', { maxHalf: 20 });
+  await moveTo(900, 330, 400);
+  await hold(5);
   await ask("画面の探し方、絞り込み、時間帯の指定のどこで迷いますか？", "#0B7FB5");
   await hold(4.5);
-
-  // デモ②
-  await showScene("d2");
-  await sceneCard("デモ②・仮説4・5　実務で再現できない／学びを再利用できない", "障害時の一次確認を、社内手順どおりに進める", "テックタッチ 操作ガイド案：専門家の手順を、誰でも同じ順番で再現する", "#0B7FB5");
-  await hold(3.5);
   await hideCard();
-  await caption("障害の一次確認を、社内手順どおり4つのステップで案内します。", "社内手順・連絡先は架空です。お客様の実際の手順に置き換える前提です。");
-  await hold(4.5);
-  await caption("ステップ1：進行中の問題の概要を開きます。");
-  await hold(1.5);
-  await click("#d2-open", { maxHalf: 90 });
+  await caption("⑦ 同じ時間帯に検知された問題があります。社内手順の一次確認に切り替えます。");
   await hold(2.5);
-  await caption("影響範囲の前に「ログ」を開くと、社内手順の順番を案内します。", "順番の案内は構想の表現です。");
-  await click('#d2-tabs [data-tab="logs"]', { maxHalf: 30 });
-  await hold(4.5);
-  await caption("ステップ2：影響範囲を確認します。影響範囲を先に確かめると、連絡の優先度を判断できます。");
-  await click('#d2-tabs [data-tab="impact"]', { maxHalf: 40 });
-  await hold(4.5);
-  await caption("ステップ3：関連ログを確認します。吹き出しが、期間の設定値まで示します。");
+  await click('[data-act="c1-problem"]', { maxHalf: 40 });
+  await hold(0.6);
+
+  // 第2章（デモ②）
+  await card('<p class="v-eyebrow">第2章・デモ②・仮説4・5　実務で再現できない／学びを再利用できない</p><p class="v-title">10:18　障害の一次確認を、社内手順どおりに進めて連絡する</p>' +
+    '<p class="v-sub">支援：テックタッチのステップガイド（案）</p><p class="v-note">' + FIXED_NOTE + "<br>社内手順・連絡先は架空です。お客様の実際の手順に置き換える前提です。</p>", { accent: "#0B7FB5" });
+  await hold(4);
+  await hideCard();
+  await caption("問題の画面を開くと、テックタッチのポップアップが社内手順（架空）の一次確認を案内します。");
+  await hold(4);
+  await click("#m-start", { maxHalf: 120 });
+  await hold(1);
+  await caption("ステップ1：何が・いつから・どこで起きているかを確認します。");
   await hold(3);
-  await click('#d2-tabs [data-tab="logs"]', { maxHalf: 30 });
-  await hold(1.5);
-  await choose("#d2-f-period", "#d2-period", "5min");
-  await moveTo(1060, 690, 400);
-  await caption("問題の開始前（09:58）から、接続待ちの警告が出ていたことを確認します。原因はこの段階では確定しません。", "ログはすべて架空です。");
+  await click("#panel-next", { maxHalf: 80 });
+  await hold(1);
+  await caption("影響範囲の前に「ログ」を開くと、社内手順の順番を案内します。", "順番の案内は構想の表現です。");
+  await click('[data-act="c2-tab"][data-arg="logs"]', { maxHalf: 20 });
   await hold(4.5);
-  await caption("ステップ4：社内手順に沿って、優先度・連絡先・伝える内容を確認します。担当者によらず同じ手順で連絡します。");
-  await click("#d2-contact", { maxHalf: 60 });
-  await moveTo(1060, 690, 400);
-  await hold(6);
-  await click("#d2-modal-done", { maxHalf: 120 });
-  await caption("一次確認の4ステップが完了しました。");
+  await caption("ステップ2：影響範囲を確認します。");
+  await click('[data-act="c2-tab"][data-arg="impact"]', { maxHalf: 30 });
+  await hold(2);
+  await caption("「?」で社内の優先度の基準（架空）を表示します。一部の利用者に影響しているため、優先度は「中」です。");
+  await click('.tt-q[data-arg="prio"]', { maxHalf: 20 });
+  await moveTo(900, 470, 400);
+  await hold(5);
+  await caption("ステップ3：関連ログを開きます。吹き出しが、期間の設定値まで示します。");
+  await click('[data-act="c2-tab"][data-arg="logs"]', { maxHalf: 20 });
   await hold(2.5);
+  await choose("#f-c2-period", "#c2-period", "5min");
+  await moveTo(1000, 330, 400);
+  await scrollToY(110);
+  await caption("問題の開始前（09:58）から、接続待ちの警告が出ていたことを確認します。原因はこの段階では確定しません。", "ログはすべて架空です。");
+  await hold(5);
+  await caption("ステップ4：「社内手順で連絡」から、優先度・連絡先・伝える内容の例を確認します。");
+  await click('[data-act="c2-contact"]', { maxHalf: 50 });
+  await moveTo(1085, 620, 400);
+  await hold(6);
+  await click("#m-done", { maxHalf: 120 });
+  await caption("一次確認の4ステップが完了しました。パネルに、確認した内容の記録（例）を表示します。");
+  await moveTo(900, 560, 400);
+  await hold(4.5);
   await ask("障害時の一次確認で、人によって手順がばらつくのはどこですか？", "#0B7FB5");
   await hold(4.5);
-
-  // デモ③
-  await showScene("d3");
-  await sceneCard("デモ③・仮説3　作成・修正で止まる", "ダッシュボードを自分で修正する", "支援案3：テックタッチ＋AI Hub 支援案", "#6A4C9C");
-  await hold(3.5);
   await hideCard();
-  await caption("① 専門家が確認済みのひな型から選びます。");
-  await hold(2.5);
-  await click('label:has(#b-tpl-t1)');
-  await hold(1.2);
-  await caption("② 対象サービスを担当サービスに変えます。AI Hub欄が、変える理由を説明します（例文）。");
-  await choose("#b-f-service", "#b-service", "契約照会サービス（架空）");
-  await hold(3.5);
-  await caption("③ 時間枠を「過去 24 時間」に変えます。");
-  await choose("#b-f-range", "#b-range", "24h");
-  await hold(2.5);
-  await caption("④ 変更箇所は2か所です。指標の定義は変えていないことを確認します。");
-  await scrollToEl("#b-changes", 170);
+  await click("#panel-next", { maxHalf: 80 });
+  await hold(0.6);
+
+  // 第3章（デモ③）
+  await card('<p class="v-eyebrow">第3章・デモ③・仮説3　作成・修正で止まる</p><p class="v-title">14:05　再発に備えて、ダッシュボードを自分で作る</p>' +
+    '<p class="v-sub">支援：テックタッチ＋AI Hub（案・構想）</p><p class="v-note">' + FIXED_NOTE + "<br>AI Hub欄は事前に作成した例文です。</p>", { accent: "#6A4C9C" });
   await hold(4);
-  await click("#b-next", { maxHalf: 80 });
-  await caption("⑤ 結果を確認します。10時台の上昇が、デモ①で確認した時間帯と合っているかを確かめます。");
-  await scrollToEl("#b-result", 110);
-  await hold(5);
-  await click('[data-act="ask"]', { maxHalf: 70 });
-  await caption("判断に迷うときは、変更箇所と結果を添えて専門家に確認を依頼します。", "デモのため送信はしません。");
+  await hideCard();
+  await caption("専門家（架空）から、毎朝確認できるダッシュボードを作るよう助言がありました。");
   await hold(4.5);
-  await caption("DQLの作成・説明が必要な場合は、Dynatrace Assistの活用を含めて確認します。");
-  await scrollToEl(".dql", 420);
-  await hold(4);
+  await caption("ガイド「ダッシュボードをひな型から作る」を開始します。");
+  await click("#g-start", { maxHalf: 120 });
+  await hold(1);
+  await caption("①② ダッシュボードの画面を開き、「ひな型から作成」を押します。");
+  await click('.dock [data-arg="dashboards"]', { maxHalf: 60 });
+  await hold(1.5);
+  await click('[data-act="c3-create"]', { maxHalf: 60 });
+  await hold(0.8);
+  await scrollToY(150);
+  await caption("③ 専門家が確認済みのひな型から選びます。AI Hub欄が、ひな型の意図を説明します（例文）。");
+  await hold(1.5);
+  await click('label:has(input[value="t1"])', { maxHalf: 90 });
+  await hold(3.5);
+  await caption("④ 対象サービスを担当サービスに変えます。AI Hub欄が、変える理由を説明します（例文）。");
+  await choose("#f-c3-service", "#c3-service", "契約照会サービス（架空）");
+  await hold(3);
+  await caption("⑤ 時間枠を「過去 24 時間」に変えます。");
+  await choose("#f-c3-range", "#c3-range", "24h");
+  await hold(2.5);
+  await caption("⑥ 変更箇所は2か所。指標の定義は変えていないことを確認して、結果をプレビューします。");
+  await scrollToEl("#c3-changes", 200);
+  await hold(3.5);
+  await click('[data-act="c3-preview"]', { maxHalf: 60 });
+  await hold(0.8);
+  await caption("⑦ 10時台の上昇が、第1章で確認した時間帯と合っているかを確かめます。原因はこの画面だけでは特定できません。");
+  await scrollToEl("#c3-result", 90);
+  await hold(4.5);
+  await caption("保存の前に、専門家に確認を依頼します。");
+  await scrollToEl('[data-act="c3-ask"]', 420);
+  await click('[data-act="c3-ask"]', { maxHalf: 70 });
+  await hold(1);
+  await caption("専門家から承認の返信が届きました。");
+  await moveTo(900, 330, 400);
+  await hold(3.5);
+  await caption("⑧ 保存して、運用チーム（架空）に共有します。");
+  await click('[data-act="c3-save"]', { maxHalf: 50 });
+  await hold(0.6);
+  await scrollToY(0);
+  await caption("保存したダッシュボードを、チームの毎朝の確認に使います。", "デモのため実際には保存していません。");
+  await moveTo(900, 560, 400);
+  await hold(4.5);
   await ask("ひな型選択、条件の変更、結果の検証のどこで依頼しますか？", "#6A4C9C");
   await hold(4.5);
+  await hideCard();
+  await click("#panel-next", { maxHalf: 80 });
+  await hold(0.6);
 
-  // 締め
+  // 振り返り
+  await caption("振り返り：問い合わせから再発への備えまでを、一つの業務の流れとして見ました。");
+  await moveTo(1300, 250, 400);
+  await hold(5);
+  await caption("回数はこのデモを操作した回数で、効果の数値ではありません。確かめ方は、自力完了率・所要時間・依頼件数・再実行です。");
+  await scrollToY(330);
+  await hold(6);
+
+  // 最初の一歩
   await card(
     '<p class="v-eyebrow">最初の一歩</p>' +
     '<p class="v-flow"><span>対象を一つ決める</span><span class="arrow">→</span><span>実画面で確かめる</span><span class="arrow">→</span><span>変化を測る</span></p>' +

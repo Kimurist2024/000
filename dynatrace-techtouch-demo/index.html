@@ -467,12 +467,12 @@ p { margin: 0; }
   pointer-events: none;
 }
 .balloon::before {
-  content: ""; position: absolute; top: -8px; left: 20px;
+  content: ""; position: absolute; top: -8px; left: var(--ax, 20px);
   border: 8px solid transparent; border-top: 0; border-bottom-color: var(--tt);
 }
 .balloon small { display: block; font-weight: 400; font-size: 12.5px; opacity: 0.95; }
 .balloon.r { left: auto; right: 0; }
-.balloon.r::before { left: auto; right: 20px; }
+.balloon.r::before { left: auto; right: var(--axr, 20px); }
 .balloon.warn { background: var(--ov-warn); }
 .balloon.warn::before { border-bottom-color: var(--ov-warn); }
 
@@ -493,10 +493,150 @@ p { margin: 0; }
 .kbd { font-size: 13px; color: var(--dt-text-sub); }
 .foot { font-size: 12px; color: var(--dt-text-sub); text-align: right; }
 
+/* ---------- 吹き出しの向き・Dockの基準位置 ---------- */
+.dock-item { position: relative; }
+.balloon.s { top: 50%; left: calc(100% + 14px); transform: translateY(-50%); }
+.balloon.s::before { top: 50%; left: -8px; margin-top: -8px; border-style: solid; border-width: 8px 8px 8px 0; border-color: transparent var(--tt) transparent transparent; }
+.balloon.warn.s::before { border-color: transparent var(--ov-warn) transparent transparent; }
+
+/* ---------- 業務の流れ（進行バー）・場面説明 ---------- */
+.journey { display: flex; flex-wrap: wrap; gap: 6px; }
+.jn {
+  flex: 1 1 210px;
+  display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 10px; align-items: center;
+  text-align: left; padding: 8px 12px; border-radius: 9px;
+  border: 1px solid var(--dt-border); background: var(--dt-surface); color: var(--dt-text-sub);
+}
+.jn .no {
+  grid-row: 1 / 3; width: 26px; height: 26px; border-radius: 50%;
+  display: inline-grid; place-items: center; font-size: 12px; font-weight: 700;
+  border: 1px solid var(--dt-border); background: var(--dt-surface);
+}
+.jn .jl { font-weight: 700; font-size: 14px; line-height: 1.4; color: var(--dt-text); }
+.jn .jt { font-size: 12px; line-height: 1.4; }
+.jn.now { border-color: var(--dt-text); box-shadow: inset 0 0 0 1px var(--dt-text); }
+.jn.now .no { background: var(--dt-text); border-color: var(--dt-text); color: var(--dt-base); }
+.jn.done .no { background: var(--dt-success); border-color: var(--dt-success); color: var(--on-accent); }
+.jn.todo .jl { color: var(--dt-text-sub); font-weight: 500; }
+.story {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 18px; align-items: start;
+  background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 12px; padding: 14px 18px;
+}
+.story-time {
+  grid-row: 1 / 4; min-width: 4.4em; padding-right: 18px; border-right: 1px solid var(--dt-border);
+  font-size: 30px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums;
+}
+.story-time small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--dt-text-sub); }
+.story h1 { font-size: clamp(20px, 2vw, 26px); line-height: 1.4; }
+.story-text { color: var(--dt-text-sub); font-size: 15px; }
+.story-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.story-tags span { font-size: 12px; border-radius: 999px; padding: 1px 10px; background: var(--dt-container); color: var(--dt-text-sub); }
+
+/* ---------- Dock（押せる項目） ---------- */
+button.dock-item { width: 100%; border: 0; background: transparent; text-align: left; font: inherit; color: var(--dt-text); cursor: pointer; }
+button.dock-item:hover { background: var(--dt-container-emph); }
+button.dock-item.active:hover { background: var(--dt-primary-cont-emph); }
+
+/* ---------- 社内チャット（架空） ---------- */
+.chat {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 2px 12px; align-items: start;
+  background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-float);
+  border-left: 4px solid var(--dt-text-sub); padding: 12px 14px; font-family: var(--font-demo);
+}
+.chat .av { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--dt-container-emph); font-weight: 700; }
+.chat .who { font-size: 13px; color: var(--dt-text-sub); }
+.chat .who b { color: var(--dt-text); margin-right: 8px; }
+.chat .say { font-size: 15px; line-height: 1.6; }
+.chat .src { font-size: 11px; color: var(--dt-text-sub); }
+.chat-close { border: 0; background: transparent; color: var(--dt-text-sub); font-size: 13px; padding: 2px 6px; }
+
+/* ---------- ホーム（架空） ---------- */
+.home-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.app-tile {
+  display: grid; gap: 6px; justify-items: start; text-align: left; font: inherit;
+  background: var(--dt-surface); border: 0; border-radius: 12px; box-shadow: var(--dt-shadow-raised);
+  padding: 14px 16px; color: var(--dt-text);
+}
+button.app-tile { cursor: pointer; }
+.app-tile .app-icon { width: 32px; height: 32px; }
+.app-tile .app-icon svg { width: 20px; height: 20px; }
+.app-tile b { font-weight: 600; }
+.app-tile span.d { color: var(--dt-text-sub); font-size: 13px; }
+
+/* ---------- テックタッチのツールチップ（案） ---------- */
+.tip-wrap { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.tt-q {
+  display: inline-grid; place-items: center; width: 20px; height: 20px; padding: 0; flex: none;
+  border-radius: 50%; border: 1px solid var(--tt); color: var(--tt); background: var(--tt-soft);
+  font-size: 12px; font-weight: 700; line-height: 1;
+}
+.tt-q[aria-expanded="true"] { background: var(--tt); color: var(--on-accent); }
+.tt-tip {
+  position: absolute; top: calc(100% + 10px); left: -10px; z-index: 35;
+  width: min(340px, 78vw); padding: 10px 12px;
+  background: var(--dt-surface); border: 2px solid var(--tt); border-radius: 10px; box-shadow: var(--dt-shadow-float);
+  font-family: var(--font-demo); font-size: 13.5px; font-weight: 400; line-height: 1.6; color: var(--dt-text); white-space: normal;
+}
+.tt-tip .lab { display: block; margin-bottom: 2px; font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* ---------- 画面内のお知らせ・ボタン ---------- */
+.dt-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; background: var(--dt-warning-cont-emph); border-radius: 9px; padding: 10px 14px; }
+.dt-banner b { color: var(--dt-warning); }
+.title-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
+.share-chip { font-size: 12px; border-radius: 999px; padding: 1px 10px; background: var(--dt-primary-cont-emph); color: var(--dt-primary); font-weight: 500; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px; display: grid; gap: 2px; }
+.kpi span { font-size: 12.5px; color: var(--dt-text-sub); }
+.kpi b { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- パネル：ガイド一覧・記録 ---------- */
+.glist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.gitem {
+  width: 100%; display: grid; gap: 2px; text-align: left; font: inherit; font-family: var(--font-demo);
+  border: 1px solid var(--dt-border); border-radius: 9px; background: var(--dt-surface); padding: 9px 12px; color: var(--dt-text);
+}
+button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-soft); }
+.overlay.hub button.gitem { border-color: var(--hub); background: var(--hub-soft); }
+.gname { font-weight: 700; font-size: 14px; }
+.gmeta { font-size: 12px; color: var(--dt-text-sub); }
+.rec-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.rec-list li { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 8px; }
+.rec-list .t { color: var(--dt-text-sub); font-variant-numeric: tabular-nums; }
+.steps.compact li { padding: 2px 8px; font-size: 13.5px; }
+
+/* ---------- 振り返り ---------- */
+.summary { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; }
+.sum-card {
+  background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 12px;
+  padding: 18px 20px; display: grid; gap: 12px; align-content: start; min-width: 0;
+}
+.sum-card.wide { grid-column: 1 / -1; }
+.sum-card h2 { font-size: 18px; line-height: 1.4; }
+.sum-note { font-size: 13px; color: var(--dt-text-sub); }
+.tl { list-style: none; margin: 0; padding: 0; display: grid; }
+.tl li { display: grid; grid-template-columns: 3.4em 16px minmax(0, 1fr); column-gap: 12px; }
+.tl .t { font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 1px; }
+.tl .rail { position: relative; }
+.tl .rail::before { content: ""; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--dt-border); }
+.tl li:first-child .rail::before { top: 9px; }
+.tl li:last-child .rail::before { bottom: auto; height: 9px; }
+.tl .rail::after { content: ""; position: absolute; left: 2px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--tt); }
+.tl .body { padding-bottom: 14px; }
+.tl .body b { display: block; }
+.tl .body span { color: var(--dt-text-sub); font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--dt-container); border-radius: 9px; padding: 10px 12px; display: grid; gap: 2px; align-content: start; }
+.stat b { font-size: 28px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--dt-text-sub); }
+.sum-list { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.flow3 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 20px; font-weight: 700; }
+.flow3 .arrow { color: var(--dt-text-sub); font-weight: 400; }
+
 @media (max-width: 1240px) {
   :root { --dock-w: 56px; }
-  .dock-item span, .dock-label { display: none; }
+  .dock-item .dl, .dock-label { display: none; }
   .dock-item { justify-content: center; padding: 8px 0; }
+  .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 1080px) {
   .dt { grid-template-columns: var(--dock-w) minmax(0, 1fr); grid-template-rows: auto auto; }
@@ -505,7 +645,7 @@ p { margin: 0; }
   .overlay { grid-column: 2; grid-row: 2; margin: 0 16px 16px; position: relative; top: auto; }
   .has-overlay .dt-page { padding-right: 20px; }
   .tt-modal { grid-column: 2; padding: 72px 24px 24px; border-radius: 0; }
-  .notes-grid { grid-template-columns: minmax(0, 1fr); }
+  .notes-grid, .summary { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 700px) {
   .wrap { padding-inline: 16px; }
@@ -521,8 +661,10 @@ p { margin: 0; }
   .toolbar > * { width: 100%; }
   .dt-field select { flex: 1; }
   .tip-anchor .dt-accent { width: 100%; }
-  .tpl-list, .edit-grid { grid-template-columns: minmax(0, 1fr); }
+  .tpl-list, .edit-grid, .home-grid, .kpis, .stats { grid-template-columns: minmax(0, 1fr); }
   .ah-nav span { padding: 10px 6px; }
+  .story { grid-template-columns: minmax(0, 1fr); }
+  .story-time { grid-row: auto; border-right: 0; padding-right: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .is-target { animation: none; }
@@ -537,16 +679,11 @@ p { margin: 0; }
   <header class="topbar">
     <div class="brand">
       <span class="brand-name">Dynatrace × テックタッチ　構想デモ</span>
-      <span class="brand-sub">観測はDynatrace、利用者が迷う画面での介入はテックタッチ</span>
+      <span class="brand-sub">運用担当者の一日（架空）：問い合わせから、再発への備えまで</span>
     </div>
-    <nav class="scene-nav" aria-label="デモの切り替え">
-      <button type="button" id="tab-d1" data-go="d1">デモ①　状況を確認</button>
-      <button type="button" id="tab-d2" data-go="d2">デモ②　障害時の一次確認</button>
-      <button type="button" id="tab-d3" data-go="d3">デモ③　ダッシュボード修正</button>
-    </nav>
     <div class="tools">
       <button type="button" class="tool" id="notes-btn" aria-pressed="false" aria-controls="notes">進行メモ</button>
-      <button type="button" class="tool" id="reset-btn">この画面を最初から</button>
+      <button type="button" class="tool" id="reset-btn">この章を最初から</button>
       <button type="button" class="tool" id="theme-btn">表示：自動</button>
     </div>
   </header>
@@ -555,355 +692,51 @@ p { margin: 0; }
     <span>構想デモ。画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。</span>
     <span class="legend" aria-label="色の意味">
       <span><i class="l-dt"></i>監視画面（Dynatraceの画面イメージ・架空）</span>
-      <span><i class="l-tt"></i>テックタッチ 操作ガイド（案）</span>
+      <span><i class="l-tt"></i>テックタッチ ガイド（案）</span>
       <span><i class="l-hub"></i>AI Hub 理解支援（構想）</span>
     </span>
   </div>
 
-  <!-- ==================== デモ① ==================== -->
-  <section class="scene" id="scene-d1" aria-labelledby="h-d1">
-    <div class="scene-head">
-      <div>
-        <p class="eyebrow">デモ①・仮説1　画面・操作で迷う</p>
-        <h1 id="h-d1">担当サービスの状況を確認する</h1>
-        <p class="lede">仮説1：対象と時間帯をそろえ、次の操作へ進む</p>
-      </div>
-      <span class="tag">イメージデモ</span>
-    </div>
-
-    <div class="window">
-      <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>監視画面（架空）　Dynatraceの画面イメージを踏襲</span></div>
-      <div class="dt has-overlay">
-        <nav class="dock" data-active="services" aria-label="Dock（架空）"></nav>
-        <div class="dt-app">
-          <div class="appheader">
-            <div class="ah-left">
-              <span class="app-icon" data-icon="services" aria-hidden="true"></span>
-              <span class="app-name">サービス</span>
-              <div class="ah-nav" aria-hidden="true"><span class="active">概要</span><span>エンドポイント</span><span>応答時間の分析</span></div>
-            </div>
-            <span class="dt-look-btn" aria-hidden="true">共有</span>
-          </div>
-          <div class="dt-page">
-            <div>
-              <p class="crumbs">サービス ＞ 状況確認</p>
-              <h2 class="dt-h">サービスの状況確認</h2>
-            </div>
-            <div class="toolbar" id="a1-filters">
-              <span class="dt-look-btn" aria-hidden="true" data-icon-inline="segment">セグメント</span>
-              <div class="dt-field" id="a1-f-service">
-                <label for="a1-service">サービス</label>
-                <select id="a1-service">
-                  <option value="">選択してください</option>
-                  <option>契約照会サービス（架空）</option>
-                  <option>保険料計算サービス（架空）</option>
-                  <option>代理店ポータル（架空）</option>
-                </select>
-              </div>
-              <div class="dt-field" id="a1-f-period">
-                <label for="a1-period"><span data-icon-inline="clock"></span>時間枠</label>
-                <select id="a1-period">
-                  <option value="">選択してください</option>
-                  <option>09:45–10:00</option>
-                  <option>10:00–10:15</option>
-                  <option>10:15–10:30</option>
-                </select>
-              </div>
-              <div class="dt-field" id="a1-f-compare" data-tip-side="right">
-                <label for="a1-compare">比較期間</label>
-                <select id="a1-compare">
-                  <option value="">選択してください</option>
-                  <option>09:00–10:00</option>
-                  <option>09:45–10:00</option>
-                  <option>前日 10:00–10:15</option>
-                </select>
-              </div>
-              <span class="tip-anchor" id="a1-apply-wrap" data-tip-side="right"><button type="button" class="dt-accent" id="a1-apply">適用</button></span>
-            </div>
-            <div id="a1-metrics"></div>
-            <p class="dt-fine">数値・サービス名・時刻はすべて架空です。</p>
-          </div>
-        </div>
-
-        <aside class="overlay" aria-live="polite" aria-label="テックタッチ 操作ガイド案">
-          <div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">支援案 1</span></div>
-          <p class="ov-brand">テックタッチ 操作ガイド案</p>
-          <h3 class="ov-title">まず、対象サービスと時間帯を確認します</h3>
-          <p class="ov-text">調査したいサービス、事象の発生時間、比較する時間帯を選びます。今回は対象・比較ともに15分間です。</p>
-          <ol class="steps" id="a1-steps">
-            <li>対象サービスを選ぶ</li>
-            <li>対象期間（時間枠）を選ぶ</li>
-            <li>比較期間を選ぶ</li>
-            <li>条件を確認して指標を見る</li>
-          </ol>
-          <p class="now-box" id="a1-now"></p>
-          <p class="alert" id="a1-alert" hidden></p>
-          <p class="soft">確認する理由：対象や時間帯が違うと、比較結果の解釈も変わります。</p>
-          <div class="actions">
-            <button type="button" class="btn btn-ghost" id="a1-back">戻る</button>
-            <button type="button" class="btn btn-primary" id="a1-next">次へ</button>
-          </div>
-        </aside>
-      </div>
-    </div>
-
-    <p class="ask"><strong>伺いたいこと</strong><span>画面の探し方、絞り込み、時間帯の指定のどこで迷いますか？</span></p>
-  </section>
-
-  <!-- ==================== デモ② ==================== -->
-  <section class="scene" id="scene-d2" aria-labelledby="h-d2" hidden>
-    <div class="scene-head">
-      <div>
-        <p class="eyebrow">デモ②・仮説4・5　実務で再現できない／学びを再利用できない</p>
-        <h1 id="h-d2">障害時の一次確認を、社内手順どおりに進める</h1>
-        <p class="lede">仮説4・5：専門家の手順を、誰でも同じ順番で再現する</p>
-      </div>
-      <span class="tag">イメージデモ</span>
-    </div>
-
-    <div class="window">
-      <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>監視画面（架空）　Dynatraceの画面イメージを踏襲</span></div>
-      <div class="dt has-overlay">
-        <nav class="dock" data-active="problems" aria-label="Dock（架空）"></nav>
-        <div class="dt-app">
-          <div class="appheader">
-            <div class="ah-left">
-              <span class="app-icon" data-icon="problems" aria-hidden="true"></span>
-              <span class="app-name">問題</span>
-              <div class="ah-nav" aria-hidden="true"><span class="active">問題一覧</span></div>
-            </div>
-            <span class="dt-look-btn" aria-hidden="true">共有</span>
-          </div>
-          <div class="dt-page">
-            <div id="d2-list" class="plist">
-              <p class="crumbs">問題</p>
-              <h2 class="dt-h">問題一覧</h2>
-              <div class="toolbar" aria-hidden="true" style="margin-top:14px">
-                <span class="dt-look-btn" data-icon-inline="segment">セグメント</span>
-                <span class="dt-field"><span class="pre"><span data-icon-inline="clock"></span>時間枠</span><span class="locked">過去 24 時間</span></span>
-              </div>
-              <div class="surface" style="margin-top:14px">
-                <table class="dtable" style="min-width:0">
-                  <thead><tr><th scope="col">問題</th><th scope="col">状態</th><th scope="col">開始</th><th scope="col">影響を受けたサービス</th></tr></thead>
-                  <tbody>
-                    <tr><th scope="row"><span class="tip-anchor" id="d2-open-wrap"><button type="button" class="row-link" id="d2-open">P-0412　応答時間の悪化</button></span></th><td><span class="status active">進行中</span></td><td>10:02</td><td>契約照会サービス（架空）</td></tr>
-                    <tr><th scope="row">P-0409　エラー率の上昇</th><td><span class="status">解決済み</span></td><td>前日 16:40</td><td>保険料計算サービス（架空）</td></tr>
-                    <tr><th scope="row">P-0405　応答時間の悪化</th><td><span class="status">解決済み</span></td><td>前日 09:15</td><td>代理店ポータル（架空）</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div id="d2-detail" hidden>
-              <p class="crumbs">問題 ＞ P-0412</p>
-              <div class="tb-row">
-                <h2 class="dt-h">問題の詳細（架空）</h2>
-              </div>
-              <div class="tb-row" style="margin-top:6px">
-                <span class="dt-h3">P-0412　応答時間の悪化</span>
-                <span class="status active">進行中</span>
-                <span class="dt-fine">開始 10:02</span>
-                <span class="tip-anchor" id="d2-contact-wrap" data-tip-side="right"><button type="button" class="tt-chip" id="d2-contact">社内手順で連絡</button></span>
-              </div>
-              <div class="dt-tabs" id="d2-tabs" role="tablist" aria-label="問題の詳細" style="margin-top:12px">
-                <span class="tip-anchor" id="d2-tab-overview-wrap"><button type="button" role="tab" data-tab="overview">概要</button></span>
-                <span class="tip-anchor" id="d2-tab-impact-wrap"><button type="button" role="tab" data-tab="impact">影響範囲</button></span>
-                <span class="tip-anchor" id="d2-tab-logs-wrap"><button type="button" role="tab" data-tab="logs">ログ</button></span>
-                <span class="tip-anchor" id="d2-tab-events-wrap"><button type="button" role="tab" data-tab="events">イベント</button></span>
-              </div>
-              <div id="d2-tab-content" style="margin-top:14px"></div>
-            </div>
-            <p class="dt-fine">画面・サービス名・手順・数値はすべて架空です。</p>
-          </div>
-        </div>
-
-        <aside class="overlay" aria-live="polite" aria-label="テックタッチ 操作ガイド案">
-          <div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">社内手順（架空）</span></div>
-          <p class="ov-brand">テックタッチ 操作ガイド案</p>
-          <h3 class="ov-title">障害の一次確認（社内手順）</h3>
-          <ol class="steps" id="d2-steps">
-            <li>問題の概要を開く</li>
-            <li>影響範囲を確認する</li>
-            <li>関連ログを確認する</li>
-            <li>社内手順に沿って連絡する</li>
-          </ol>
-          <p class="now-box" id="d2-now"></p>
-          <p class="alert" id="d2-alert" hidden></p>
-          <p class="soft" id="d2-reason"></p>
-          <div class="actions">
-            <button type="button" class="btn btn-ghost" id="d2-back">戻る</button>
-            <button type="button" class="btn btn-primary" id="d2-next">次へ</button>
-          </div>
-        </aside>
-
-        <div class="tt-modal" id="d2-modal" hidden role="dialog" aria-modal="false" aria-labelledby="d2-modal-title">
-          <div class="tt-modal-card">
-            <div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ステップ4／4　社内手順（架空）</span></div>
-            <h3 class="ov-title" id="d2-modal-title">障害の一次連絡</h3>
-            <ol class="proc">
-              <li><b>優先度を決める</b><span>影響の範囲が「Webからの照会の一部」のため、優先度は「中」（社内基準・架空）</span></li>
-              <li><b>連絡先</b><span>システム運用チーム（架空）、業務部門の窓口（架空）</span></li>
-              <li><b>伝える内容（例）</b>
-                <div class="msg">【障害一次連絡】P-0412 応答時間の悪化（進行中）
-・開始：10:02
-・影響：契約照会サービス（架空）、Webからの照会の一部
-・関連ログ：09:58から契約DBへの接続待ちの警告（原因は未確定）
-・次の連絡：原因を確認したあと</div>
-              </li>
-            </ol>
-            <p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。デモのため送信はしません。</p>
-            <div class="actions">
-              <button type="button" class="btn btn-ghost" id="d2-modal-close">閉じる</button>
-              <button type="button" class="btn btn-primary" id="d2-modal-done">連絡内容を確認した</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <p class="ask"><strong>伺いたいこと</strong><span>障害時の一次確認で、人によって手順がばらつくのはどこですか？</span></p>
-  </section>
-
-  <!-- ==================== デモ③ ==================== -->
-  <section class="scene" id="scene-d3" aria-labelledby="h-d3" hidden>
-    <div class="scene-head">
-      <div>
-        <p class="eyebrow">デモ③・仮説3　作成・修正で止まる</p>
-        <h1 id="h-d3">ダッシュボードを自分で修正する</h1>
-        <p class="lede">仮説3：ひな型を選び、変更箇所と結果を確認する</p>
-      </div>
-      <span class="tag">イメージデモ</span>
-    </div>
-
-    <div class="window">
-      <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>監視画面（架空）　Dynatraceの画面イメージを踏襲</span></div>
-      <div class="dt has-overlay">
-        <nav class="dock" data-active="dashboards" aria-label="Dock（架空）"></nav>
-        <div class="dt-app">
-          <div class="appheader">
-            <div class="ah-left">
-              <span class="app-icon" data-icon="dashboards" aria-hidden="true"></span>
-              <span class="app-name">ダッシュボード</span>
-              <div class="ah-nav" aria-hidden="true"><span>すべてのダッシュボード</span><span class="active">ひな型</span></div>
-            </div>
-            <span class="dt-look-btn" aria-hidden="true">共有</span>
-          </div>
-          <div class="dt-page">
-            <div>
-              <p class="crumbs">ダッシュボード ＞ ひな型から作成</p>
-              <h2 class="dt-h">ひな型の編集</h2>
-            </div>
-
-            <p class="section-label">ひな型を選ぶ</p>
-            <div class="tpl-list" id="b-templates" role="radiogroup" aria-label="ひな型">
-              <label class="tpl"><input type="radio" name="b-tpl" value="t1" id="b-tpl-t1"><span class="tpl-name">サービスの状況確認（標準）</span><span class="tpl-desc">平均応答時間とエラー率を期間で比べる</span><span class="badge">専門家が確認済み</span></label>
-              <label class="tpl"><input type="radio" name="b-tpl" value="t2" id="b-tpl-t2"><span class="tpl-name">エラーの内訳（標準）</span><span class="tpl-desc">エラーの種類と発生箇所を一覧する</span><span class="badge">専門家が確認済み</span></label>
-              <label class="tpl"><input type="radio" name="b-tpl" value="t3" id="b-tpl-t3"><span class="tpl-name">利用の多い時間帯（標準）</span><span class="tpl-desc">リクエスト数の推移を見る</span><span class="badge">専門家が確認済み</span></label>
-            </div>
-
-            <p class="section-label">設定を変更する</p>
-            <div class="edit-grid">
-              <div class="dt-field block" id="b-f-service">
-                <label for="b-service">対象サービス</label>
-                <select id="b-service">
-                  <option value="all">すべてのサービス（既定）</option>
-                  <option>契約照会サービス（架空）</option>
-                  <option>保険料計算サービス（架空）</option>
-                  <option>代理店ポータル（架空）</option>
-                </select>
-              </div>
-              <div class="dt-field block" id="b-f-range">
-                <label for="b-range"><span data-icon-inline="clock"></span>時間枠</label>
-                <select id="b-range">
-                  <option value="2h">過去 2 時間（既定）</option>
-                  <option value="24h">過去 24 時間</option>
-                  <option value="7d">過去 7 日間</option>
-                </select>
-              </div>
-              <div class="dt-field block">
-                <span class="pre">指標（変更しない）</span>
-                <span class="locked">平均応答時間・エラー率</span>
-              </div>
-            </div>
-
-            <p class="dt-callout"><b>専門家が確認済みの設定内容を使用する想定</b><br>対象サービス、集計期間、指標の定義を確認してから変更します。</p>
-
-            <div class="surface changes" id="b-changes">
-              <p class="section-label">変更箇所</p>
-              <ul id="b-changes-list"></ul>
-            </div>
-
-            <div id="b-result-slot"></div>
-
-            <div class="dql">
-              <strong>DQLの作成・説明が必要な場合</strong>
-              <span>利用条件を満たすDynatrace Assistの活用を含めて確認します。</span>
-            </div>
-          </div>
-        </div>
-
-        <aside class="overlay hub" aria-live="polite" aria-label="テックタッチ＋AI Hub 支援案">
-          <div class="ov-head"><span class="ov-pill">テックタッチ＋AI Hub</span><span class="ov-kicker">支援案 3</span></div>
-          <p class="ov-brand">テックタッチ＋AI Hub 支援案</p>
-          <h3 class="ov-title">変える項目と、変える理由を確認します</h3>
-          <p class="ov-text">操作ガイドで変更箇所を示し、AI Hubで社内のひな型の意図や指標定義を説明する構想です。DQLそのものの生成・説明は、Dynatraceの既存機能（Dynatrace Assist）の利用状況も含めて確認します。</p>
-          <ol class="steps" id="b-steps">
-            <li>ひな型を選ぶ</li>
-            <li>対象サービスを変える</li>
-            <li>時間枠を変える</li>
-            <li>変更箇所を見直す</li>
-            <li>結果を確認する</li>
-          </ol>
-          <div class="part tt">
-            <p class="part-head"><span>テックタッチ 操作ガイド</span><span class="num" id="b-count"></span></p>
-            <p id="b-op"></p>
-          </div>
-          <p class="alert" id="b-alert" hidden></p>
-          <div class="part hub">
-            <p class="part-head"><span>AI Hub（例文）</span></p>
-            <p id="b-why"></p>
-          </div>
-          <p class="refs">実環境の項目名やデータ構造に合わせた説明・検証が必要です。</p>
-          <div class="actions">
-            <button type="button" class="btn btn-ghost" id="b-back">戻る</button>
-            <button type="button" class="btn btn-primary" id="b-next">次へ</button>
-          </div>
-        </aside>
-      </div>
-    </div>
-
-    <p class="ask"><strong>伺いたいこと</strong><span>ひな型選択、条件の変更、結果の検証のどこで依頼しますか？</span></p>
-  </section>
+  <nav class="journey" id="journey" aria-label="業務の流れ"></nav>
+  <section class="story" id="story" aria-live="polite"></section>
+  <div id="stage"></div>
+  <p class="ask" id="ask"><strong>伺いたいこと</strong><span id="ask-text"></span></p>
 
   <!-- ==================== 進行メモ（発表者用・既定は非表示） ==================== -->
   <section class="notes" id="notes" hidden aria-label="進行メモ">
     <h2>進行メモ（発表者用）</h2>
     <div class="notes-grid">
       <div>
-        <h3>この画面の進め方</h3>
-        <ul data-for="d1">
-          <li>仮説1「画面・操作で迷う」への支援案（テックタッチの操作ガイド）。</li>
-          <li>選択を間違えるとガイドが止まり、選び直しを案内します。例：比較期間に「09:00–10:00」を選ぶ。</li>
+        <h3>この章の進め方</h3>
+        <ul data-for="1">
+          <li>仮説1「画面・操作で迷う」への支援案（テックタッチのガイド）。p.11に対応します。</li>
+          <li>見せ場：ガイド一覧から開始 → Dockで画面を探す → サービス・時間枠・比較期間をそろえる → 「?」で社内の指標定義（架空）を表示。</li>
+          <li>比較期間に「09:00–10:00」を選ぶと、ガイドが選び直しを案内します（構想の表現）。</li>
+          <li>最後に、同じ時間帯に検知された問題から第2章へつなぎます。</li>
           <li>問いかけ：「どこで迷いますか」</li>
         </ul>
-        <ul data-for="d2" hidden>
-          <li>仮説4「実務で再現できない」・仮説5「学びを再利用できない」への支援案（テックタッチのステップガイド）。</li>
-          <li>4ステップ：問題の概要 → 影響範囲 → 関連ログ（期間は問題の開始5分前から）→ 社内手順に沿って連絡。</li>
-          <li>順番を飛ばすと社内手順の順番を案内します。例：影響範囲の前に「ログ」タブを開く。</li>
+        <ul data-for="2" hidden>
+          <li>仮説4「実務で再現できない」・仮説5「学びを再利用できない」への支援案（テックタッチのステップガイド）。p.12に対応します。</li>
+          <li>4ステップ：概要 → 影響範囲（優先度の基準を表示）→ 関連ログ（期間は問題の開始5分前から）→ 社内手順に沿って連絡。</li>
+          <li>影響範囲の前に「ログ」タブを開くと、社内手順の順番を案内します（構想の表現）。</li>
           <li>社内手順・連絡先は架空です。お客様の実際の手順に置き換える前提です。</li>
           <li>問いかけ：「人によって手順がばらつくのはどこですか」</li>
         </ul>
-        <ul data-for="d3" hidden>
-          <li>仮説3「作成・修正で止まる」への支援案（ひな型編集の案内＋AI Hub＋Dynatrace Assist）。</li>
+        <ul data-for="3" hidden>
+          <li>仮説3「作成・修正で止まる」への支援案（ひな型編集の案内＋AI Hub＋Dynatrace Assist）。p.13に対応します。</li>
+          <li>見せ場：ひな型から作成 → 変える項目と理由（AI Hub欄は例文）→ 専門家に確認を依頼 → 承認後に保存して共有。</li>
           <li>Dynatrace Assistの利用状況（利用条件を満たすか）も伺います。</li>
           <li>問いかけ：「どこで依頼しますか」</li>
+        </ul>
+        <ul data-for="4" hidden>
+          <li>振り返りの回数は、このデモを操作した回数です。効果の数値ではありません。</li>
+          <li>p.14「本日伺いたいこと」、p.15「最初の一歩のご提案」へつなげます。</li>
         </ul>
         <h3>全体</h3>
         <ul>
           <li>冒頭で「構想デモです。画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません」とお伝えする。</li>
+          <li>問い合わせ → 状況確認 → 一次確認・連絡 → 再発への備え、を一つの業務の流れとして見せます。章の終わりごとに止めて質問できます。</li>
           <li>デモはテックタッチ（DAP）中心。仮説2（AI Hubの理解支援）は専用デモを持たず、p.8の支援案で説明します。</li>
-          <li>画面はDynatraceの画面イメージを踏襲した架空画面です。実際の画面構成・項目名とは異なります。</li>
-          <li>各画面の「伺いたいこと」をそのまま質問し、直近の具体例を一つ伺う。</li>
           <li>削減率などの数値はお約束しない。確かめ方は自力完了率・所要時間・依頼件数・再実行。</li>
         </ul>
       </div>
@@ -915,7 +748,7 @@ p { margin: 0; }
           <li>「効果はどれくらいですか」→ 現時点で数値はお約束しません。一つの作業で、自力完了率・所要時間・依頼件数を測って確かめます。</li>
           <li>「セキュリティは」→ 拡張機能の配布手続きと、AI Hubに渡す情報の範囲を御社方針に沿って決めます。AI Hubは外部のAIサービスを利用します。</li>
         </ul>
-        <p class="kbd">キー操作：→ 次へ ／ ← 戻る ／ 1・2・3 画面の切り替え ／ N 進行メモ ／ R この画面を最初から</p>
+        <p class="kbd">キー操作：→ 次へ ／ ← 戻る ／ 1〜4 章の切り替え ／ N 進行メモ ／ R この章を最初から</p>
       </div>
     </div>
   </section>
@@ -929,6 +762,9 @@ p { margin: 0; }
   document.documentElement.lang = "ja";
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(t) {
+    return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
 
   /* ---------- アイコン（汎用の図形。製品のアイコンではありません） ---------- */
   var ICON = {
@@ -948,41 +784,26 @@ p { margin: 0; }
   function svg(name) {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[name] + "</svg>";
   }
-  function dockHTML(active) {
-    var item = function (key, label) {
-      return '<span class="dock-item' + (key === active ? " active" : "") + '" title="' + label + '">' + svg(key) + "<span>" + label + "</span></span>";
-    };
-    return '<div class="dock-group">' + item("home", "ホーム") + item("search", "検索") + "</div>" +
-      '<div class="dock-sep"></div><p class="dock-label">アプリ</p>' +
-      '<div class="dock-group">' + item("dashboards", "ダッシュボード") + item("services", "サービス") +
-      item("notebooks", "ノートブック") + item("logs", "ログ") + item("problems", "問題") + "</div>" +
-      '<div class="dock-spacer"></div>' +
-      '<div class="dock-group">' + item("hide", "Dockを隠す") + item("help", "サポート") +
-      '<span class="dock-item" title="運用担当（架空）"><span class="avatar">運</span><span>運用担当（架空）</span></span></div>';
-  }
-  $$(".dock").forEach(function (d) { d.innerHTML = dockHTML(d.getAttribute("data-active")); d.setAttribute("aria-hidden", "true"); });
-  $$("[data-icon]").forEach(function (el) { el.innerHTML = svg(el.getAttribute("data-icon")); });
-  $$("[data-icon-inline]").forEach(function (el) { el.insertAdjacentHTML("afterbegin", svg(el.getAttribute("data-icon-inline"))); });
 
-  /* ---------- 共通：ハイライトと吹き出し ---------- */
-  function clearGuide(scene) {
-    $$(".is-target", scene).forEach(function (el) { el.classList.remove("is-target"); });
-    $$(".balloon", scene).forEach(function (el) { el.remove(); });
-  }
-  function point(target, text, warn, sub) {
-    if (!target) return;
-    target.classList.add("is-target");
-    var b = document.createElement("div");
-    b.className = "balloon" + (warn ? " warn" : "") + (target.getAttribute("data-tip-side") === "right" ? " r" : "");
-    b.textContent = text;
-    if (sub) { var sm = document.createElement("small"); sm.textContent = sub; b.appendChild(sm); }
-    target.appendChild(b);
-  }
-  function setSteps(list, step) {
-    $$("li", list).forEach(function (li, i) { li.className = i < step ? "done" : (i === step ? "now" : ""); });
-  }
+  /* ---------- 数値・ログ（すべて架空） ---------- */
+  var SVC = "契約照会サービス（架空）";
+  // 1分ごとの平均応答時間。09:30〜10:30の61点。09:45〜10:00の平均は420 ms、10:00〜10:15の平均は980 ms。
+  var MIN_VALUES = [432, 418, 425, 440, 428, 415, 421, 436, 424, 419, 430, 427, 416, 433, 422,
+    410, 425, 415, 430, 420, 405, 428, 418, 422, 431, 412, 419, 426, 414, 425,
+    600, 750, 880, 990, 1080, 1120, 1150, 1130, 1100, 1060, 1020, 980, 950, 920, 970,
+    820, 760, 700, 650, 610, 580, 560, 540, 520, 510, 500, 490, 480, 470, 465, 460];
+  // 1時間ごとの平均応答時間。前日15時台〜当日14時台の24本。10時台は10:00〜10:15の上昇を含む。
+  var HOUR_VALUES = [430, 440, 420, 400, 390, 380, 370, 360, 350, 340, 330, 330, 330, 340, 350, 370, 400, 430, 440, 610, 470, 445, 435, 425];
+  var LOGS = [
+    ["08:30:00", "info", "INFO", "定時バッチが完了しました（架空）"],
+    ["09:58:12", "warn", "WARN", "契約DBへの接続待ちが長くなっています（架空）"],
+    ["09:59:40", "warn", "WARN", "契約DBへの接続待ちが長くなっています（架空）"],
+    ["10:01:05", "error", "ERROR", "契約DBへの接続がタイムアウトしました（架空）"],
+    ["10:02:31", "error", "ERROR", "照会処理がタイムアウトしました（架空）"],
+    ["10:03:10", "info", "INFO", "接続の再試行に成功しました（架空）"]
+  ];
+  var PERIOD_FROM = { during: "10:02:00", "5min": "09:57:00", "2h": "08:05:00" };
 
-  /* ---------- 折れ線グラフ（数値は架空） ---------- */
   function lineChart(o) {
     var W = 680, H = o.bands ? 230 : 210, L = 44, R = 14, T = o.bands ? 30 : 16, B = 28, n = o.values.length;
     var x = function (i) { return L + i * (W - L - R) / (n - 1); };
@@ -1009,14 +830,8 @@ p { margin: 0; }
     }
     return s + "</svg>";
   }
-  // 1分ごとの平均応答時間（架空）。09:30〜10:30の61点。09:45〜10:00の平均は420 ms、10:00〜10:15の平均は980 ms。
-  var MIN_VALUES = [432, 418, 425, 440, 428, 415, 421, 436, 424, 419, 430, 427, 416, 433, 422,
-    410, 425, 415, 430, 420, 405, 428, 418, 422, 431, 412, 419, 426, 414, 425,
-    600, 750, 880, 990, 1080, 1120, 1150, 1130, 1100, 1060, 1020, 980, 950, 920, 970,
-    820, 760, 700, 650, 610, 580, 560, 540, 520, 510, 500, 490, 480, 470, 465, 460];
   function minuteChart() {
-    return '<div class="surface">' +
-      '<div class="surface-head"><p class="dt-h3">平均応答時間（1分ごと）</p>' +
+    return '<div class="surface"><div class="surface-head"><p class="dt-h3">平均応答時間（1分ごと）</p>' +
       '<p class="chart-legend"><span><i class="sw-line"></i>平均応答時間</span><span><i class="sw-cmp"></i>比較期間</span><span><i class="sw-tgt"></i>対象期間</span></p></div>' +
       '<div class="chart-wrap">' + lineChart({
         values: MIN_VALUES, yMax: 1200, yTicks: [0, 400, 800, 1200],
@@ -1025,157 +840,472 @@ p { margin: 0; }
         aria: "平均応答時間の推移（架空）。比較期間の平均420ミリ秒に対し、対象期間は平均980ミリ秒に上昇。"
       }) + "</div></div>";
   }
-
-  /* ---------- 指標テーブル ---------- */
-  var ROWS = [
-    { key: "rt", label: "平均応答時間", base: "420 ms", cur: "980 ms", big: true, up: true },
-    { key: "req", label: "リクエスト数", base: "6,000件", cur: "6,200件" },
-    { key: "err", label: "エラー数 / エラー率", base: "12件 / 0.2%", cur: "48件 / 約0.8%" }
-  ];
-  function tableHTML() {
-    var h = '<div class="surface"><p class="dt-h3">期間の比較</p><div class="table-wrap"><table class="dtable num"><thead><tr><th scope="col">指標</th>' +
-      '<th scope="col">比較期間<br>09:45–10:00</th><th scope="col">対象期間<br>10:00–10:15</th></tr></thead><tbody>';
-    ROWS.forEach(function (r) {
-      h += '<tr><th scope="row">' + r.label + "</th>" +
-        '<td class="' + (r.big ? "big" : "") + '">' + r.base + "</td>" +
-        '<td class="' + (r.big ? "big " : "") + (r.up ? "up" : "") + '">' + r.cur + "</td></tr>";
+  function hourChart() {
+    return lineChart({
+      values: HOUR_VALUES, yMax: 800, yTicks: [0, 200, 400, 600, 800],
+      xLabels: [[0, "前日 15時", "start"], [6, "21時"], [12, "3時"], [18, "9時"], [23, "14時", "end"]],
+      mark: { i: 19, label: "10時台 610 ms" },
+      aria: "平均応答時間の推移（架空）。10時台に610ミリ秒へ上昇し、その後は元の水準に戻っている。"
     });
-    return h + "</tbody></table></div></div>";
   }
 
-  /* ==================== デモ① ==================== */
-  var a1 = { shown: false, step: 0, applyMsg: "" };
-  var A1F = [
-    { id: "a1-service", wrap: "a1-f-service", expect: "契約照会サービス（架空）",
-      tip: "① 調査したいサービスを選びます", now: "担当する「契約照会サービス（架空）」を選びます。" },
-    { id: "a1-period", wrap: "a1-f-period", expect: "10:00–10:15",
-      tip: "② 事象が起きた時間帯を「時間枠」で選びます", now: "事象が起きた「10:00–10:15」を選びます。" },
-    { id: "a1-compare", wrap: "a1-f-compare", expect: "09:45–10:00",
-      tip: "③ 比べる時間帯を選びます", now: "直前の同じ長さ「09:45–10:00」を選びます。対象期間と長さ（15分）をそろえます。" }
+  /* ---------- 章 ---------- */
+  var CH = {
+    1: { time: "10:16", timeSub: "問い合わせ", title: "問い合わせを受けて、担当サービスの状況を確認する",
+      text: "業務部門から「10時過ぎから契約照会の画面が遅い」と連絡が入りました。担当者がDynatraceを使うのは月に数回です（想定の人物像）。",
+      tags: ["第1章", "デモ①・p.11", "仮説1　画面・操作で迷う"], ask: "画面の探し方、絞り込み、時間帯の指定のどこで迷いますか？" },
+    2: { time: "10:18", timeSub: "問題を検知", title: "障害の一次確認を、社内手順どおりに進めて連絡する",
+      text: "同じ時間帯に問題が検知されていました。人によって順番がばらつかないよう、社内手順（架空）に沿って一次確認し、関係者に連絡します。",
+      tags: ["第2章", "デモ②・p.12", "仮説4・5　実務で再現できない／学びを再利用できない"], ask: "障害時の一次確認で、人によって手順がばらつくのはどこですか？" },
+    3: { time: "14:05", timeSub: "専門家の助言", title: "再発に備えて、ダッシュボードを自分で作る",
+      text: "専門家（架空）から、毎朝確認できるダッシュボードを作るよう助言がありました。ひな型を使って自分で作り、確認を受けてからチームに共有します。",
+      tags: ["第3章", "デモ③・p.13", "仮説3　作成・修正で止まる"], ask: "ひな型選択、条件の変更、結果の検証のどこで依頼しますか？" },
+    4: { time: "まとめ", timeSub: "振り返り", title: "問い合わせから再発への備えまで、一つの業務の流れで見る",
+      text: "今日の流れと、テックタッチが手当てした場面を振り返ります。どこで迷い、どこで依頼しているかを伺い、最初に支援する作業を一つ決めます。",
+      tags: ["振り返り", "p.14・p.15"], ask: "" }
+  };
+  var JOURNEY = [
+    [1, "第1章　問い合わせ・状況確認", "10:16　デモ①"],
+    [2, "第2章　一次確認・連絡", "10:18　デモ②"],
+    [3, "第3章　再発に備える", "14:05　デモ③"],
+    [4, "振り返り", "まとめ"]
   ];
-  function a1Wrong(id, v) {
-    if (id === "a1-service") return "今回は「契約照会サービス（架空）」で進めます。別のサービスを選ぶと、別のサービスの値を見ることになります。";
-    if (id === "a1-period") return "事象が起きたのは10:00–10:15です。時間枠は事象の時間帯に合わせます。";
+
+  /* ---------- ガイドの手順 ---------- */
+  var G1 = [null,
+    { label: "サービス画面を開く", target: '.dock [data-arg="services"]', tip: "① 左のDockから「サービス」を開きます", sub: "画面の場所を覚えていなくても進められます",
+      now: "左のDockから「サービス」を開きます。", reason: "確認する理由：担当サービスの応答時間やエラーは「サービス」画面で確認します。" },
+    { label: "対象サービスを選ぶ", target: "#f-c1-service", tip: "② 調査するサービスを選びます", sub: "問い合わせのあった「契約照会サービス（架空）」",
+      now: "問い合わせのあった「契約照会サービス（架空）」を選びます。", reason: "確認する理由：対象がずれると、別のサービスの値を見ることになります。" },
+    { label: "時間枠を選ぶ", target: "#f-c1-period", tip: "③ 事象が起きた時間帯を「時間枠」で選びます", sub: "問い合わせの「10時過ぎ」に合わせて 10:00–10:15",
+      now: "問い合わせの「10時過ぎ」に合わせて、10:00–10:15 を選びます。", reason: "確認する理由：問い合わせの時間帯と、画面の時間枠をそろえます。" },
+    { label: "比較期間を選ぶ", target: "#f-c1-compare", tip: "④ 比べる時間帯を選びます", sub: "直前の同じ長さ（15分）：09:45–10:00",
+      now: "直前の同じ長さ「09:45–10:00」を選びます。", reason: "確認する理由：対象や時間帯が違うと、比較結果の解釈も変わります。" },
+    { label: "条件を確認して適用する", target: "#w-c1-apply", tip: "⑤ 条件を確認して「適用」を押します", sub: "サービス・時間枠・比較期間の3つ",
+      now: "3つの条件を見直してから「適用」を押します。", reason: "確認する理由：条件がそろっているかを、表示の前に見直します。" },
+    { label: "上がっている値と定義を確認する", target: "#w-tip-rt", tip: "⑥ 上がっている値を確認します", sub: "「?」で社内の指標の定義（架空）を表示します",
+      now: "平均応答時間が 420 ms から 980 ms に上がっています。「?」で社内の定義を確認します。", reason: "確認する理由：値の意味を社内の定義でそろえてから判断します。" },
+    { label: "検知された問題を開く", target: "#w-c1-problem", tip: "⑦ 同じ時間帯に検知された問題を開きます", sub: "障害の一次確認（社内手順）に切り替えます",
+      now: "同じ時間帯に問題「P-0412」が検知されています。問題を開きます。", reason: "確認する理由：問題が検知されている場合は、社内手順の一次確認に切り替えます。" }
+  ];
+  var G2 = [null,
+    { label: "問題の概要を確認する", target: "#c2-kv", tip: "ステップ1／4：問題の概要を確認します", sub: "何が・いつから・どこで起きているか",
+      reason: "確認する理由：何が・いつから起きているかを先にそろえると、以降の確認がぶれません。" },
+    { label: "影響範囲を確認する", target: "#w-tab-impact", tip: "ステップ2／4：影響範囲を確認します", sub: "「影響範囲」タブを開きます",
+      reason: "確認する理由：影響範囲を先に確かめると、連絡の優先度を判断できます。" },
+    { label: "関連ログを確認する", target: "#w-tab-logs", tip: "ステップ3／4：関連ログを確認します", sub: "期間は「問題の開始5分前から」に設定します",
+      reason: "確認する理由：問題の開始前後のログを見ると、いつから異常が出ていたかを確かめられます。原因はこの段階では確定しません。" },
+    { label: "社内手順に沿って連絡する", target: "#w-c2-contact", tip: "ステップ4／4：社内手順に沿って連絡します", sub: "「社内手順で連絡」から連絡内容を確認します",
+      reason: "確認する理由：連絡の宛先と内容を、担当者によらず同じ手順にそろえます。" }
+  ];
+  var G3 = [null,
+    { label: "ダッシュボード画面を開く", target: '.dock [data-arg="dashboards"]', tip: "① 左のDockから「ダッシュボード」を開きます", sub: "",
+      op: "左のDockから「ダッシュボード」を開きます。", hub: "" },
+    { label: "ひな型から作成する", target: "#w-c3-create", tip: "② 「ひな型から作成」を押します", sub: "一から作らず、専門家が確認済みのひな型を使います",
+      op: "「ひな型から作成」を押します。", hub: "ひな型を使う理由：指標の定義や集計のしかたを、専門家が確認済みの設定にそろえるためです。" },
+    { label: "ひな型を選ぶ", target: "#c3-templates", tip: "③ 専門家が確認済みのひな型から選びます", sub: "助言のあった「サービスの状況確認（標準）」",
+      op: "助言のあった「サービスの状況確認（標準）」を選びます。", hub: "ひな型の意図：「サービスの状況確認（標準）」は、担当サービスの平均応答時間とエラー率を、同じ長さの期間で比べるためのひな型です。" },
+    { label: "対象サービスを変える", target: "#f-c3-service", tip: "④ 対象サービスを担当サービスに変えます", sub: "",
+      op: "対象サービスを「契約照会サービス（架空）」に変えます。", hub: "変える理由：ひな型の既定は、すべてのサービスの合計です。担当サービスに絞らないと、他のサービスの変化が混ざります。" },
+    { label: "時間枠を変える", target: "#f-c3-range", tip: "⑤ 時間枠を「過去 24 時間」に変えます", sub: "",
+      op: "時間枠を「過去 24 時間」に変えます。", hub: "変える理由：問題が起きた10時台の前後を含めて、1日の中でいつ上がり始めたかを確認するためです。" },
+    { label: "変更箇所を見直す", target: "#c3-changes", tip: "⑥ 変更箇所を見直します", sub: "指標の定義は変えていないことを確認します",
+      op: "変更したのは2か所です。指標の定義を変えていないことを確認して、結果をプレビューします。", hub: "変えない項目：指標の定義（平均応答時間・エラー率）は、専門家が決めたものをそのまま使います。変えるのは対象と時間枠だけです。" },
+    { label: "結果を確認し、専門家に依頼する", target: "#w-c3-ask", tip: "⑦ 保存の前に、専門家に確認を依頼します", sub: "変更箇所2点と結果の画面を添えます",
+      op: "結果を確認し、保存の前に専門家に確認を依頼します。", hub: "結果の見方：10時台に平均応答時間が上がっています。第1章で確認した時間帯と合っているかを確かめます。原因はこの画面だけでは特定できません。" },
+    { label: "保存して運用チームに共有する", target: "#w-c3-save", tip: "⑧ 保存して、運用チームに共有します", sub: "専門家の確認が済みました",
+      op: "専門家の確認が済みました。保存して、運用チーム（架空）に共有します。", hub: "共有の意図：同じダッシュボードをチームで見ることで、毎朝の確認の手順をそろえます。" }
+  ];
+  var C1_KEYS = ["service", "period", "compare"];
+  var C1_EXP = [SVC, "10:00–10:15", "09:45–10:00"];
+  var TAB_LABEL = { overview: "概要", impact: "影響範囲", logs: "ログ", events: "イベント" };
+  var APP_LABEL = { home: "ホーム", services: "サービス", problems: "問題", dashboards: "ダッシュボード" };
+  var CHATS = {
+    inquiry: { av: "業", who: "業務部門（架空）", time: "10:16", say: "10時過ぎから、契約照会の画面が遅いという声が出ています。状況を確認してもらえますか？" },
+    advice: { av: "専", who: "専門家（架空）", time: "14:05", say: "今回の件、毎朝確認できるようにダッシュボードを作っておきましょう。ひな型「サービスの状況確認（標準）」を使ってください。" },
+    approved: { av: "専", who: "専門家（架空）", time: "14:12", say: "確認しました。この設定で保存して、運用チームに共有してください。" }
+  };
+
+  /* ---------- 状態 ---------- */
+  function fresh() {
+    return {
+      ch: 1, app: "home", chat: "inquiry", tip: null, warn: null,
+      c1: { step: 0, service: "", period: "", compare: "", applied: false, started: false },
+      c2: { step: 0, view: "list", tab: "overview", period: "during", popup: false, modal: false, started: false },
+      c3: { step: 0, view: "list", tpl: "", service: "all", range: "2h", preview: false, asked: false, saved: false, started: false },
+      stats: { fixes: 0, notes: 0 }
+    };
+  }
+  var S = fresh();
+  var hist = [];
+  var pendingTop = false;
+  function snap() { hist.push(JSON.stringify(S)); if (hist.length > 300) hist.shift(); }
+  function undo() { if (!hist.length) return; S = JSON.parse(hist.pop()); render(); }
+  function done(c) { S[c].step++; }
+  function fix(msg) { S.warn = msg; S.stats.fixes++; }
+
+  function goChapter(n) {
+    var keep = { c1: S.c1.started, c2: S.c2.started, c3: S.c3.started };
+    var s = fresh();
+    s.stats = S.stats;
+    if (n >= 2) s.c1 = { step: 8, service: SVC, period: "10:00–10:15", compare: "09:45–10:00", applied: true, started: keep.c1 };
+    if (n >= 3) s.c2 = { step: 5, view: "detail", tab: "logs", period: "5min", popup: false, modal: false, started: keep.c2 };
+    if (n >= 4) s.c3 = { step: 9, view: "saved", tpl: "t1", service: SVC, range: "24h", preview: true, asked: true, saved: true, started: keep.c3 };
+    s.ch = n;
+    s.app = n === 2 ? "problems" : n === 4 ? "dashboards" : "home";
+    s.chat = n === 1 ? "inquiry" : n === 3 ? "advice" : null;
+    if (n === 2) { s.c2.view = "detail"; s.c2.popup = true; }
+    S = s; hist = []; pendingTop = true;
+    render();
+  }
+  function expectedApp() {
+    if (S.ch === 1) return S.c1.step >= 2 && S.c1.step <= 7 ? "services" : null;
+    if (S.ch === 2) return S.c2.step <= 4 ? "problems" : null;
+    if (S.ch === 3) return S.c3.step >= 2 && S.c3.step <= 8 ? "dashboards" : null;
+    return null;
+  }
+  function offGuide() { var e = expectedApp(); return e && S.app !== e ? e : null; }
+  function stepsDone() {
+    var n = 0;
+    if (S.c1.started) n += Math.max(0, Math.min(S.c1.step, 8) - 1);
+    if (S.c2.started) n += Math.max(0, Math.min(S.c2.step, 5) - 1);
+    if (S.c3.started) n += Math.max(0, Math.min(S.c3.step, 9) - 1);
+    return n;
+  }
+
+  /* ---------- 操作 ---------- */
+  function nav(app) {
+    S.app = app;
+    if ((S.chat === "inquiry" || S.chat === "advice") && app !== "home") S.chat = null;
+    if (S.ch === 1 && S.c1.step === 1 && app === "services") done("c1");
+    if (S.ch === 3 && S.c3.step === 1 && app === "dashboards") done("c3");
+  }
+  function start() {
+    if (S.ch === 1 && S.c1.step === 0) { S.c1.step = 1; S.c1.started = true; }
+    else if (S.ch === 3 && S.c3.step === 0) { S.c3.step = 1; S.c3.started = true; }
+  }
+  function tip(arg) {
+    S.tip = S.tip === arg ? null : arg;
+    if (!S.tip) return;
+    S.stats.notes++;
+    if (arg === "rt" && S.ch === 1 && S.c1.step === 6) done("c1");
+    if (arg === "prio" && S.ch === 2 && S.c2.step === 2 && S.c2.tab === "impact") done("c2");
+  }
+  function c1Wrong(i, v) {
+    if (i === 0) return "今回は問い合わせのあった「契約照会サービス（架空）」を確認します。別のサービスを選ぶと、別のサービスの値を見ることになります。";
+    if (i === 1) return "問い合わせは「10時過ぎ」です。時間枠は 10:00–10:15 に合わせます。";
     if (v === "09:00–10:00") return "対象期間（15分）と長さが違います。件数を比べるときは、期間の長さをそろえます。";
     return "前日の同じ時間帯と比べる方法もあります。今回は直前の15分（09:45–10:00）と比べます。";
   }
-  function a1Sync() {
-    var first = -1, wrong = null;
-    A1F.forEach(function (f, i) {
-      var v = $("#" + f.id).value;
-      if (first === -1 && v !== f.expect) { first = i; if (v) wrong = a1Wrong(f.id, v); }
-    });
-    if (first !== -1) { a1.shown = false; a1.step = first; }
-    else a1.step = a1.shown ? 4 : 3;
-    if (!wrong && a1.applyMsg) wrong = a1.applyMsg;
-    a1.applyMsg = "";
-    a1Render(wrong);
+  function setC1(i, v) {
+    var c = S.c1;
+    c[C1_KEYS[i]] = v;
+    if (S.ch !== 1 || c.step < 2) return;
+    var first = -1;
+    for (var k = 0; k < 3; k++) { if (c[C1_KEYS[k]] !== C1_EXP[k]) { first = k; break; } }
+    if (first === -1) { if (c.step < 5) c.step = 5; }
+    else { c.applied = false; c.step = 2 + first; }
+    if (v && v !== C1_EXP[i]) fix(c1Wrong(i, v));
   }
-  function a1Render(wrong) {
-    var scene = $("#scene-d1");
-    clearGuide(scene);
-    setSteps($("#a1-steps"), a1.step);
-    var next = $("#a1-next"), now = $("#a1-now"), alert = $("#a1-alert");
-    alert.hidden = !wrong;
-    alert.textContent = wrong || "";
-    if (a1.step < 3) {
-      var f = A1F[a1.step];
-      point($("#" + f.wrap), wrong ? "「" + f.expect + "」を選び直します" : f.tip, !!wrong);
-      now.textContent = f.now;
-      next.textContent = "次へ";
-    } else if (a1.step === 3) {
-      point($("#a1-apply-wrap"), "④ 条件を確認して「適用」を押します");
-      now.textContent = "サービスと2つの時間帯を見直してから、指標を表示します。";
-      next.textContent = "条件を確認して、指標を見る";
+  function c1Apply() {
+    var c = S.c1;
+    if (S.ch !== 1) return;
+    if (c.step === 5) { c.applied = true; done("c1"); }
+    else if (c.step >= 2 && c.step < 5) fix("条件がまだそろっていません。ガイドの順に選びます。");
+  }
+  function c1Problem() {
+    if (S.ch === 1 && S.c1.step === 7) {
+      done("c1");
+      S.ch = 2; S.app = "problems"; S.chat = null;
+      S.c2.view = "detail"; S.c2.tab = "overview"; S.c2.popup = true;
+      S.stats.notes++;
+      pendingTop = true;
+    } else if (S.ch === 1 && S.c1.step === 6) {
+      fix("ガイドでは、先に上がっている値と社内の定義を確認します。");
     } else {
-      now.textContent = "条件がそろった状態で指標を表示しました。";
-      next.textContent = "デモ②へ進む";
+      S.app = "problems"; S.c2.view = "detail";
     }
-    $("#a1-back").disabled = a1.step === 0;
-    $("#a1-metrics").innerHTML = a1.step === 4
-      ? '<div style="display:grid;gap:14px">' + minuteChart() + tableHTML() + "</div>"
-      : '<div class="empty">' + svg("empty") + "<span>サービスと時間枠を指定して「適用」を押すと、指標が表示されます。</span></div>";
   }
-  function a1Apply() {
-    if (a1.step === 3) { a1.shown = true; a1Sync(); }
-    else if (a1.step < 3) { a1.applyMsg = "条件がまだそろっていません。ガイドの順に選びます。"; a1Sync(); }
+  function c2Open() {
+    if (S.ch === 1 && S.c1.step === 7) { c1Problem(); return; }
+    S.c2.view = "detail";
+    if (S.ch === 2 && S.c2.step === 0) S.c2.popup = true;
   }
-  function a1Next() {
-    if (a1.step < 3) { $("#" + A1F[a1.step].id).value = A1F[a1.step].expect; a1Sync(); }
-    else if (a1.step === 3) a1Apply();
-    else show("d2");
+  function c2Start() {
+    var c = S.c2;
+    if (c.step !== 0) return;
+    c.popup = false; c.step = 1; c.started = true; c.view = "detail"; c.tab = "overview";
   }
-  function a1Back() {
-    if (a1.step === 4) { a1.shown = false; a1Sync(); return; }
-    if (a1.step === 0) return;
-    for (var i = a1.step - 1; i < A1F.length; i++) $("#" + A1F[i].id).value = "";
-    a1Sync();
+  function c2Tab(t) {
+    var c = S.c2;
+    c.tab = t;
+    if (S.ch !== 2 || c.step === 0 || c.step === 5 || t === "overview") return;
+    if (t === "impact") { if (c.step === 1) done("c2"); return; }
+    if (t === "logs") {
+      if (c.step < 3) fix("社内手順では、ログの前に影響範囲を確かめ、連絡の優先度を先に判断します。次は「影響範囲」です。");
+      else if (c.step === 3 && c.period === "5min") done("c2");
+      return;
+    }
+    fix("社内手順では、次は「" + (c.step <= 2 ? "影響範囲" : c.step === 3 ? "ログ" : "社内手順で連絡") + "」を確認します。");
   }
-  function a1Reset() { A1F.forEach(function (f) { $("#" + f.id).value = ""; }); a1.shown = false; a1Sync(); }
-  A1F.forEach(function (f) { $("#" + f.id).addEventListener("change", a1Sync); });
-  $("#a1-apply").addEventListener("click", a1Apply);
-  $("#a1-next").addEventListener("click", a1Next);
-  $("#a1-back").addEventListener("click", a1Back);
+  function c2Period(v) {
+    var c = S.c2;
+    c.period = v;
+    if (S.ch !== 2 || c.step !== 3) return;
+    if (v === "5min") done("c2");
+    else if (v === "during") fix("問題の発生期間だけでは、発生直前の変化を見落とすことがあります。社内手順どおり「問題の開始5分前から」にします。");
+    else fix("過去 2 時間では範囲が広く、関係の薄いログが混ざります。社内手順どおり「問題の開始5分前から」にします。");
+  }
+  function c2Contact() {
+    var c = S.c2;
+    if (S.ch === 2 && c.step >= 1 && c.step < 4) { fix("社内手順では、連絡の前に影響範囲と関連ログを確認します。"); return; }
+    c.modal = true;
+    S.stats.notes++;
+  }
+  function c2ModalDone() {
+    S.c2.modal = false;
+    if (S.ch === 2 && S.c2.step === 4) done("c2");
+  }
+  function toChapter3() { S.ch = 3; S.app = "home"; S.chat = "advice"; S.c2.modal = false; pendingTop = true; }
+  function toChapter4() { S.ch = 4; S.chat = null; pendingTop = true; }
+  function c3Create() {
+    S.c3.view = "edit";
+    if (S.ch === 3 && S.c3.step === 2) done("c3");
+  }
+  function c3Eval() {
+    var c = S.c3;
+    if (S.ch !== 3 || c.step < 3 || c.step > 8) return;
+    var t = c.tpl !== "t1" ? 3 : c.service !== SVC ? 4 : c.range !== "24h" ? 5 : 6;
+    if (t < 6) {
+      c.step = t; c.preview = false;
+      if (c.asked) { c.asked = false; if (S.chat === "approved") S.chat = null; }
+    } else if (c.step < 6) c.step = 6;
+  }
+  function c3Tpl(v) {
+    S.c3.tpl = v;
+    if (v !== "t1") fix("今回は助言のあった「サービスの状況確認（標準）」を使います。");
+    c3Eval();
+  }
+  function c3Service(v) {
+    S.c3.service = v;
+    if (v !== SVC && v !== "all") fix("今回は担当の「契約照会サービス（架空）」に絞ります。");
+    c3Eval();
+  }
+  function c3Range(v) {
+    S.c3.range = v;
+    if (v === "7d") fix("今回は10時台の前後を見るため「過去 24 時間」にします。過去 7 日間は、日ごとの傾向を見るときに使います。");
+    c3Eval();
+  }
+  function c3Preview() {
+    var c = S.c3;
+    if (S.ch === 3 && c.step >= 3 && c.step < 6) { fix("先に設定を変更します。ガイドの順に進めます。"); return; }
+    c.preview = true;
+    if (S.ch === 3 && c.step === 6) done("c3");
+  }
+  function c3Ask() {
+    var c = S.c3;
+    if (S.ch === 3 && c.step === 7) { c.asked = true; S.chat = "approved"; done("c3"); }
+  }
+  function c3Save() {
+    var c = S.c3;
+    if (S.ch === 3 && c.step === 7) { fix("保存の前に、専門家に確認を依頼します（社内ルール・架空）。"); return; }
+    if (S.ch === 3 && c.step === 8) { c.saved = true; c.view = "saved"; S.chat = null; done("c3"); }
+  }
 
-  /* ==================== デモ② ==================== */
-  // 障害の一次確認（社内手順・架空）。step 0:概要を開く 1:影響範囲 2:関連ログ 3:連絡 4:完了
-  var d2 = { step: 0, view: "list", tab: "overview", period: "during", modal: false };
-  var TAB_LABEL = { overview: "概要", impact: "影響範囲", logs: "ログ", events: "イベント" };
-  var D2STEP = [
-    { target: "#d2-open-wrap", tip: "ステップ1／4：問題の概要を開きます", sub: "進行中の「P-0412」を開きます",
-      now: "進行中の問題「P-0412　応答時間の悪化」を開きます。",
-      reason: "確認する理由：何が・いつから起きているかを先にそろえると、以降の確認がぶれません。", btn: "概要を開く" },
-    { target: "#d2-tab-impact-wrap", tip: "ステップ2／4：影響範囲を確認します", sub: "「影響範囲」タブを開きます",
-      now: "影響を受けたサービスと、影響の範囲を確認します。",
-      reason: "確認する理由：影響範囲を先に確かめると、連絡の優先度を判断できます。", btn: "影響範囲を開く" },
-    { target: "#d2-tab-logs-wrap", tip: "ステップ3／4：関連ログを確認します", sub: "期間は「問題の開始5分前から」に設定します",
-      now: "関連ログを開き、期間を「問題の開始5分前から」に設定します。",
-      reason: "確認する理由：問題の開始前後のログを見ると、いつから異常が出ていたかを確かめられます。原因はこの段階では確定しません。", btn: "ログを開く" },
-    { target: "#d2-contact-wrap", tip: "ステップ4／4：社内手順に沿って連絡します", sub: "「社内手順で連絡」から連絡内容を確認します",
-      now: "社内手順に沿って、優先度・連絡先・伝える内容を確認します。",
-      reason: "確認する理由：連絡の宛先と内容を、担当者によらず同じ手順にそろえます。", btn: "社内手順を開く" },
-    { now: "一次確認の4ステップが完了しました。",
-      reason: "社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。", btn: "デモ③へ進む" }
-  ];
-  var LOGS = [
-    ["08:30:00", "info", "INFO", "定時バッチが完了しました（架空）"],
-    ["09:58:12", "warn", "WARN", "契約DBへの接続待ちが長くなっています（架空）"],
-    ["09:59:40", "warn", "WARN", "契約DBへの接続待ちが長くなっています（架空）"],
-    ["10:01:05", "error", "ERROR", "契約DBへの接続がタイムアウトしました（架空）"],
-    ["10:02:31", "error", "ERROR", "照会処理がタイムアウトしました（架空）"],
-    ["10:03:10", "info", "INFO", "接続の再試行に成功しました（架空）"]
-  ];
-  var PERIOD_FROM = { during: "10:02:00", "5min": "09:57:00", "2h": "08:05:00" };
-  function d2TabHTML() {
-    if (d2.tab === "overview") {
-      return '<div class="surface"><dl class="kv">' +
-        "<dt>影響を受けたサービス</dt><dd>契約照会サービス（架空）</dd>" +
+  // パネルの主ボタン（→キーでも実行）
+  function primary() {
+    var off = offGuide();
+    if (off) return { label: "ガイドの画面に戻る", run: function () { nav(off); } };
+    if (S.ch === 1) {
+      switch (S.c1.step) {
+        case 0: return { label: "ガイドを開始", run: start };
+        case 1: return { label: "サービスを開く", run: function () { nav("services"); } };
+        case 2: return { label: "次へ", run: function () { setC1(0, C1_EXP[0]); } };
+        case 3: return { label: "次へ", run: function () { setC1(1, C1_EXP[1]); } };
+        case 4: return { label: "次へ", run: function () { setC1(2, C1_EXP[2]); } };
+        case 5: return { label: "条件を確認して適用", run: c1Apply };
+        case 6: return { label: "定義を表示", run: function () { tip("rt"); } };
+        case 7: return { label: "問題を開く", run: c1Problem };
+      }
+    }
+    if (S.ch === 2) {
+      var d = S.c2;
+      switch (d.step) {
+        case 0: return { label: "ガイドを開始", run: c2Start };
+        case 1: return { label: "確認した", run: function () { done("c2"); } };
+        case 2: return d.tab !== "impact" ? { label: "影響範囲を開く", run: function () { c2Tab("impact"); } } : { label: "優先度の基準を表示", run: function () { tip("prio"); } };
+        case 3: return d.tab !== "logs" ? { label: "ログを開く", run: function () { c2Tab("logs"); } } : { label: "期間を設定する", run: function () { c2Period("5min"); } };
+        case 4: return d.modal ? { label: "連絡内容を確認した", run: c2ModalDone } : { label: "社内手順を開く", run: c2Contact };
+        case 5: return { label: "第3章へ進む", run: toChapter3 };
+      }
+    }
+    if (S.ch === 3) {
+      switch (S.c3.step) {
+        case 0: return { label: "ガイドを開始", run: start };
+        case 1: return { label: "ダッシュボードを開く", run: function () { nav("dashboards"); } };
+        case 2: return { label: "ひな型から作成", run: c3Create };
+        case 3: return { label: "次へ", run: function () { c3Tpl("t1"); } };
+        case 4: return { label: "次へ", run: function () { c3Service(SVC); } };
+        case 5: return { label: "次へ", run: function () { c3Range("24h"); } };
+        case 6: return { label: "結果の確認へ", run: c3Preview };
+        case 7: return { label: "専門家に確認を依頼", run: c3Ask };
+        case 8: return { label: "保存して共有", run: c3Save };
+        case 9: return { label: "振り返りへ", run: toChapter4 };
+      }
+    }
+    return { label: "次へ", run: function () {} };
+  }
+
+  function act(name, arg, value) {
+    if (name === "back") { undo(); return; }
+    if (name === "chapter") { goChapter(+arg); return; }
+    snap();
+    S.warn = null;
+    if (name !== "tip") S.tip = null;
+    switch (name) {
+      case "next": primary().run(); break;
+      case "nav": nav(arg); break;
+      case "start": start(); break;
+      case "chat-close": S.chat = null; break;
+      case "tip": tip(arg); break;
+      case "c1-service": setC1(0, value); break;
+      case "c1-period": setC1(1, value); break;
+      case "c1-compare": setC1(2, value); break;
+      case "c1-apply": c1Apply(); break;
+      case "c1-problem": c1Problem(); break;
+      case "c2-open": c2Open(); break;
+      case "c2-start": c2Start(); break;
+      case "c2-tab": c2Tab(arg); break;
+      case "c2-period": c2Period(value); break;
+      case "c2-contact": c2Contact(); break;
+      case "c2-modal-done": c2ModalDone(); break;
+      case "c2-modal-close": S.c2.modal = false; break;
+      case "c3-create": c3Create(); break;
+      case "c3-tpl": c3Tpl(value); break;
+      case "c3-service": c3Service(value); break;
+      case "c3-range": c3Range(value); break;
+      case "c3-preview": c3Preview(); break;
+      case "c3-ask": c3Ask(); break;
+      case "c3-save": c3Save(); break;
+    }
+    render();
+  }
+
+  /* ---------- 画面の組み立て ---------- */
+  function sel(id, change, opts, val, disabled) {
+    return '<select id="' + id + '" data-change="' + change + '"' + (disabled ? " disabled" : "") + ">" + opts.map(function (o) {
+      var v = typeof o === "string" ? o : o[0], t = typeof o === "string" ? o : o[1];
+      return '<option value="' + esc(v) + '"' + (v === val ? " selected" : "") + ">" + esc(t) + "</option>";
+    }).join("") + "</select>";
+  }
+  function dockHTML(active) {
+    var item = function (key, label, navigable) {
+      var cls = "dock-item" + (key === active ? " active" : "");
+      var inner = svg(key) + '<span class="dl">' + label + "</span>";
+      if (navigable) return '<button type="button" class="' + cls + '" data-act="nav" data-arg="' + key + '" data-tip-side="s" title="' + label + '">' + inner + "</button>";
+      return '<span class="' + cls + '" title="' + label + '">' + inner + "</span>";
+    };
+    return '<div class="dock-group">' + item("home", "ホーム", true) + item("search", "検索") + "</div>" +
+      '<div class="dock-sep"></div><p class="dock-label">アプリ</p>' +
+      '<div class="dock-group">' + item("dashboards", "ダッシュボード", true) + item("services", "サービス", true) +
+      item("notebooks", "ノートブック") + item("logs", "ログ") + item("problems", "問題", true) + "</div>" +
+      '<div class="dock-spacer"></div>' +
+      '<div class="dock-group">' + item("hide", "Dockを隠す") + item("help", "サポート") +
+      '<span class="dock-item" title="運用担当（架空）"><span class="avatar">運</span><span class="dl">運用担当（架空）</span></span></div>';
+  }
+  function appHeader() {
+    var navs = { home: [], services: ["概要", "エンドポイント", "応答時間の分析"], problems: ["問題一覧"], dashboards: ["すべてのダッシュボード", "ひな型"] }[S.app];
+    var activeIdx = S.app === "dashboards" && S.c3.view === "edit" ? 1 : 0;
+    var nav = navs.map(function (n, i) { return "<span" + (i === activeIdx ? ' class="active"' : "") + ">" + n + "</span>"; }).join("");
+    return '<div class="appheader"><div class="ah-left"><span class="app-icon" aria-hidden="true">' + svg(S.app) + '</span><span class="app-name">' + APP_LABEL[S.app] + "</span>" +
+      (nav ? '<div class="ah-nav" aria-hidden="true">' + nav + "</div>" : "") + '</div><span class="dt-look-btn" aria-hidden="true">共有</span></div>';
+  }
+  function chatHTML() { return S.chat && S.chat !== "approved" ? chatCard(S.chat) : ""; }
+  function chatCard(key) {
+    var c = CHATS[key];
+    return '<div class="chat" role="status"><span class="av" aria-hidden="true">' + c.av + '</span><div><p class="who"><b>' + c.who + "</b>" + c.time +
+      '</p><p class="say">' + c.say + '</p><p class="src">社内チャット（架空）の通知</p></div><button type="button" class="chat-close" data-act="chat-close">閉じる</button></div>';
+  }
+  function tipHTML(key) {
+    if (S.tip !== key) return "";
+    if (key === "rt") {
+      return '<span class="tt-tip" role="tooltip"><span class="lab">テックタッチ ツールチップ（案）：社内の指標定義（架空）</span>平均応答時間は、画面の操作から結果が返るまでの時間の平均です。社内の目安は 500 ms 以下（架空）。平均だけでは、一部の遅い操作は見えません。</span>';
+    }
+    return '<span class="tt-tip" role="tooltip"><span class="lab">テックタッチ ツールチップ（案）：優先度の基準（社内・架空）</span>全利用者に影響 → 高／一部の利用者に影響 → 中／影響なし → 低。今回は「Webからの照会の一部」のため「中」です。</span>';
+  }
+  function qBtn(key, label) {
+    return '<button type="button" class="tt-q" data-act="tip" data-arg="' + key + '" aria-expanded="' + (S.tip === key) + '" aria-label="' + label + '">?</button>';
+  }
+
+  function pageHome() {
+    var tile = function (key, name, desc, navigable) {
+      var inner = '<span class="app-icon" aria-hidden="true">' + svg(key) + "</span><b>" + name + '</b><span class="d">' + desc + "</span>";
+      return navigable ? '<button type="button" class="app-tile" data-act="nav" data-arg="' + key + '">' + inner + "</button>" : '<div class="app-tile">' + inner + "</div>";
+    };
+    return '<div><p class="crumbs">ホーム</p><h2 class="dt-h">ホーム</h2></div>' +
+      '<p class="section-label">最近使ったアプリ</p><div class="home-grid">' +
+      tile("dashboards", "ダッシュボード", "チームのダッシュボード", true) +
+      tile("services", "サービス", "サービスの状況確認", true) +
+      tile("problems", "問題", "検知された問題の一覧", true) +
+      tile("notebooks", "ノートブック", "調査のメモ", false) + "</div>" +
+      '<p class="dt-fine">ホーム画面は架空です。</p>';
+  }
+
+  function pageServices() {
+    var c = S.c1, lock = !(S.ch === 1 && c.step >= 2);
+    var h = '<div><p class="crumbs">サービス ＞ 状況確認</p><h2 class="dt-h">サービスの状況確認</h2></div>' +
+      '<div class="toolbar">' +
+      '<span class="dt-look-btn" aria-hidden="true">' + svg("segment") + "セグメント</span>" +
+      '<div class="dt-field" id="f-c1-service"><label for="c1-service">サービス</label>' +
+      sel("c1-service", "c1-service", [["", "選択してください"], SVC, "保険料計算サービス（架空）", "代理店ポータル（架空）"], c.service, lock) + "</div>" +
+      '<div class="dt-field" id="f-c1-period"><label for="c1-period">' + svg("clock") + "時間枠</label>" +
+      sel("c1-period", "c1-period", [["", "選択してください"], "09:45–10:00", "10:00–10:15", "10:15–10:30"], c.period, lock) + "</div>" +
+      '<div class="dt-field" id="f-c1-compare" data-tip-side="right"><label for="c1-compare">比較期間</label>' +
+      sel("c1-compare", "c1-compare", [["", "選択してください"], "09:00–10:00", "09:45–10:00", "前日 10:00–10:15"], c.compare, lock) + "</div>" +
+      '<span class="tip-anchor" id="w-c1-apply" data-tip-side="right"><button type="button" class="dt-accent" data-act="c1-apply"' + (lock ? " disabled" : "") + ">適用</button></span></div>";
+    if (!c.applied) {
+      return h + '<div class="empty">' + svg("empty") + "<span>サービスと時間枠を指定して「適用」を押すと、指標が表示されます。</span></div>" +
+        '<p class="dt-fine">数値・サービス名・時刻はすべて架空です。</p>';
+    }
+    return h + '<div class="dt-banner"><b>この時間帯に検知された問題</b><span>P-0412　応答時間の悪化（10:02〜・進行中）</span>' +
+      '<span class="tip-anchor" id="w-c1-problem" data-tip-side="right"><button type="button" class="row-link" data-act="c1-problem">問題を開く</button></span></div>' +
+      '<div class="surface"><p class="dt-h3">期間の比較</p><table class="dtable num" style="min-width:0"><thead><tr><th scope="col">指標</th>' +
+      '<th scope="col">比較期間<br>09:45–10:00</th><th scope="col">対象期間<br>10:00–10:15</th></tr></thead><tbody>' +
+      '<tr><th scope="row"><span class="tip-wrap" id="w-tip-rt">平均応答時間' + qBtn("rt", "平均応答時間の定義") + tipHTML("rt") + "</span></th>" +
+      '<td class="big">420 ms</td><td class="big up">980 ms</td></tr>' +
+      '<tr><th scope="row">リクエスト数</th><td>6,000件</td><td>6,200件</td></tr>' +
+      '<tr><th scope="row">エラー数 / エラー率</th><td>12件 / 0.2%</td><td>48件 / 約0.8%</td></tr></tbody></table></div>' +
+      minuteChart() + '<p class="dt-fine">数値・サービス名・時刻はすべて架空です。</p>';
+  }
+
+  function c2TabHTML() {
+    var c = S.c2;
+    if (c.tab === "overview") {
+      return '<div class="surface" id="c2-kv"><dl class="kv">' +
+        "<dt>影響を受けたサービス</dt><dd>" + SVC + "</dd>" +
         "<dt>影響の範囲</dt><dd>Webからの照会の一部（架空）</dd>" +
         "<dt>原因の候補</dt><dd>契約DBへの接続待ち（架空・未確定）</dd></dl></div>";
     }
-    if (d2.tab === "impact") {
+    if (c.tab === "impact") {
       return '<div style="display:grid;gap:14px">' +
-        '<div class="surface"><p class="dt-h3">影響を受けたサービス</p><div class="table-wrap"><table class="dtable num"><thead><tr><th scope="col">サービス</th><th scope="col">平均応答時間</th><th scope="col">エラー率</th></tr></thead>' +
-        '<tbody><tr><th scope="row">契約照会サービス（架空）</th><td class="up">980 ms（平常時 420 ms）</td><td>約0.8%（平常時 0.2%）</td></tr></tbody></table></div></div>' +
-        '<div class="surface"><p class="dt-h3">影響の範囲</p><div class="table-wrap"><table class="dtable"><thead><tr><th scope="col">照会の入口</th><th scope="col">影響</th></tr></thead>' +
-        '<tbody><tr><th scope="row">Webからの照会</th><td class="up">一部で遅延（架空）</td></tr><tr><th scope="row">代理店ポータルからの照会</th><td>影響なし（架空）</td></tr></tbody></table></div></div></div>';
+        '<div class="surface"><p class="dt-h3">影響を受けたサービス</p><table class="dtable num" style="min-width:0"><thead><tr><th scope="col">サービス</th><th scope="col">平均応答時間</th><th scope="col">エラー率</th></tr></thead>' +
+        '<tbody><tr><th scope="row">' + SVC + '</th><td class="up">980 ms（平常時 420 ms）</td><td>約0.8%（平常時 0.2%）</td></tr></tbody></table></div>' +
+        '<div class="surface"><p class="dt-h3"><span class="tip-wrap" id="w-tip-prio">影響の範囲' + qBtn("prio", "優先度の基準") + tipHTML("prio") + "</span></p>" +
+        '<table class="dtable" style="min-width:0"><thead><tr><th scope="col">照会の入口</th><th scope="col">影響</th></tr></thead>' +
+        '<tbody><tr><th scope="row">Webからの照会</th><td class="up">一部で遅延（架空）</td></tr><tr><th scope="row">代理店ポータルからの照会</th><td>影響なし（架空）</td></tr></tbody></table></div></div>';
     }
-    if (d2.tab === "logs") {
-      var from = PERIOD_FROM[d2.period];
+    if (c.tab === "logs") {
+      var from = PERIOD_FROM[c.period];
       var rows = LOGS.filter(function (l) { return l[0] >= from; }).map(function (l) {
         return "<tr><td>" + l[0] + '</td><td><span class="lv ' + l[1] + '">' + l[2] + "</span></td><td>" + l[3] + "</td></tr>";
       }).join("");
-      return '<div style="display:grid;gap:12px">' +
-        '<div class="toolbar">' +
-        '<div class="dt-field" id="d2-f-period"><label for="d2-period">' + svg("clock") + "期間</label>" +
-        '<select id="d2-period">' +
-        '<option value="during"' + (d2.period === "during" ? " selected" : "") + ">問題の発生期間（10:02〜）</option>" +
-        '<option value="5min"' + (d2.period === "5min" ? " selected" : "") + ">問題の開始5分前から（09:57〜）</option>" +
-        '<option value="2h"' + (d2.period === "2h" ? " selected" : "") + ">過去 2 時間</option></select></div>" +
-        '<span class="dt-field" aria-hidden="true"><span class="pre">サービス</span><span class="locked">契約照会サービス（架空）</span></span></div>' +
+      return '<div style="display:grid;gap:12px"><div class="toolbar">' +
+        '<div class="dt-field" id="f-c2-period"><label for="c2-period">' + svg("clock") + "期間</label>" +
+        sel("c2-period", "c2-period", [["during", "問題の発生期間（10:02〜）"], ["5min", "問題の開始5分前から（09:57〜）"], ["2h", "過去 2 時間"]], c.period) + "</div>" +
+        '<span class="dt-field" aria-hidden="true"><span class="pre">サービス</span><span class="locked">' + SVC + "</span></span></div>" +
         '<div class="surface"><div class="table-wrap"><table class="dtable num logs"><thead><tr><th scope="col">時刻</th><th scope="col">状態</th><th scope="col">内容</th></tr></thead><tbody>' +
         rows + "</tbody></table></div>" +
-        (d2.period === "5min" ? '<p class="dt-callout">10:02の開始より前（09:58）から、接続待ちの警告が出ています（架空）。原因はこの段階では確定しません。</p>' : "") +
+        (c.period === "5min" ? '<p class="dt-callout">10:02の開始より前（09:58）から、接続待ちの警告が出ています（架空）。原因はこの段階では確定しません。</p>' : "") +
         "</div></div>";
     }
     return '<div class="surface"><div class="table-wrap"><table class="dtable num"><thead><tr><th scope="col">時刻</th><th scope="col">イベント</th></tr></thead><tbody>' +
@@ -1183,221 +1313,309 @@ p { margin: 0; }
       "<tr><td>10:04</td><td>影響範囲が更新されました（架空）</td></tr>" +
       "<tr><td>10:06</td><td>関連するイベントが追加されました（架空）</td></tr></tbody></table></div></div>";
   }
-  function d2Render(warn) {
-    var scene = $("#scene-d2");
-    clearGuide(scene);
-    $("#d2-list").hidden = d2.view !== "list";
-    $("#d2-detail").hidden = d2.view !== "detail";
-    $$("#d2-tabs [data-tab]").forEach(function (t) {
-      var on = t.getAttribute("data-tab") === d2.tab;
-      t.classList.toggle("active", on);
-      t.setAttribute("aria-selected", String(on));
-    });
-    if (d2.view === "detail") $("#d2-tab-content").innerHTML = d2TabHTML();
-    $("#d2-modal").hidden = !d2.modal;
-    setSteps($("#d2-steps"), d2.step);
-    var st = D2STEP[d2.step];
-    var needPeriod = d2.step === 2 && d2.tab === "logs";
-    $("#d2-now").textContent = needPeriod ? "期間を「問題の開始5分前から」に設定します。" : st.now;
-    $("#d2-reason").textContent = st.reason;
-    var alert = $("#d2-alert");
-    alert.hidden = !warn;
-    alert.textContent = warn || "";
-    var next = $("#d2-next");
-    next.textContent = needPeriod ? "期間を設定する" : (d2.step === 3 && d2.modal ? "連絡内容を確認した" : st.btn);
-    $("#d2-back").disabled = d2.step === 0;
-    if (d2.modal || d2.step === 4) return;
-    if (needPeriod) point($("#d2-f-period"), "期間を「問題の開始5分前から」にします", !!warn);
-    else point($(st.target), st.tip, false, st.sub);
-  }
-  function d2Open() {
-    d2.view = "detail"; d2.tab = "overview";
-    if (d2.step === 0) d2.step = 1;
-    d2Render();
-  }
-  function d2Tab(tab) {
-    var warn = null;
-    d2.tab = tab;
-    if (d2.step === 1 && tab === "impact") d2.step = 2;
-    else if (d2.step === 2 && tab === "logs" && d2.period === "5min") d2.step = 3;
-    else if (tab !== "overview" && !(tab === "impact" && d2.step >= 2) && !(tab === "logs" && d2.step >= 2)) {
-      warn = d2.step <= 2 ? "社内手順では、次は「" + TAB_LABEL[d2.step === 1 ? "impact" : "logs"] + "」を確認します。" +
-        (d2.step === 1 && tab === "logs" ? "ログの前に影響範囲を確かめ、連絡の優先度を先に判断します。" : "") : null;
+  function pageProblems() {
+    var c = S.c2;
+    if (c.view === "list") {
+      return '<div><p class="crumbs">問題</p><h2 class="dt-h">問題一覧</h2></div>' +
+        '<div class="toolbar" aria-hidden="true"><span class="dt-look-btn">' + svg("segment") + 'セグメント</span><span class="dt-field"><span class="pre">' + svg("clock") + '時間枠</span><span class="locked">過去 24 時間</span></span></div>' +
+        '<div class="surface"><table class="dtable" style="min-width:0"><thead><tr><th scope="col">問題</th><th scope="col">状態</th><th scope="col">開始</th><th scope="col">影響を受けたサービス</th></tr></thead><tbody>' +
+        '<tr><th scope="row"><button type="button" class="row-link" data-act="c2-open">P-0412　応答時間の悪化</button></th><td><span class="status active">進行中</span></td><td>10:02</td><td>' + SVC + "</td></tr>" +
+        '<tr><th scope="row">P-0409　エラー率の上昇</th><td><span class="status">解決済み</span></td><td>前日 16:40</td><td>保険料計算サービス（架空）</td></tr>' +
+        '<tr><th scope="row">P-0405　応答時間の悪化</th><td><span class="status">解決済み</span></td><td>前日 09:15</td><td>代理店ポータル（架空）</td></tr></tbody></table></div>' +
+        '<p class="dt-fine">画面・サービス名・手順・数値はすべて架空です。</p>';
     }
-    d2Render(warn);
+    var tabs = ["overview", "impact", "logs", "events"].map(function (t) {
+      return '<span class="tip-anchor" id="w-tab-' + t + '"><button type="button" role="tab" data-act="c2-tab" data-arg="' + t + '" aria-selected="' + (c.tab === t) + '"' +
+        (c.tab === t ? ' class="active"' : "") + ">" + TAB_LABEL[t] + "</button></span>";
+    }).join("");
+    return '<div><p class="crumbs">問題 ＞ P-0412</p><h2 class="dt-h">問題の詳細（架空）</h2></div>' +
+      '<div class="tb-row"><span class="dt-h3">P-0412　応答時間の悪化</span><span class="status active">進行中</span><span class="dt-fine">開始 10:02</span>' +
+      '<span class="tip-anchor" id="w-c2-contact" data-tip-side="right"><button type="button" class="tt-chip" data-act="c2-contact">社内手順で連絡</button></span></div>' +
+      '<div class="dt-tabs" role="tablist" aria-label="問題の詳細">' + tabs + "</div>" +
+      c2TabHTML() + '<p class="dt-fine">画面・サービス名・手順・数値はすべて架空です。</p>';
   }
-  function d2Period(v) {
-    var warn = null;
-    d2.period = v;
-    if (v === "5min") { if (d2.step === 2) d2.step = 3; }
-    else if (v === "during") warn = "問題の発生期間だけでは、発生直前の変化を見落とすことがあります。社内手順どおり「問題の開始5分前から」にします。";
-    else warn = "過去 2 時間では範囲が広く、関係の薄いログが混ざります。社内手順どおり「問題の開始5分前から」にします。";
-    d2Render(d2.step === 3 && v === "5min" ? null : warn);
-  }
-  function d2Contact() {
-    if (d2.step < 3) { d2Render("社内手順では、連絡の前に影響範囲と関連ログを確認します。"); return; }
-    d2.modal = true; d2Render();
-  }
-  function d2Done() { d2.modal = false; d2.step = 4; d2Render(); }
-  function d2Next() {
-    if (d2.step === 0) d2Open();
-    else if (d2.step === 1) d2Tab("impact");
-    else if (d2.step === 2) { if (d2.tab !== "logs") d2Tab("logs"); else d2Period("5min"); }
-    else if (d2.step === 3) { if (d2.modal) d2Done(); else d2Contact(); }
-    else show("d3");
-  }
-  function d2Back() {
-    if (d2.step === 4) { d2.step = 3; }
-    else if (d2.step === 3) { if (d2.modal) d2.modal = false; else { d2.step = 2; d2.period = "during"; } }
-    else if (d2.step === 2) { d2.step = 1; d2.tab = "overview"; d2.period = "during"; }
-    else if (d2.step === 1) { d2.step = 0; d2.view = "list"; d2.tab = "overview"; }
-    d2Render();
-  }
-  function d2Reset() { d2.step = 0; d2.view = "list"; d2.tab = "overview"; d2.period = "during"; d2.modal = false; d2Render(); }
-  $("#d2-open").addEventListener("click", d2Open);
-  $("#d2-tabs").addEventListener("click", function (e) {
-    var t = e.target.closest("[data-tab]");
-    if (t) d2Tab(t.getAttribute("data-tab"));
-  });
-  $("#d2-tab-content").addEventListener("change", function (e) {
-    if (e.target.id === "d2-period") d2Period(e.target.value);
-  });
-  $("#d2-contact").addEventListener("click", d2Contact);
-  $("#d2-modal-done").addEventListener("click", d2Done);
-  $("#d2-modal-close").addEventListener("click", function () { d2.modal = false; d2Render(); });
-  $("#d2-next").addEventListener("click", d2Next);
-  $("#d2-back").addEventListener("click", d2Back);
 
-  /* ==================== デモ③ ==================== */
-  var SVC = "契約照会サービス（架空）";
-  var b = { step: 0, result: false, action: "" };
-  var BSTEP = [
-    { target: "#b-templates", tip: "① 専門家が確認済みのひな型から選びます",
-      op: "ひな型を選びます。今回は「サービスの状況確認（標準）」を選びます。",
-      why: "ひな型の意図：「サービスの状況確認（標準）」は、担当サービスの平均応答時間とエラー率を、同じ長さの期間で比べるためのひな型です。" },
-    { target: "#b-f-service", tip: "② 対象サービスを担当サービスに変えます",
-      op: "対象サービスを「契約照会サービス（架空）」に変えます。",
-      why: "変える理由：ひな型の既定は、すべてのサービスの合計です。担当サービスに絞らないと、他のサービスの変化が混ざります。" },
-    { target: "#b-f-range", tip: "③ 時間枠を変えます",
-      op: "時間枠を「過去 24 時間」に変えます。",
-      why: "変える理由：朝の事象の前後を含めて、1日の中でいつ上がり始めたかを確認するためです。" },
-    { target: "#b-changes", tip: "④ 変更箇所を見直します",
-      op: "変更したのは2か所です。指標の定義を変えていないことを確認して、結果を表示します。",
-      why: "変えない項目：指標の定義（平均応答時間・エラー率）は、専門家が決めたものをそのまま使います。変えるのは対象と時間枠だけです。" },
-    { target: "#b-result", tip: "",
-      op: "結果を確認し、保存するか、専門家に確認を依頼します。",
-      why: "結果の見方：10時台に平均応答時間が上がっています。デモ①で確認した時間帯と合っているかを確かめます。原因はこの画面だけでは特定できません。" }
-  ];
-  function bTpl() { var c = $('input[name="b-tpl"]:checked'); return c ? c.value : ""; }
-  function bSync() {
-    var tpl = bTpl(), svc = $("#b-service").value, rng = $("#b-range").value, wrong = null;
-    var ok = tpl === "t1";
-    $("#b-service").disabled = !ok;
-    $("#b-range").disabled = !ok || svc !== SVC;
-    if (!ok) { b.step = 0; b.result = false; if (tpl) wrong = "今回は応答時間の変化を見るため、「サービスの状況確認（標準）」を使います。"; }
-    else if (svc !== SVC) { b.step = 1; b.result = false; if (svc !== "all") wrong = "今回は担当の「契約照会サービス（架空）」に絞ります。"; }
-    else if (rng !== "24h") { b.step = 2; b.result = false; if (rng !== "2h") wrong = "今回は朝の事象の前後を見るため「過去 24 時間」にします。過去 7 日間は、日ごとの傾向を見るときに使います。"; }
-    else b.step = b.result ? 4 : 3;
-    if (!b.result) b.action = "";
-    bRender(wrong);
-  }
-  function hourChart() {
-    // 1時間ごとの平均応答時間（架空）。前日11時台〜当日10時台の24本。10時台は10:00〜10:15の上昇を含む。
-    var v = [430, 450, 440, 420, 430, 440, 420, 400, 390, 380, 370, 360, 350, 340, 330, 330, 330, 340, 350, 370, 400, 430, 440, 610];
-    return lineChart({
-      values: v, yMax: 800, yTicks: [0, 200, 400, 600, 800],
-      xLabels: [[0, "前日 11時", "start"], [6, "17時"], [12, "23時"], [18, "5時"], [23, "10時", "end"]],
-      mark: { i: 23, label: "10時台 610 ms" },
-      aria: "平均応答時間の推移（架空）。10時台に610ミリ秒へ上昇。"
-    });
-  }
-  function bRender(wrong) {
-    var scene = $("#scene-d3");
-    clearGuide(scene);
-    var svc = $("#b-service").value, rng = $("#b-range").value;
-    var svcChanged = svc === SVC, rngChanged = rng === "24h";
-    $("#b-changes-list").innerHTML =
-      '<li><span class="k">対象サービス</span><span>すべてのサービス → ' + (svcChanged ? SVC : "（未変更）") + '</span><span class="st' + (svcChanged ? " on" : "") + '">' + (svcChanged ? "変更" : "未変更") + "</span></li>" +
-      '<li><span class="k">時間枠</span><span>過去 2 時間 → ' + (rngChanged ? "過去 24 時間" : "（未変更）") + '</span><span class="st' + (rngChanged ? " on" : "") + '">' + (rngChanged ? "変更" : "未変更") + "</span></li>" +
-      '<li><span class="k">指標</span><span>平均応答時間・エラー率</span><span class="st">変更しない</span></li>';
-    var slot = $("#b-result-slot");
-    if (b.step === 4) {
-      var msg = b.action === "ask"
-        ? "依頼内容（例）：変更箇所2点と結果の画面を添えて、専門家に確認を依頼します。デモのため送信はしません。"
-        : b.action === "save" ? "デモのため保存はしません。実環境では保存先と共有範囲を確認します。" : "";
-      slot.innerHTML = '<div class="surface" id="b-result">' +
-        '<div class="surface-head"><p class="dt-h3">平均応答時間（1時間ごと）</p><p class="chart-legend"><span>' + SVC + "</span><span>過去 24 時間</span></p></div>" +
+  function pageDashboards() {
+    var c = S.c3;
+    if (c.view === "list") {
+      return '<div class="title-row"><div><p class="crumbs">ダッシュボード</p><h2 class="dt-h">すべてのダッシュボード</h2></div>' +
+        '<span class="tip-anchor" id="w-c3-create" data-tip-side="right"><button type="button" class="dt-accent" data-act="c3-create">ひな型から作成</button></span></div>' +
+        '<div class="surface"><table class="dtable" style="min-width:0"><thead><tr><th scope="col">名前</th><th scope="col">所有者</th><th scope="col">更新</th></tr></thead><tbody>' +
+        '<tr><th scope="row">インフラの概要</th><td>基盤チーム（架空）</td><td>前日</td></tr>' +
+        '<tr><th scope="row">代理店ポータルの状況</th><td>代理店システム担当（架空）</td><td>3日前</td></tr>' +
+        '<tr><th scope="row">保険料計算の夜間処理</th><td>運用チーム（架空）</td><td>先週</td></tr></tbody></table></div>' +
+        '<p class="dt-fine">ダッシュボード名・所有者はすべて架空です。</p>';
+    }
+    if (c.view === "saved") {
+      return '<div class="title-row"><div><p class="crumbs">ダッシュボード ＞ 契約照会サービスの状況（架空）</p><h2 class="dt-h">契約照会サービスの状況（架空）</h2></div>' +
+        '<span class="share-chip">共有：運用チーム（架空）</span></div>' +
+        '<div class="kpis"><div class="kpi"><span>平均応答時間（14時台）</span><b>425 ms</b></div>' +
+        '<div class="kpi"><span>最大（過去 24 時間）</span><b>610 ms</b></div>' +
+        '<div class="kpi"><span>エラー率（14時台）</span><b>0.2%</b></div></div>' +
+        '<div class="surface"><div class="surface-head"><p class="dt-h3">平均応答時間（1時間ごと）</p><p class="chart-legend"><span>' + SVC + "</span><span>過去 24 時間</span></p></div>" +
+        '<div class="chart-wrap">' + hourChart() + "</div></div>" +
+        '<p class="dt-fine">ひな型「サービスの状況確認（標準）」から作成。数値はすべて架空です。デモのため実際には保存していません。</p>';
+    }
+    var ok = c.tpl === "t1", svcChanged = c.service === SVC, rngChanged = c.range === "24h";
+    var tpl = function (v, name, desc) {
+      return '<label class="tpl"><input type="radio" name="c3-tpl" value="' + v + '" data-change="c3-tpl"' + (c.tpl === v ? " checked" : "") + '><span class="tpl-name">' + name +
+        '</span><span class="tpl-desc">' + desc + '</span><span class="badge">専門家が確認済み</span></label>';
+    };
+    var st = function (on, yes) { return '<span class="st' + (on ? " on" : "") + '">' + (on ? yes : "未変更") + "</span>"; };
+    var h = '<div><p class="crumbs">ダッシュボード ＞ ひな型から作成</p><h2 class="dt-h">ひな型の編集</h2></div>' +
+      '<p class="section-label">ひな型を選ぶ</p><div class="tpl-list" id="c3-templates" role="radiogroup" aria-label="ひな型">' +
+      tpl("t1", "サービスの状況確認（標準）", "平均応答時間とエラー率を期間で比べる") +
+      tpl("t2", "エラーの内訳（標準）", "エラーの種類と発生箇所を一覧する") +
+      tpl("t3", "利用の多い時間帯（標準）", "リクエスト数の推移を見る") + "</div>" +
+      '<p class="section-label">設定を変更する</p><div class="edit-grid">' +
+      '<div class="dt-field block" id="f-c3-service"><label for="c3-service">対象サービス</label>' +
+      sel("c3-service", "c3-service", [["all", "すべてのサービス（既定）"], SVC, "保険料計算サービス（架空）", "代理店ポータル（架空）"], c.service, !ok) + "</div>" +
+      '<div class="dt-field block" id="f-c3-range"><label for="c3-range">' + svg("clock") + "時間枠</label>" +
+      sel("c3-range", "c3-range", [["2h", "過去 2 時間（既定）"], ["24h", "過去 24 時間"], ["7d", "過去 7 日間"]], c.range, !ok || !svcChanged) + "</div>" +
+      '<div class="dt-field block"><span class="pre">指標（変更しない）</span><span class="locked">平均応答時間・エラー率</span></div></div>' +
+      '<p class="dt-callout"><b>専門家が確認済みの設定内容を使用する想定</b><br>対象サービス、集計期間、指標の定義を確認してから変更します。</p>' +
+      '<div class="surface changes" id="c3-changes"><div class="surface-head"><p class="section-label">変更箇所</p>' +
+      '<button type="button" class="dt-emph" data-act="c3-preview">結果をプレビュー</button></div><ul>' +
+      '<li><span class="k">対象サービス</span><span>すべてのサービス → ' + (svcChanged ? SVC : "（未変更）") + "</span>" + st(svcChanged, "変更") + "</li>" +
+      '<li><span class="k">時間枠</span><span>過去 2 時間 → ' + (rngChanged ? "過去 24 時間" : "（未変更）") + "</span>" + st(rngChanged, "変更") + "</li>" +
+      '<li><span class="k">指標</span><span>平均応答時間・エラー率</span><span class="st">変更しない</span></li></ul></div>';
+    if (c.preview) {
+      h += '<div class="surface" id="c3-result"><div class="surface-head"><p class="dt-h3">平均応答時間（1時間ごと）</p><p class="chart-legend"><span>' + SVC + "</span><span>過去 24 時間</span></p></div>" +
         '<div class="chart-wrap">' + hourChart() + "</div>" +
-        '<ul class="checks"><li>対象サービスが担当サービスになっている</li><li>時間枠が過去 24 時間になっている</li><li>10時台の上昇が、デモ①で確認した時間帯と合っている</li></ul>' +
-        '<div class="row-actions"><button type="button" class="dt-emph" data-act="ask">専門家に確認を依頼</button><button type="button" class="dt-accent" data-act="save">保存</button></div>' +
-        (msg ? '<p class="status" role="status">' + msg + "</p>" : "") +
+        '<ul class="checks"><li>対象サービスが担当サービスになっている</li><li>時間枠が過去 24 時間になっている</li><li>10時台の上昇が、第1章で確認した時間帯と合っている</li></ul>' +
+        '<div class="row-actions"><span class="tip-anchor" id="w-c3-ask"><button type="button" class="dt-emph" data-act="c3-ask">専門家に確認を依頼</button></span>' +
+        '<span class="tip-anchor" id="w-c3-save"><button type="button" class="dt-accent" data-act="c3-save">保存して共有</button></span></div>' +
+        (c.asked ? '<p class="status" role="status">依頼しました：変更箇所2点と結果の画面を添えて、専門家（架空）に確認を依頼しました。デモのため送信はしません。</p>' : "") +
+        (S.chat === "approved" ? chatCard("approved") : "") +
         '<p class="dt-fine">数値はすべて架空です。</p></div>';
     } else {
-      slot.innerHTML = '<div class="empty" id="b-result">' + svg("empty") + "<span>設定を変更して「結果の確認へ」を押すと、ここにプレビューが表示されます。</span></div>";
+      h += '<div class="empty" id="c3-result">' + svg("empty") + "<span>設定を変更して「結果をプレビュー」を押すと、ここに結果が表示されます。</span></div>";
     }
-    var st = BSTEP[b.step];
-    setSteps($("#b-steps"), b.step);
-    if (b.step === 4) $(st.target).classList.add("is-target");
-    else point($(st.target), wrong ? "選び直します" : st.tip, !!wrong);
-    $("#b-count").textContent = (b.step + 1) + " / 5";
-    $("#b-op").textContent = st.op;
-    $("#b-why").textContent = st.why;
-    var alert = $("#b-alert");
-    alert.hidden = !wrong;
-    alert.textContent = wrong || "";
-    var next = $("#b-next");
-    next.hidden = b.step === 4;
-    next.textContent = b.step === 3 ? "結果の確認へ" : "次へ";
-    $("#b-back").disabled = b.step === 0;
+    return h + '<div class="dql"><strong>DQLの作成・説明が必要な場合</strong><span>利用条件を満たすDynatrace Assistの活用を含めて確認します。</span></div>';
   }
-  function bNext() {
-    if (b.step === 0) { $("#b-tpl-t1").checked = true; }
-    else if (b.step === 1) { $("#b-service").value = SVC; }
-    else if (b.step === 2) { $("#b-range").value = "24h"; }
-    else if (b.step === 3) { b.result = true; }
-    else return;
-    bSync();
+  function pageHTML() {
+    return { home: pageHome, services: pageServices, problems: pageProblems, dashboards: pageDashboards }[S.app]();
   }
-  function bBack() {
-    if (b.step === 4) { b.result = false; }
-    else if (b.step === 3) { $("#b-range").value = "2h"; }
-    else if (b.step === 2) { $("#b-service").value = "all"; $("#b-range").value = "2h"; }
-    else if (b.step === 1) { $$('input[name="b-tpl"]').forEach(function (r) { r.checked = false; }); $("#b-service").value = "all"; $("#b-range").value = "2h"; }
-    bSync();
-  }
-  function bReset() {
-    $$('input[name="b-tpl"]').forEach(function (r) { r.checked = false; });
-    $("#b-service").value = "all"; $("#b-range").value = "2h";
-    b.result = false; b.action = ""; bSync();
-  }
-  $$('input[name="b-tpl"]').forEach(function (r) { r.addEventListener("change", bSync); });
-  $("#b-service").addEventListener("change", bSync);
-  $("#b-range").addEventListener("change", bSync);
-  $("#b-next").addEventListener("click", bNext);
-  $("#b-back").addEventListener("click", bBack);
-  $("#b-result-slot").addEventListener("click", function (e) {
-    var a = e.target.closest("[data-act]");
-    if (!a) return;
-    b.action = a.getAttribute("data-act");
-    bRender(null);
-  });
 
-  /* ==================== 画面切り替え・進行メモ・表示 ==================== */
-  var SCENES = ["d1", "d2", "d3"];
-  var current = "d1";
-  function show(id) {
-    if (SCENES.indexOf(id) === -1) id = "d1";
-    current = id;
-    SCENES.forEach(function (s) {
-      $("#scene-" + s).hidden = s !== id;
-      $("#tab-" + s).setAttribute("aria-current", s === id ? "true" : "false");
-    });
-    $$("#notes [data-for]").forEach(function (ul) { ul.hidden = ul.getAttribute("data-for") !== id; });
-    try { history.replaceState(null, "", "#" + id); } catch (e) { /* 表示には影響なし */ }
-    window.scrollTo(0, 0);
+  function modalHTML() {
+    if (S.app !== "problems" || S.c2.view !== "detail") return "";
+    if (S.ch === 2 && S.c2.popup) {
+      return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
+        '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ポップアップ（案）</span></div>' +
+        '<h3 class="ov-title" id="m-title">障害の一次確認は、社内手順どおりに進めます</h3>' +
+        "<p>概要 → 影響範囲 → 関連ログ → 連絡、の4つのステップを順番に案内します。所要の目安は約10分です（架空）。</p>" +
+        '<p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。</p>' +
+        '<div class="actions"><button type="button" class="btn btn-primary" data-act="c2-start" id="m-start">ガイドを開始</button></div></div></div>';
+    }
+    if (S.c2.modal) {
+      return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
+        '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ステップ4／4　社内手順（架空）</span></div>' +
+        '<h3 class="ov-title" id="m-title">障害の一次連絡</h3><ol class="proc">' +
+        "<li><b>優先度を決める</b><span>影響の範囲が「Webからの照会の一部」のため、優先度は「中」（社内基準・架空）</span></li>" +
+        "<li><b>連絡先</b><span>システム運用チーム（架空）、業務部門の窓口（架空）</span></li>" +
+        '<li><b>伝える内容（例）</b><div class="msg">【障害一次連絡】P-0412 応答時間の悪化（進行中）\n・開始：10:02\n・影響：契約照会サービス（架空）、Webからの照会の一部\n・関連ログ：09:58から契約DBへの接続待ちの警告（原因は未確定）\n・次の連絡：原因を確認したあと</div></li></ol>' +
+        '<p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。デモのため送信はしません。</p>' +
+        '<div class="actions"><button type="button" class="btn btn-ghost" data-act="c2-modal-close">閉じる</button>' +
+        '<button type="button" class="btn btn-primary" data-act="c2-modal-done" id="m-done">連絡内容を確認した</button></div></div></div>';
+    }
+    return "";
   }
-  $$("[data-go]").forEach(function (btn) {
-    btn.addEventListener("click", function () { show(btn.getAttribute("data-go")); });
+
+  function stepsList(G, step) {
+    return '<ol class="steps compact">' + G.slice(1).map(function (g, i) {
+      var n = i + 1;
+      return '<li class="' + (n < step ? "done" : n === step ? "now" : "") + '">' + g.label + "</li>";
+    }).join("") + "</ol>";
+  }
+  function actions() {
+    return '<div class="actions"><button type="button" class="btn btn-ghost" data-act="back"' + (hist.length ? "" : " disabled") + ">戻る</button>" +
+      '<button type="button" class="btn btn-primary" data-act="next" id="panel-next">' + primary().label + "</button></div>";
+  }
+  function guideBody(now, reason) {
+    var off = offGuide();
+    if (off) return '<p class="alert" role="alert">ガイドの画面から離れています。「' + APP_LABEL[off] + "」の画面に戻ると、続きから進められます。</p>";
+    return '<p class="now-box">' + now + "</p>" + (S.warn ? '<p class="alert" role="alert">' + S.warn + "</p>" : "") + '<p class="soft">' + reason + "</p>";
+  }
+  function panelC1() {
+    var c = S.c1;
+    var h = '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">' + (c.step === 0 ? "ガイド一覧（案）" : "ガイド（案）") + "</span></div>";
+    if (c.step === 0) {
+      return h + '<h3 class="ov-title">この画面で使えるガイド</h3>' +
+        '<p class="ov-text">問い合わせのあったサービスの状況を確認します。ガイドを選ぶと、操作する場所を順番に案内します。</p>' +
+        '<ul class="glist"><li><button type="button" class="gitem" data-act="start" id="g-start"><span class="gname">担当サービスの状況を確認する</span><span class="gmeta">7ステップ・目安5分（架空）・おすすめ</span></button></li>' +
+        '<li><div class="gitem"><span class="gname">障害の一次確認（社内手順）</span><span class="gmeta">問題の画面で表示されます</span></div></li>' +
+        '<li><div class="gitem"><span class="gname">ダッシュボードをひな型から作る</span><span class="gmeta">ダッシュボードの画面で表示されます</span></div></li></ul>' + actions();
+    }
+    var g = G1[Math.min(c.step, 7)];
+    return h + '<h3 class="ov-title">担当サービスの状況を確認する</h3>' + stepsList(G1, c.step) + guideBody(g.now, g.reason) + actions();
+  }
+  function c2Now() {
+    var c = S.c2;
+    if (c.step === 1) return c.tab === "overview" ? "事象・開始時刻・影響を受けたサービス・原因の候補を確認します。" : "「概要」タブに戻り、事象と開始時刻を確認します。";
+    if (c.step === 2) return c.tab !== "impact" ? "「影響範囲」タブで、影響を受けたサービスと影響の範囲を確認します。" : "影響の範囲を社内の基準（架空）に当てはめて、優先度を判断します。「?」で基準を表示します。";
+    if (c.step === 3) return c.tab !== "logs" ? "「ログ」タブで関連ログを開きます。" : "期間を「問題の開始5分前から」に設定します。";
+    return c.modal ? "優先度・連絡先・伝える内容を確認します。" : "「社内手順で連絡」から、社内手順に沿った連絡内容を確認します。";
+  }
+  function panelC2() {
+    var c = S.c2;
+    var h = '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ガイド（案）・社内手順（架空）</span></div>' +
+      '<h3 class="ov-title">障害の一次確認（社内手順）</h3>' + stepsList(G2, c.step);
+    if (c.step === 0) return h + (offGuide() ? guideBody("", "") : '<p class="now-box">ポップアップの「ガイドを開始」から始めます。</p>') + actions();
+    if (c.step === 5) {
+      return h + '<p class="now-box">一次確認の4ステップが完了しました。</p>' +
+        '<div class="soft"><p><b>一次確認の記録（例）</b></p><ul class="rec-list">' +
+        '<li><span class="t">10:18</span><span>概要を確認（P-0412 応答時間の悪化・進行中）</span></li>' +
+        '<li><span class="t">10:19</span><span>影響範囲を確認（Webからの照会の一部 → 優先度「中」）</span></li>' +
+        '<li><span class="t">10:21</span><span>関連ログを確認（09:58から接続待ちの警告・原因は未確定）</span></li>' +
+        '<li><span class="t">10:22</span><span>社内手順に沿って連絡（システム運用チーム・業務部門の窓口）</span></li></ul></div>' +
+        '<p class="refs">時刻・記録はすべて架空です。</p>' + actions();
+    }
+    return h + guideBody(c2Now(), G2[c.step].reason) + actions();
+  }
+  function panelC3() {
+    var c = S.c3;
+    var h = '<div class="ov-head"><span class="ov-pill">テックタッチ＋AI Hub</span><span class="ov-kicker">支援案3</span></div>';
+    if (c.step === 0) {
+      return h + '<h3 class="ov-title">おすすめのガイド</h3><p class="ov-text">専門家の助言にあったダッシュボードを、ひな型から自分で作ります。</p>' +
+        '<ul class="glist"><li><button type="button" class="gitem" data-act="start" id="g-start"><span class="gname">ダッシュボードをひな型から作る</span><span class="gmeta">8ステップ・目安10分（架空）</span></button></li></ul>' + actions();
+    }
+    h += '<h3 class="ov-title">ダッシュボードをひな型から作る</h3>' + stepsList(G3, c.step);
+    if (c.step === 9) {
+      return h + '<p class="now-box">保存して、運用チーム（架空）に共有しました。</p><p class="soft">デモのため実際には保存していません。実環境では保存先と共有範囲を確認します。</p>' + actions();
+    }
+    if (offGuide()) return h + guideBody("", "") + actions();
+    var g = G3[c.step];
+    h += '<div class="part tt"><p class="part-head"><span>テックタッチ 操作ガイド</span><span class="num">' + c.step + " / 8</span></p><p>" + g.op + "</p></div>";
+    if (S.warn) h += '<p class="alert" role="alert">' + S.warn + "</p>";
+    if (g.hub) h += '<div class="part hub"><p class="part-head"><span>AI Hub（例文）</span></p><p>' + g.hub + "</p></div>";
+    return h + '<p class="refs">実環境の項目名やデータ構造に合わせた説明・検証が必要です。</p>' + actions();
+  }
+  function panelHTML() { return S.ch === 1 ? panelC1() : S.ch === 2 ? panelC2() : panelC3(); }
+
+  function summaryHTML() {
+    var any = S.c1.started || S.c2.started || S.c3.started;
+    var stat = function (v, label) { return '<div class="stat"><b>' + (any ? v : "—") + "</b><span>" + label + "</span></div>"; };
+    var tl = function (t, title, desc) { return '<li><span class="t">' + t + '</span><span class="rail" aria-hidden="true"></span><div class="body"><b>' + title + "</b><span>" + desc + "</span></div></li>"; };
+    return '<div class="summary">' +
+      '<section class="sum-card"><h2>今日の業務の流れ（架空）</h2><ol class="tl">' +
+      tl("10:16", "業務部門から問い合わせ", "「10時過ぎから契約照会の画面が遅い」") +
+      tl("10:17", "第1章　担当サービスの状況を確認", "ガイド7ステップ。平均応答時間 420 ms → 980 ms を確認し、検知された問題に気づく") +
+      tl("10:18", "第2章　障害の一次確認と連絡", "ガイド4ステップ。影響範囲から優先度「中」と判断し、社内手順どおりに連絡") +
+      tl("14:05", "第3章　再発に備えてダッシュボードを作成", "ガイド8ステップ。ひな型から作り、専門家の確認を受けて運用チームに共有") +
+      "</ol></section>" +
+      '<section class="sum-card"><h2>このデモで、テックタッチが手当てした場面</h2><div class="stats">' +
+      stat(stepsDone(), "ガイドで進めたステップ") + stat(S.stats.fixes, "選び直し・順番の案内") + stat(S.stats.notes, "定義・基準・社内手順の表示") + "</div>" +
+      '<p class="sum-note">' + (any ? "このデモを操作した回数です。効果の数値ではありません。" : "章を順に進めると、操作した回数を数えます。効果の数値ではありません。") + "</p></section>" +
+      '<section class="sum-card"><h2>確かめ方（案）</h2><ul class="sum-list">' +
+      "<li>自力完了率：依頼せずに作業を終えられた割合</li><li>所要時間：作業の開始から完了まで</li><li>依頼件数：専門家への問い合わせの件数</li><li>再実行：同じ作業を、次回も自力でできるか</li></ul>" +
+      '<p class="sum-note">数値の目標は、現状を伺ってから設定します。ガイドの完了率だけでは判断せず、作業の結果で確かめます。</p></section>' +
+      '<section class="sum-card"><h2>本日伺いたいこと</h2><ul class="sum-list">' +
+      "<li>" + CH[1].ask + "</li><li>" + CH[2].ask + "</li><li>" + CH[3].ask + "</li>" +
+      "<li>対象者・止まる場面・現在の解決方法・既存の支援・自走の判断基準</li></ul></section>" +
+      '<section class="sum-card wide"><h2>最初の一歩</h2><p class="flow3"><span>対象を一つ決める</span><span class="arrow">→</span><span>実画面で確かめる</span><span class="arrow">→</span><span>変化を測る</span></p>' +
+      '<p class="sum-note">画面・サービス名・手順・数値は架空です。御社環境での実画面の確認は、導入時の通常手順として実施します。</p></section></div>';
+  }
+
+  /* ---------- 吹き出し ---------- */
+  function point(target, text, warn, sub) {
+    target.classList.add("is-target");
+    var side = target.getAttribute("data-tip-side");
+    var b = document.createElement("div");
+    b.className = "balloon" + (warn ? " warn" : "") + (side === "right" ? " r" : side === "s" ? " s" : "");
+    b.textContent = text;
+    if (sub) { var sm = document.createElement("small"); sm.textContent = sub; b.appendChild(sm); }
+    target.appendChild(b);
+    keepInside(b, side === "right" ? "r" : side === "s" ? "s" : "l");
+  }
+  // 吹き出し・ツールチップが画面の端からはみ出さないよう、内側にずらす
+  function keepInside(el, mode) {
+    var vw = document.documentElement.clientWidth, pad = 8, r = el.getBoundingClientRect();
+    if (mode === "s") {
+      if (r.right > vw - pad) { el.classList.remove("s"); keepInside(el, "l"); }
+      return;
+    }
+    if (mode === "l" && r.right > vw - pad) {
+      var shift = Math.min(r.right - (vw - pad), Math.max(0, r.left - pad));
+      el.style.left = (parseFloat(getComputedStyle(el).left) - shift) + "px";
+      el.style.setProperty("--ax", Math.min(20 + shift, r.width - 24) + "px");
+    } else if (mode === "r" && r.left < pad) {
+      var back = Math.min(pad - r.left, Math.max(0, vw - pad - r.right));
+      el.style.right = (parseFloat(getComputedStyle(el).right) - back) + "px";
+      el.style.setProperty("--axr", Math.min(20 + back, r.width - 24) + "px");
+    }
+  }
+  function guideTarget() {
+    if (S.ch === 4 || offGuide()) return null;
+    var c, g;
+    if (S.ch === 1) {
+      c = S.c1; g = G1[c.step];
+      if (!g) return null;
+      if (S.warn && c.step >= 2 && c.step <= 4) return { sel: g.target, tip: "「" + C1_EXP[c.step - 2] + "」を選び直します", warn: true };
+      return { sel: g.target, tip: g.tip, sub: g.sub };
+    }
+    if (S.ch === 2) {
+      c = S.c2;
+      if (c.step < 1 || c.step > 4 || c.modal) return null;
+      if (c.step === 1 && c.tab !== "overview") return { sel: "#w-tab-overview", tip: "ステップ1／4：「概要」タブに戻ります" };
+      if (c.step === 2 && c.tab === "impact") return { sel: "#w-tip-prio", tip: "優先度の基準を確認します", sub: "「?」で社内の基準（架空）を表示します" };
+      if (c.step === 3 && c.tab === "logs") return { sel: "#f-c2-period", tip: "期間を「問題の開始5分前から」にします", warn: !!S.warn };
+      g = G2[c.step];
+      return { sel: g.target, tip: g.tip, sub: g.sub };
+    }
+    c = S.c3; g = G3[c.step];
+    if (!g) return null;
+    var bad = !!S.warn && c.step >= 3 && c.step <= 5;
+    return { sel: g.target, tip: bad ? "選び直します" : g.tip, sub: bad ? "" : g.sub, warn: bad };
+  }
+
+  /* ---------- 描画 ---------- */
+  function renderJourney() {
+    $("#journey").innerHTML = JOURNEY.map(function (j) {
+      var st = j[0] < S.ch ? "done" : j[0] === S.ch ? "now" : "todo";
+      return '<button type="button" class="jn ' + st + '" data-act="chapter" data-arg="' + j[0] + '"' + (st === "now" ? ' aria-current="step"' : "") + ">" +
+        '<span class="no">' + (st === "done" ? "✓" : j[0]) + '</span><span class="jl">' + j[1] + '</span><span class="jt">' + j[2] + "</span></button>";
+    }).join("");
+  }
+  function renderStory() {
+    var c = CH[S.ch];
+    $("#story").innerHTML = '<p class="story-time">' + c.time + "<small>" + c.timeSub + "</small></p><h1>" + c.title + '</h1><p class="story-text">' + c.text + "</p>" +
+      '<p class="story-tags">' + c.tags.map(function (t) { return "<span>" + t + "</span>"; }).join("") + "</p>";
+  }
+  function renderStage() {
+    var st = $("#stage");
+    if (S.ch === 4) { st.innerHTML = summaryHTML(); return; }
+    st.innerHTML = '<div class="window"><div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>監視画面（架空）　Dynatraceの画面イメージを踏襲</span></div>' +
+      '<div class="dt has-overlay"><nav class="dock" aria-label="Dock（架空）">' + dockHTML(S.app) + "</nav>" +
+      '<div class="dt-app">' + appHeader() + '<div class="dt-page">' + chatHTML() + pageHTML() + "</div></div>" +
+      '<aside class="overlay' + (S.ch === 3 ? " hub" : "") + '" aria-label="テックタッチのガイド">' + panelHTML() + "</aside>" +
+      modalHTML() + "</div></div>";
+  }
+  function render() {
+    var active = document.activeElement, focusId = active && active.id;
+    renderJourney();
+    renderStory();
+    renderStage();
+    $("#ask").hidden = S.ch === 4;
+    $("#ask-text").textContent = CH[S.ch].ask;
+    $$("#notes [data-for]").forEach(function (ul) { ul.hidden = ul.getAttribute("data-for") !== String(S.ch); });
+    var t = guideTarget(), el = t && $(t.sel);
+    if (el) point(el, t.tip, t.warn, t.sub);
+    $$(".tt-tip").forEach(function (tt) { keepInside(tt, "l"); });
+    if (focusId) { var f = document.getElementById(focusId); if (f && f !== document.activeElement) { try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); } } }
+    if (pendingTop) { window.scrollTo(0, 0); pendingTop = false; }
+    try { history.replaceState(null, "", "#c" + S.ch); } catch (e) { /* 表示には影響なし */ }
+  }
+
+  /* ---------- 入力 ---------- */
+  document.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-act]");
+    if (!el || el.disabled) return;
+    act(el.getAttribute("data-act"), el.getAttribute("data-arg"));
+  });
+  document.addEventListener("change", function (e) {
+    var el = e.target.closest("[data-change]");
+    if (!el) return;
+    act(el.getAttribute("data-change"), null, el.value);
   });
   function toggleNotes() {
     var n = $("#notes"), btn = $("#notes-btn");
@@ -1405,10 +1623,7 @@ p { margin: 0; }
     btn.setAttribute("aria-pressed", String(!n.hidden));
   }
   $("#notes-btn").addEventListener("click", toggleNotes);
-  var RESET = { d1: a1Reset, d2: d2Reset, d3: bReset };
-  var NEXT = { d1: a1Next, d2: d2Next, d3: bNext };
-  var BACK = { d1: a1Back, d2: d2Back, d3: bBack };
-  $("#reset-btn").addEventListener("click", function () { RESET[current](); });
+  $("#reset-btn").addEventListener("click", function () { goChapter(S.ch); });
 
   var THEME_KEY = "dt-tt-demo-theme";
   var themes = ["", "light", "dark"], labels = { "": "自動", light: "ライト", dark: "ダーク" };
@@ -1421,28 +1636,24 @@ p { margin: 0; }
     if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* 保存できなくても表示は切り替わる */ } }
   }
   try { var saved = localStorage.getItem(THEME_KEY); if (saved === "light" || saved === "dark") applyTheme(saved, false); } catch (e) { /* 既定のまま */ }
-  $("#theme-btn").addEventListener("click", function () {
-    applyTheme(themes[(themes.indexOf(theme) + 1) % themes.length], true);
-  });
+  $("#theme-btn").addEventListener("click", function () { applyTheme(themes[(themes.indexOf(theme) + 1) % themes.length], true); });
 
   document.addEventListener("keydown", function (e) {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     var tag = (e.target && e.target.tagName || "").toLowerCase();
     if (tag === "select" || tag === "input" || tag === "textarea") return;
-    if (e.key === "ArrowRight") { NEXT[current](); e.preventDefault(); }
-    else if (e.key === "ArrowLeft") { BACK[current](); e.preventDefault(); }
-    else if (e.key === "1") show("d1");
-    else if (e.key === "2") show("d2");
-    else if (e.key === "3") show("d3");
+    if (e.key === "ArrowRight") { act("next"); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { act("back"); e.preventDefault(); }
+    else if (e.key >= "1" && e.key <= "4") goChapter(+e.key);
     else if (e.key === "n" || e.key === "N") toggleNotes();
-    else if (e.key === "r" || e.key === "R") RESET[current]();
+    else if (e.key === "r" || e.key === "R") goChapter(S.ch);
   });
 
-  a1Sync();
-  d2Render();
-  bSync();
-  var h = (location.hash || "").replace("#", "");
-  show(SCENES.indexOf(h) !== -1 ? h : "d1");
+  var resizeTimer = null;
+  window.addEventListener("resize", function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 150); });
+
+  var m = /^#c([1-4])$/.exec(location.hash || "");
+  goChapter(m ? +m[1] : 1);
 })();
 </script>
 <!-- fragment:body:end -->
