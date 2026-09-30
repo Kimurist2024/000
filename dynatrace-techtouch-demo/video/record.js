@@ -87,7 +87,7 @@ html { scroll-behavior: auto !important; }
 .v-menu div.hl { background: var(--dt-field-hover); }
 `;
 
-const FIXED_NOTE = "構想デモ｜画面・サービス名・数値は架空で、実際の製品画面や連携動作を示すものではありません。";
+const FIXED_NOTE = "構想デモ｜画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。";
 
 let page;
 let frameNo = 0;
@@ -242,14 +242,14 @@ async function main() {
   await card(
     '<p class="v-eyebrow">構想デモ</p><p class="v-title">Dynatrace × テックタッチ</p>' +
     '<p class="v-sub">専門家の「着眼点」を、全員の画面に。</p>' +
-    '<p class="v-text">観測はDynatrace。利用者が迷う画面での介入はテックタッチ。値の理解はAI Hub（構想）が補います。</p>' +
+    '<p class="v-text">観測はDynatrace。利用者が迷う画面での介入はテックタッチ。</p>' +
     '<p class="v-legend"><span><i style="background:#fff;border:1px solid #464cce"></i>監視画面（Dynatraceの画面イメージ・架空）</span>' +
     '<span><i style="background:#0B7FB5"></i>テックタッチ 操作ガイド（案）</span><span><i style="background:#6A4C9C"></i>AI Hub 理解支援（構想）</span></p>' +
     '<p class="v-note">' + FIXED_NOTE + "<br>監視画面はDynatraceの画面イメージを踏襲した架空画面です。</p>");
   await hold(7);
 
-  // デモA①
-  await sceneCard("デモA①・仮説1　画面・操作で迷う", "担当サービスの状況を確認する", "支援案1：テックタッチ 操作ガイド案", "#0B7FB5");
+  // デモ①
+  await sceneCard("デモ①・仮説1　画面・操作で迷う", "担当サービスの状況を確認する", "支援案1：テックタッチ 操作ガイド案", "#0B7FB5");
   await hold(3.5);
   await hideCard();
   await caption("テックタッチの操作ガイドが、次に操作する場所をハイライトと吹き出しで示します。");
@@ -277,31 +277,44 @@ async function main() {
   await ask("画面の探し方、絞り込み、時間帯の指定のどこで迷いますか？", "#0B7FB5");
   await hold(4.5);
 
-  // デモA②
-  await showScene("a2");
-  await sceneCard("デモA②・仮説2　指標を読み解けない", "表示された値を理解する", "支援案2：AI Hub 理解支援案", "#6A4C9C");
+  // デモ②
+  await showScene("d2");
+  await sceneCard("デモ②・仮説4・5　実務で再現できない／学びを再利用できない", "障害時の一次確認を、社内手順どおりに進める", "テックタッチ 操作ガイド案：専門家の手順を、誰でも同じ順番で再現する", "#0B7FB5");
   await hold(3.5);
   await hideCard();
-  await caption("テックタッチが画面に追加した「?」から、AI Hubの説明を開く構想です。", "AI Hub欄は事前に作成した例文です。");
-  await hold(4);
-  await click('#a2-metrics [data-metric="rt"]', { maxHalf: 70 });
-  await caption("意味・確認する理由・次の確認候補を、その場で確認します。原因は断定しません。");
+  await caption("障害の一次確認を、社内手順どおり4つのステップで案内します。", "社内手順・連絡先は架空です。お客様の実際の手順に置き換える前提です。");
   await hold(4.5);
-  await click("#a2-next");
-  await moveTo(1090, 560, 400);
-  await caption("次に見る情報を、監視画面で確認するものと社内資料（架空）で確認するものに分けて示します。");
+  await caption("ステップ1：進行中の問題の概要を開きます。");
+  await hold(1.5);
+  await click("#d2-open", { maxHalf: 90 });
+  await hold(2.5);
+  await caption("影響範囲の前に「ログ」を開くと、社内手順の順番を案内します。", "順番の案内は構想の表現です。");
+  await click('#d2-tabs [data-tab="logs"]', { maxHalf: 30 });
   await hold(4.5);
-  await click('#a2-metrics [data-metric="err"]', { maxHalf: 70 });
-  await caption("指標を選ぶと説明が切り替わります。リクエスト数が違うため、エラーは件数ではなく率で比べます。");
-  await hold(5);
-  await caption("Dynatrace内で完結する説明はDynatraceの既存AI支援（Dynatrace Assist）を優先し、AI Hubは社内資料側を補います。");
-  await hold(5);
-  await ask("値の意味、比較条件、次に見る情報のどこで止まりますか？", "#6A4C9C");
+  await caption("ステップ2：影響範囲を確認します。影響範囲を先に確かめると、連絡の優先度を判断できます。");
+  await click('#d2-tabs [data-tab="impact"]', { maxHalf: 40 });
+  await hold(4.5);
+  await caption("ステップ3：関連ログを確認します。吹き出しが、期間の設定値まで示します。");
+  await hold(3);
+  await click('#d2-tabs [data-tab="logs"]', { maxHalf: 30 });
+  await hold(1.5);
+  await choose("#d2-f-period", "#d2-period", "5min");
+  await moveTo(1060, 690, 400);
+  await caption("問題の開始前（09:58）から、接続待ちの警告が出ていたことを確認します。原因はこの段階では確定しません。", "ログはすべて架空です。");
+  await hold(4.5);
+  await caption("ステップ4：社内手順に沿って、優先度・連絡先・伝える内容を確認します。担当者によらず同じ手順で連絡します。");
+  await click("#d2-contact", { maxHalf: 60 });
+  await moveTo(1060, 690, 400);
+  await hold(6);
+  await click("#d2-modal-done", { maxHalf: 120 });
+  await caption("一次確認の4ステップが完了しました。");
+  await hold(2.5);
+  await ask("障害時の一次確認で、人によって手順がばらつくのはどこですか？", "#0B7FB5");
   await hold(4.5);
 
-  // デモB
-  await showScene("b");
-  await sceneCard("デモB・仮説3　作成・修正で止まる", "ダッシュボードを自分で修正する", "支援案3：テックタッチ＋AI Hub 支援案", "#6A4C9C");
+  // デモ③
+  await showScene("d3");
+  await sceneCard("デモ③・仮説3　作成・修正で止まる", "ダッシュボードを自分で修正する", "支援案3：テックタッチ＋AI Hub 支援案", "#6A4C9C");
   await hold(3.5);
   await hideCard();
   await caption("① 専門家が確認済みのひな型から選びます。");
@@ -318,7 +331,7 @@ async function main() {
   await scrollToEl("#b-changes", 170);
   await hold(4);
   await click("#b-next", { maxHalf: 80 });
-  await caption("⑤ 結果を確認します。10時台の上昇が、デモA①で確認した時間帯と合っているかを確かめます。");
+  await caption("⑤ 結果を確認します。10時台の上昇が、デモ①で確認した時間帯と合っているかを確かめます。");
   await scrollToEl("#b-result", 110);
   await hold(5);
   await click('[data-act="ask"]', { maxHalf: 70 });
