@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- fragment:head:start -->
+<title>Dynatrace×テックタッチ 構想デモ</title>
+<style>
+/* Layout: 見出し → 左に架空の監視ツール画面／右に支援パネル（テックタッチ＝青、AI Hub＝紫）→ 伺いたいこと。スライドp.11〜13と同じ並び。 */
+:root {
+  --bg: #F2F4F8;
+  --surface: #FFFFFF;
+  --surface-2: #EEF2F7;
+  --ink: #1B2B45;
+  --ink-2: #44536A;
+  --muted: #6B7280;
+  --line: #DCE2EB;
+  --tt: #0B7FB5;
+  --tt-soft: #E7F3FA;
+  --tt-ink: #075E86;
+  --tt-ring: rgba(11, 127, 181, 0.35);
+  --hub: #6A4C9C;
+  --hub-soft: #F3EFF9;
+  --hub-ink: #553C80;
+  --warn: #B4531A;
+  --warn-soft: #FCF0E6;
+  --ok: #2E7D4F;
+  --app: #3E6A89;
+  --app-soft: #E3ECF3;
+  --on-accent: #FFFFFF;
+  --shadow: 0 1px 2px rgba(27, 43, 69, 0.06), 0 6px 20px rgba(27, 43, 69, 0.07);
+  --font: "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Yu Gothic", "游ゴシック", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
+  --fs-body: 16px;
+  --fs-small: 14px;
+  --fs-lede: 18px;
+  --fs-h1: clamp(22px, 2.3vw, 30px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1623; --surface: #172131; --surface-2: #1E2A3D; --ink: #E6EBF2; --ink-2: #B9C3D1; --muted: #8E99AA; --line: #2C394D;
+    --tt: #45AEE0; --tt-soft: #12324A; --tt-ink: #8FD0EF; --tt-ring: rgba(69, 174, 224, 0.4);
+    --hub: #A88DD8; --hub-soft: #28213D; --hub-ink: #CDBDEB;
+    --warn: #F2A465; --warn-soft: #3A2616; --ok: #6CC596; --app: #7FB2D4; --app-soft: #1C3346;
+    --on-accent: #0B1420; --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1623; --surface: #172131; --surface-2: #1E2A3D; --ink: #E6EBF2; --ink-2: #B9C3D1; --muted: #8E99AA; --line: #2C394D;
+  --tt: #45AEE0; --tt-soft: #12324A; --tt-ink: #8FD0EF; --tt-ring: rgba(69, 174, 224, 0.4);
+  --hub: #A88DD8; --hub-soft: #28213D; --hub-ink: #CDBDEB;
+  --warn: #F2A465; --warn-soft: #3A2616; --ok: #6CC596; --app: #7FB2D4; --app-soft: #1C3346;
+  --on-accent: #0B1420; --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding-inline: 24px;
+  padding-block: 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--tt); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; line-height: 1.4; }
+p { margin: 0; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- ヘッダー ---------- */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  justify-content: space-between;
+}
+.brand { display: flex; flex-direction: column; line-height: 1.35; }
+.brand-name { font-weight: 700; font-size: 17px; letter-spacing: 0.02em; }
+.brand-sub { font-size: 13px; color: var(--muted); }
+.scene-nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.scene-nav button {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.scene-nav button[aria-current="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+  font-weight: 700;
+}
+.tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.tool {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+.tool[aria-pressed="true"] { background: var(--surface-2); color: var(--ink); font-weight: 700; }
+
+.disclaimer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.legend .l-app { background: var(--app-soft); border: 1px solid var(--app); }
+.legend .l-tt { background: var(--tt); }
+.legend .l-hub { background: var(--hub); }
+
+/* ---------- シーン見出し ---------- */
+.scene { display: flex; flex-direction: column; gap: 16px; }
+.scene-head { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.scene-head > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.eyebrow { font-size: 13px; color: var(--muted); letter-spacing: 0.08em; }
+.scene-head h1 { font-size: var(--fs-h1); }
+.lede { font-size: var(--fs-lede); color: var(--ink-2); }
+.tag {
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* ---------- ステージ（左：画面、右：支援パネル） ---------- */
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(300px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.app {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+.app-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  align-items: center;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  border-radius: 12px 12px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.app-bar .app-name { font-weight: 700; color: var(--app); }
+.app-body { padding: 22px 24px 18px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.app-title-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.app-title { font-size: 22px; }
+.fine { font-size: 13px; color: var(--muted); }
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  position: relative;
+}
+.field { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; border-radius: 10px; }
+.field label, .field .label { font-size: 14px; color: var(--muted); }
+.field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 16px;
+}
+.field select:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ガイドの対象箇所（テックタッチのハイライト表現のイメージ） */
+.is-target {
+  outline: 3px solid var(--tt);
+  outline-offset: 5px;
+  border-radius: 10px;
+  animation: ring 1.8s ease-out infinite;
+}
+@keyframes ring {
+  0% { box-shadow: 0 0 0 0 var(--tt-ring); }
+  70% { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.balloon {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 0;
+  z-index: 30;
+  width: max-content;
+  max-width: min(320px, 78vw);
+  background: var(--tt);
+  color: var(--on-accent);
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  box-shadow: var(--shadow);
+}
+.balloon::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 22px;
+  border: 8px solid transparent;
+  border-top: 0;
+  border-bottom-color: var(--tt);
+}
+.balloon.warn { background: var(--warn); }
+.balloon.warn::before { border-bottom-color: var(--warn); }
+.balloon small { display: block; font-weight: 400; font-size: 12px; opacity: 0.9; }
+
+/* 指標テーブル */
+.table-wrap { overflow-x: auto; border-radius: 8px; }
+.mtable { width: 100%; border-collapse: collapse; min-width: 440px; }
+.mtable th, .mtable td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.mtable thead th { background: var(--surface-2); font-weight: 400; color: var(--muted); font-size: 15px; line-height: 1.45; }
+.mtable td { font-size: 17px; }
+.mtable .big { font-size: 26px; font-weight: 700; }
+.mtable .up { color: var(--warn); }
+.mtable tr.is-sel > * { background: var(--hub-soft); }
+.metric-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 0; background: transparent; padding: 0; text-align: left; color: var(--ink);
+}
+.metric-btn .q {
+  display: inline-grid; place-items: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1px solid var(--hub); color: var(--hub); font-size: 13px; font-weight: 700; flex: none;
+}
+tr.is-sel .metric-btn .q { background: var(--hub); color: var(--on-accent); }
+.placeholder {
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 26px 18px;
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+}
+.ghost-row { height: 14px; border-radius: 4px; background: var(--surface-2); }
+.ghost-row:nth-child(2) { width: 88%; }
+.ghost-row:nth-child(3) { width: 72%; }
+.callout {
+  border-left: 4px solid var(--ink-2);
+  background: var(--surface-2);
+  padding: 12px 16px;
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+}
+.chip-btn {
+  border: 1px solid var(--tt);
+  color: var(--tt-ink);
+  background: var(--tt-soft);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---------- 支援パネル ---------- */
+.guide {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 5px solid var(--tt);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.guide.hub { border-top-color: var(--hub); }
+.guide-kicker { font-size: 13px; color: var(--muted); }
+.guide-brand { font-weight: 700; color: var(--tt-ink); font-size: 18px; margin-top: -8px; }
+.guide.hub .guide-brand { color: var(--hub-ink); }
+.guide-title { font-size: 21px; }
+.guide-text { color: var(--ink-2); font-size: 15px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; counter-reset: st; }
+.steps li {
+  counter-increment: st;
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 15px;
+  color: var(--muted);
+}
+.steps li::before {
+  content: counter(st);
+  display: inline-grid; place-items: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1px solid var(--line); font-size: 12px;
+}
+.steps li.done { color: var(--ink-2); }
+.steps li.done::before { content: "✓"; background: var(--ok); border-color: var(--ok); color: var(--on-accent); }
+.steps li.now { background: var(--tt-soft); color: var(--tt-ink); font-weight: 700; }
+.steps li.now::before { background: var(--tt); border-color: var(--tt); color: var(--on-accent); }
+.now-box { font-size: 16px; font-weight: 700; }
+.alert {
+  background: var(--warn-soft);
+  border: 1px solid var(--warn);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 15px;
+}
+.reason, .soft-box {
+  background: var(--tt-soft);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 15px;
+  color: var(--ink);
+}
+.guide.hub .soft-box { background: var(--hub-soft); }
+.sample-label {
+  align-self: flex-start;
+  font-size: 12px;
+  border: 1px solid var(--hub);
+  color: var(--hub-ink);
+  border-radius: 999px;
+  padding: 1px 10px;
+}
+.explain { margin: 0; display: grid; gap: 4px; }
+.explain dt { font-size: 13px; color: var(--hub-ink); font-weight: 700; letter-spacing: 0.04em; }
+.explain dd { margin: 0 0 8px; font-size: 16px; }
+.next-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.next-list li { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; font-size: 15px; }
+.src { font-size: 12px; border-radius: 4px; padding: 0 6px; white-space: nowrap; }
+.src.app { background: var(--app-soft); color: var(--app); }
+.src.doc { background: var(--hub); color: var(--on-accent); }
+.refs { font-size: 13px; color: var(--muted); }
+.part { border-radius: 8px; padding: 12px 14px; display: grid; gap: 4px; font-size: 15px; }
+.part.tt { background: var(--tt-soft); }
+.part.hub { background: var(--hub-soft); }
+.part-head { font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+.part.tt .part-head { color: var(--tt-ink); }
+.part.hub .part-head { color: var(--hub-ink); }
+.actions { display: flex; gap: 10px; }
+.btn {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.4;
+}
+.btn-primary { background: var(--tt); color: var(--on-accent); flex: 1; }
+.guide.hub .btn-primary { background: var(--hub); }
+.btn-ghost { background: transparent; border-color: var(--line); color: var(--ink-2); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---------- デモB：ひな型の編集 ---------- */
+.tpl-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 4px; border-radius: 12px; position: relative; }
+.tpl {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  background: var(--surface);
+  min-width: 0;
+}
+.tpl input { position: absolute; opacity: 0; pointer-events: none; }
+.tpl:has(input:checked) { border-color: var(--app); background: var(--app-soft); }
+.tpl:has(input:focus-visible) { outline: 3px solid var(--tt); outline-offset: 2px; }
+.tpl-name { font-weight: 700; font-size: 16px; }
+.tpl-desc { font-size: 14px; color: var(--ink-2); }
+.badge { justify-self: start; font-size: 12px; border-radius: 4px; padding: 0 6px; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+.section-label { font-size: 14px; color: var(--muted); font-weight: 700; letter-spacing: 0.04em; }
+.edit-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.locked {
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--ink-2);
+  background: var(--surface-2);
+}
+.changes { position: relative; display: grid; gap: 6px; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+.changes ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.changes li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 15px; }
+.changes .k { color: var(--muted); min-width: 7.5em; }
+.changes .st { font-size: 12px; border-radius: 4px; padding: 0 6px; background: var(--surface-2); color: var(--muted); }
+.changes .st.on { background: var(--tt); color: var(--on-accent); }
+.result { position: relative; display: grid; gap: 12px; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.result-head { font-weight: 700; }
+.chart-wrap { overflow-x: auto; }
+.chart { width: 100%; min-width: 420px; height: auto; display: block; }
+.c-grid { stroke: var(--line); stroke-width: 1; }
+.c-area { fill: var(--app-soft); }
+.c-line { stroke: var(--app); stroke-width: 2.5; fill: none; }
+.c-txt { fill: var(--muted); font-size: 12px; font-family: var(--font); }
+.c-hit { fill: var(--warn); }
+.c-hit-txt { fill: var(--warn); font-size: 13px; font-weight: 700; font-family: var(--font); }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 15px; }
+.checks li::before { content: "✓"; color: var(--ok); font-weight: 700; margin-right: 8px; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.row-actions .btn { flex: 0 1 auto; }
+.btn-app { background: var(--app); color: var(--on-accent); }
+.status { font-size: 15px; background: var(--surface-2); border-radius: 8px; padding: 10px 12px; }
+.dql { display: grid; gap: 2px; border-top: 1px solid var(--line); padding-top: 12px; }
+.dql strong { font-size: 15px; }
+.dql span { font-size: 15px; color: var(--ink-2); }
+
+/* ---------- 伺いたいこと・進行メモ ---------- */
+.ask {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: baseline;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: var(--fs-lede);
+}
+.ask strong {
+  font-size: 14px;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 999px;
+  padding: 2px 12px;
+  white-space: nowrap;
+}
+.ask span { min-width: 0; }
+.notes {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 22px;
+  display: grid;
+  gap: 14px;
+  font-size: 15px;
+}
+.notes h2 { font-size: 17px; }
+.notes h3 { font-size: 15px; color: var(--ink-2); }
+.notes ul { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.notes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 28px; }
+.notes-grid > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.kbd { font-size: 13px; color: var(--muted); }
+.foot { font-size: 12px; color: var(--muted); text-align: right; }
+
+@media (max-width: 980px) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  .notes-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .wrap { padding-inline: 16px; }
+  .filters, .edit-grid, .tpl-list { grid-template-columns: minmax(0, 1fr); }
+  .app-body { padding: 16px; }
+  .guide { padding: 16px; }
+  .mtable .big { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-target { animation: none; }
+}
+</style>
+<!-- fragment:head:end -->
+</head>
+<body>
+<!-- fragment:body:start -->
+<div class="wrap" lang="ja">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name">Dynatrace × テックタッチ　構想デモ</span>
+      <span class="brand-sub">観測はDynatrace、利用者が迷う画面での介入はテックタッチ</span>
+    </div>
+    <nav class="scene-nav" aria-label="デモの切り替え">
+      <button type="button" id="tab-a1" data-go="a1">デモA①　状況を確認</button>
+      <button type="button" id="tab-a2" data-go="a2">デモA②　値を理解</button>
+      <button type="button" id="tab-b" data-go="b">デモB　ダッシュボード修正</button>
+    </nav>
+    <div class="tools">
+      <button type="button" class="tool" id="notes-btn" aria-pressed="false" aria-controls="notes">進行メモ</button>
+      <button type="button" class="tool" id="reset-btn">この画面を最初から</button>
+      <button type="button" class="tool" id="theme-btn">表示：自動</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    <span>構想デモ。画面・サービス名・数値は架空で、実際の製品画面や連携動作を示すものではありません。</span>
+    <span class="legend" aria-label="色の意味">
+      <span><i class="l-app"></i>監視ツール画面（架空）</span>
+      <span><i class="l-tt"></i>テックタッチ 操作ガイド（案）</span>
+      <span><i class="l-hub"></i>AI Hub 理解支援（構想）</span>
+    </span>
+  </div>
+
+  <!-- ==================== デモA① ==================== -->
+  <section class="scene" id="scene-a1" aria-labelledby="h-a1">
+    <div class="scene-head">
+      <div>
+        <p class="eyebrow">デモA①・仮説1　画面・操作で迷う</p>
+        <h1 id="h-a1">担当サービスの状況を確認する</h1>
+        <p class="lede">仮説1：対象と時間帯をそろえ、次の操作へ進む</p>
+      </div>
+      <span class="tag">イメージデモ</span>
+    </div>
+
+    <div class="stage">
+      <div class="app">
+        <div class="app-bar"><span class="app-name">監視ツール画面（架空）</span><span>サービス ＞ 状況確認</span></div>
+        <div class="app-body">
+          <h2 class="app-title">サービスの状況確認</h2>
+          <div class="filters" id="a1-filters">
+            <div class="field" id="a1-f-service">
+              <label for="a1-service">対象サービス</label>
+              <select id="a1-service">
+                <option value="">選択してください</option>
+                <option>契約照会サービス（架空）</option>
+                <option>保険料計算サービス（架空）</option>
+                <option>代理店ポータル（架空）</option>
+              </select>
+            </div>
+            <div class="field" id="a1-f-period">
+              <label for="a1-period">対象期間</label>
+              <select id="a1-period">
+                <option value="">選択してください</option>
+                <option>09:45–10:00</option>
+                <option>10:00–10:15</option>
+                <option>10:15–10:30</option>
+              </select>
+            </div>
+            <div class="field" id="a1-f-compare">
+              <label for="a1-compare">比較期間</label>
+              <select id="a1-compare">
+                <option value="">選択してください</option>
+                <option>09:00–10:00</option>
+                <option>09:45–10:00</option>
+                <option>前日 10:00–10:15</option>
+              </select>
+            </div>
+          </div>
+          <div id="a1-metrics"></div>
+          <p class="fine">数値・サービス名・時刻はすべて架空です。</p>
+        </div>
+      </div>
+
+      <aside class="guide" aria-live="polite" aria-label="テックタッチ 操作ガイド案">
+        <p class="guide-kicker">支援案 1</p>
+        <p class="guide-brand">テックタッチ 操作ガイド案</p>
+        <h3 class="guide-title">まず、対象サービスと時間帯を確認します</h3>
+        <p class="guide-text">調査したいサービス、事象の発生時間、比較する時間帯を選びます。今回は対象・比較ともに15分間です。</p>
+        <ol class="steps" id="a1-steps">
+          <li>対象サービスを選ぶ</li>
+          <li>対象期間を選ぶ</li>
+          <li>比較期間を選ぶ</li>
+          <li>条件を確認して指標を見る</li>
+        </ol>
+        <p class="now-box" id="a1-now"></p>
+        <p class="alert" id="a1-alert" hidden></p>
+        <p class="reason">確認する理由：対象や時間帯が違うと、比較結果の解釈も変わります。</p>
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" id="a1-back">戻る</button>
+          <button type="button" class="btn btn-primary" id="a1-next">次へ</button>
+        </div>
+      </aside>
+    </div>
+
+    <p class="ask"><strong>伺いたいこと</strong><span>画面の探し方、絞り込み、時間帯の指定のどこで迷いますか？</span></p>
+  </section>
+
+  <!-- ==================== デモA② ==================== -->
+  <section class="scene" id="scene-a2" aria-labelledby="h-a2" hidden>
+    <div class="scene-head">
+      <div>
+        <p class="eyebrow">デモA②・仮説2　指標を読み解けない</p>
+        <h1 id="h-a2">表示された値を理解する</h1>
+        <p class="lede">仮説2：意味・確認理由・次に見る情報を、その場で確認（AI欄は事前作成の例文）</p>
+      </div>
+      <span class="tag">イメージデモ</span>
+    </div>
+
+    <div class="stage">
+      <div class="app">
+        <div class="app-bar"><span class="app-name">監視ツール画面（架空）</span><span>サービス ＞ 状況確認 ＞ 契約照会サービス（架空）</span></div>
+        <div class="app-body">
+          <div class="app-title-row">
+            <h2 class="app-title">サービスの状況確認</h2>
+            <button type="button" class="chip-btn" id="a2-chip">指標の意味を確認</button>
+          </div>
+          <div id="a2-metrics"></div>
+          <p class="callout">確認できること：平均応答時間とエラー率が比較期間より上昇。<br>この画面だけで原因や全利用者への影響は確定できません。</p>
+          <p class="fine">指標名を押すと、AI Hubの説明が切り替わります。数値・サービス名・時刻はすべて架空です。</p>
+        </div>
+      </div>
+
+      <aside class="guide hub" id="a2-guide" aria-live="polite" aria-label="AI Hub 理解支援案">
+        <p class="guide-kicker">支援案 2</p>
+        <p class="guide-brand">AI Hub 理解支援案</p>
+        <h3 class="guide-title" id="a2-title"></h3>
+        <p class="sample-label">例文（事前に作成した文章です）</p>
+        <dl class="explain">
+          <dt>意味</dt><dd id="a2-mean"></dd>
+          <dt>確認する理由</dt><dd id="a2-why"></dd>
+        </dl>
+        <div class="soft-box">
+          <p><b>次の確認候補：</b><span id="a2-hint"></span></p>
+          <ul class="next-list" id="a2-next-list" hidden></ul>
+        </div>
+        <p class="refs">参照する情報の想定：表示値、社内の指標定義、承認済みの確認手順。いずれも本デモでは架空。</p>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="a2-next" aria-expanded="false" aria-controls="a2-next-list">次に見る情報を確認</button>
+        </div>
+      </aside>
+    </div>
+
+    <p class="ask"><strong>伺いたいこと</strong><span>値の意味、比較条件、次に見る情報のどこで止まりますか？</span></p>
+  </section>
+
+  <!-- ==================== デモB ==================== -->
+  <section class="scene" id="scene-b" aria-labelledby="h-b" hidden>
+    <div class="scene-head">
+      <div>
+        <p class="eyebrow">デモB・仮説3　作成・修正で止まる</p>
+        <h1 id="h-b">ダッシュボードを自分で修正する</h1>
+        <p class="lede">仮説3：ひな型を選び、変更箇所と結果を確認する</p>
+      </div>
+      <span class="tag">イメージデモ</span>
+    </div>
+
+    <div class="stage">
+      <div class="app">
+        <div class="app-bar"><span class="app-name">監視ツール画面（架空）</span><span>ダッシュボード ＞ ひな型から作成</span></div>
+        <div class="app-body">
+          <h2 class="app-title">ひな型の編集</h2>
+
+          <p class="section-label">ひな型を選ぶ</p>
+          <div class="tpl-list" id="b-templates" role="radiogroup" aria-label="ひな型">
+            <label class="tpl"><input type="radio" name="b-tpl" value="t1" id="b-tpl-t1"><span class="tpl-name">サービスの状況確認（標準）</span><span class="tpl-desc">平均応答時間とエラー率を期間で比べる</span><span class="badge">専門家が確認済み</span></label>
+            <label class="tpl"><input type="radio" name="b-tpl" value="t2" id="b-tpl-t2"><span class="tpl-name">エラーの内訳（標準）</span><span class="tpl-desc">エラーの種類と発生箇所を一覧する</span><span class="badge">専門家が確認済み</span></label>
+            <label class="tpl"><input type="radio" name="b-tpl" value="t3" id="b-tpl-t3"><span class="tpl-name">利用の多い時間帯（標準）</span><span class="tpl-desc">リクエスト数の推移を見る</span><span class="badge">専門家が確認済み</span></label>
+          </div>
+
+          <p class="section-label">設定を変更する</p>
+          <div class="edit-grid">
+            <div class="field" id="b-f-service">
+              <label for="b-service">対象サービス</label>
+              <select id="b-service">
+                <option value="all">すべてのサービス（ひな型の既定）</option>
+                <option>契約照会サービス（架空）</option>
+                <option>保険料計算サービス（架空）</option>
+                <option>代理店ポータル（架空）</option>
+              </select>
+            </div>
+            <div class="field" id="b-f-range">
+              <label for="b-range">確認する時間帯</label>
+              <select id="b-range">
+                <option value="2h">直近2時間（ひな型の既定）</option>
+                <option value="24h">直近24時間</option>
+                <option value="7d">直近7日間</option>
+              </select>
+            </div>
+            <div class="field">
+              <span class="label">指標（変更しない）</span>
+              <span class="locked">平均応答時間・エラー率</span>
+            </div>
+          </div>
+
+          <p class="callout"><b>専門家が確認済みの設定内容を使用する想定</b><br>対象サービス、集計期間、指標の定義を確認してから変更します。</p>
+
+          <div class="changes" id="b-changes">
+            <p class="section-label">変更箇所</p>
+            <ul id="b-changes-list"></ul>
+          </div>
+
+          <div id="b-result-slot"></div>
+
+          <div class="dql">
+            <strong>DQLの作成・説明が必要な場合</strong>
+            <span>利用条件を満たすDynatrace Assistの活用を含めて確認します。</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="guide hub" aria-live="polite" aria-label="テックタッチ＋AI Hub 支援案">
+        <p class="guide-kicker">支援案 3</p>
+        <p class="guide-brand">テックタッチ＋AI Hub 支援案</p>
+        <h3 class="guide-title">変える項目と、変える理由を確認します</h3>
+        <p class="guide-text">操作ガイドで変更箇所を示し、AI Hubで社内のひな型の意図や指標定義を説明する構想です。DQLそのものの生成・説明は、Dynatraceの既存機能（Dynatrace Assist）の利用状況も含めて確認します。</p>
+        <ol class="steps" id="b-steps">
+          <li>ひな型を選ぶ</li>
+          <li>対象サービスを変える</li>
+          <li>時間帯を変える</li>
+          <li>変更箇所を見直す</li>
+          <li>結果を確認する</li>
+        </ol>
+        <div class="part tt">
+          <p class="part-head"><span>テックタッチ 操作ガイド</span><span class="num" id="b-count"></span></p>
+          <p id="b-op"></p>
+        </div>
+        <p class="alert" id="b-alert" hidden></p>
+        <div class="part hub">
+          <p class="part-head"><span>AI Hub（例文）</span></p>
+          <p id="b-why"></p>
+        </div>
+        <p class="refs">実環境の項目名やデータ構造に合わせた説明・検証が必要です。</p>
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" id="b-back">戻る</button>
+          <button type="button" class="btn btn-primary" id="b-next">次へ</button>
+        </div>
+      </aside>
+    </div>
+
+    <p class="ask"><strong>伺いたいこと</strong><span>ひな型選択、条件の変更、結果の検証のどこで依頼しますか？</span></p>
+  </section>
+
+  <!-- ==================== 進行メモ（発表者用・既定は非表示） ==================== -->
+  <section class="notes" id="notes" hidden aria-label="進行メモ">
+    <h2>進行メモ（発表者用）</h2>
+    <div class="notes-grid">
+      <div>
+        <h3>この画面の進め方</h3>
+        <ul data-for="a1">
+          <li>仮説1「画面・操作で迷う」への支援案（テックタッチの操作ガイド）。</li>
+          <li>選択を間違えるとガイドが止まり、選び直しを案内します。例：比較期間に「09:00–10:00」を選ぶ。</li>
+          <li>問いかけ：「どこで迷いますか」</li>
+        </ul>
+        <ul data-for="a2" hidden>
+          <li>仮説2「指標を読み解けない」への支援案（AI Hubの理解支援、構想）。</li>
+          <li>AI Hub欄は事前に作成した例文です。その場でAIが生成したものではありません。原因は断定しません。</li>
+          <li>Dynatrace内で完結する説明はDynatraceの既存AI支援（Dynatrace Assist）を優先。AI Hubは社内資料（指標定義・監視基準・手順書）側を補います。</li>
+          <li>問いかけ：「どこで止まりますか」</li>
+        </ul>
+        <ul data-for="b" hidden>
+          <li>仮説3「作成・修正で止まる」への支援案（ひな型編集の案内＋AI Hub＋Dynatrace Assist）。</li>
+          <li>Dynatrace Assistの利用状況（利用条件を満たすか）も伺います。</li>
+          <li>問いかけ：「どこで依頼しますか」</li>
+        </ul>
+        <h3>全体</h3>
+        <ul>
+          <li>冒頭で「構想デモです。画面・サービス名・数値は架空で、実際の製品画面や連携動作を示すものではありません」とお伝えする。</li>
+          <li>各画面の「伺いたいこと」をそのまま質問し、直近の具体例を一つ伺う。</li>
+          <li>削減率などの数値はお約束しない。確かめ方は自力完了率・所要時間・依頼件数・再実行。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>想定問答</h3>
+        <ul>
+          <li>「実際のDynatrace画面で動きますか」→ iframe構成の画面でも動作します。御社環境での確認は導入時に実施します。</li>
+          <li>「Dynatrace Assistと何が違いますか」→ Assistは公式情報・環境データを使う支援です。AI Hubは御社の社内資料側の知見を補う構想で、重複する部分はDynatraceの機能を優先します。</li>
+          <li>「効果はどれくらいですか」→ 現時点で数値はお約束しません。一つの作業で、自力完了率・所要時間・依頼件数を測って確かめます。</li>
+          <li>「セキュリティは」→ 拡張機能の配布手続きと、AI Hubに渡す情報の範囲を御社方針に沿って決めます。AI Hubは外部のAIサービスを利用します。</li>
+        </ul>
+        <p class="kbd">キー操作：→ 次へ ／ ← 戻る ／ 1・2・3 画面の切り替え ／ N 進行メモ ／ R この画面を最初から</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">構想デモ　2026年9月30日作成</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  document.documentElement.lang = "ja";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* ---------- 共通：ハイライトと吹き出し ---------- */
+  function clearGuide(scene) {
+    $$(".is-target", scene).forEach(function (el) { el.classList.remove("is-target"); });
+    $$(".balloon", scene).forEach(function (el) { el.remove(); });
+  }
+  function point(target, text, warn) {
+    if (!target) return;
+    target.classList.add("is-target");
+    var b = document.createElement("div");
+    b.className = "balloon" + (warn ? " warn" : "");
+    b.textContent = text;
+    target.appendChild(b);
+  }
+  function setSteps(list, step) {
+    $$("li", list).forEach(function (li, i) {
+      li.className = i < step ? "done" : (i === step ? "now" : "");
+    });
+  }
+
+  /* ---------- 指標テーブル ---------- */
+  var ROWS = [
+    { key: "rt", label: "平均応答時間", base: "420 ms", cur: "980 ms", big: true, up: true },
+    { key: "req", label: "リクエスト数", base: "6,000件", cur: "6,200件" },
+    { key: "err", label: "エラー数 / エラー率", base: "12件 / 0.2%", cur: "48件 / 約0.8%" }
+  ];
+  function tableHTML(selectable, sel) {
+    var h = '<div class="table-wrap"><table class="mtable num"><thead><tr><th scope="col">指標</th>' +
+      '<th scope="col">比較期間<br>09:45–10:00</th><th scope="col">対象期間<br>10:00–10:15</th></tr></thead><tbody>';
+    ROWS.forEach(function (r) {
+      var label = selectable
+        ? '<button type="button" class="metric-btn" data-metric="' + r.key + '"><span class="q" aria-hidden="true">?</span>' + r.label + "</button>"
+        : r.label;
+      h += '<tr class="' + (selectable && sel === r.key ? "is-sel" : "") + '"><th scope="row" style="font-weight:400">' + label + "</th>" +
+        '<td class="' + (r.big ? "big" : "") + '">' + r.base + "</td>" +
+        '<td class="' + (r.big ? "big " : "") + (r.up ? "up" : "") + '">' + r.cur + "</td></tr>";
+    });
+    return h + "</tbody></table></div>";
+  }
+
+  /* ==================== デモA① ==================== */
+  var a1 = { shown: false, step: 0 };
+  var A1F = [
+    { id: "a1-service", wrap: "a1-f-service", expect: "契約照会サービス（架空）",
+      tip: "① 調査したいサービスを選びます", now: "担当する「契約照会サービス（架空）」を選びます。" },
+    { id: "a1-period", wrap: "a1-f-period", expect: "10:00–10:15",
+      tip: "② 事象が起きた時間帯を選びます", now: "事象が起きた「10:00–10:15」を選びます。" },
+    { id: "a1-compare", wrap: "a1-f-compare", expect: "09:45–10:00",
+      tip: "③ 比べる時間帯を選びます", now: "直前の同じ長さ「09:45–10:00」を選びます。対象期間と長さ（15分）をそろえます。" }
+  ];
+  function a1Wrong(id, v) {
+    if (id === "a1-service") return "今回は「契約照会サービス（架空）」で進めます。別のサービスを選ぶと、別のサービスの値を見ることになります。";
+    if (id === "a1-period") return "事象が起きたのは10:00–10:15です。対象期間は事象の時間帯に合わせます。";
+    if (v === "09:00–10:00") return "対象期間（15分）と長さが違います。件数を比べるときは、期間の長さをそろえます。";
+    return "前日の同じ時間帯と比べる方法もあります。今回は直前の15分（09:45–10:00）と比べます。";
+  }
+  function a1Sync() {
+    var first = -1, wrong = null;
+    A1F.forEach(function (f, i) {
+      var v = $("#" + f.id).value;
+      if (first === -1 && v !== f.expect) { first = i; if (v) wrong = a1Wrong(f.id, v); }
+    });
+    if (first !== -1) { a1.shown = false; a1.step = first; }
+    else a1.step = a1.shown ? 4 : 3;
+    a1Render(wrong);
+  }
+  function a1Render(wrong) {
+    var scene = $("#scene-a1");
+    clearGuide(scene);
+    setSteps($("#a1-steps"), a1.step);
+    var next = $("#a1-next"), now = $("#a1-now"), alert = $("#a1-alert");
+    alert.hidden = !wrong;
+    alert.textContent = wrong || "";
+    if (a1.step < 3) {
+      var f = A1F[a1.step];
+      point($("#" + f.wrap), wrong ? "「" + f.expect + "」を選び直します" : f.tip, !!wrong);
+      now.textContent = f.now;
+      next.textContent = "次へ";
+    } else if (a1.step === 3) {
+      point($("#a1-filters"), "④ 3つの条件がそろっているか確認します");
+      now.textContent = "サービスと2つの時間帯を見直してから、指標を表示します。";
+      next.textContent = "条件を確認して、指標を見る";
+    } else {
+      now.textContent = "条件がそろった状態で指標を表示しました。次は、表示された値の意味を確認します。";
+      next.textContent = "デモA②へ進む";
+    }
+    $("#a1-back").disabled = a1.step === 0;
+    $("#a1-metrics").innerHTML = a1.step === 4 ? tableHTML(false) :
+      '<div class="placeholder" aria-label="指標の表示欄"><div class="ghost-row"></div><div class="ghost-row"></div><div class="ghost-row"></div><span>条件を選ぶと、ここに指標が表示されます。</span></div>';
+  }
+  function a1Next() {
+    if (a1.step < 3) { $("#" + A1F[a1.step].id).value = A1F[a1.step].expect; a1Sync(); }
+    else if (a1.step === 3) { a1.shown = true; a1Sync(); }
+    else show("a2");
+  }
+  function a1Back() {
+    if (a1.step === 4) { a1.shown = false; a1Sync(); return; }
+    if (a1.step === 0) return;
+    for (var i = a1.step - 1; i < A1F.length; i++) $("#" + A1F[i].id).value = "";
+    a1Sync();
+  }
+  function a1Reset() { A1F.forEach(function (f) { $("#" + f.id).value = ""; }); a1.shown = false; a1Sync(); }
+  A1F.forEach(function (f) { $("#" + f.id).addEventListener("change", a1Sync); });
+  $("#a1-next").addEventListener("click", a1Next);
+  $("#a1-back").addEventListener("click", a1Back);
+
+  /* ==================== デモA② ==================== */
+  var A2 = {
+    rt: {
+      title: "平均応答時間の変化を読み解きます",
+      mean: "選んだ期間に処理したリクエストの応答時間を平均した値です。420 msから980 msへ、約2.3倍に上昇しています。",
+      why: "利用者が「遅い」と感じる変化の入口になります。ただし平均値だけでは、一部の遅いリクエストや利用者ごとの差は分かりません。",
+      hint: "同じ時間帯で、遅い処理の内訳や関連トレースを確認します。原因は未特定です。",
+      next: [["app", "監視ツール", "同じ時間帯の遅い処理の内訳"], ["app", "監視ツール", "遅いリクエストの関連トレース"], ["doc", "社内手順（架空）", "応答時間が上がったときの確認順"]]
+    },
+    req: {
+      title: "リクエスト数の変化を読み解きます",
+      mean: "選んだ期間に受け付けたリクエストの件数です。6,000件から6,200件へ、約3%の増加です。",
+      why: "件数が大きく増えていれば、負荷の増加が応答時間に影響した可能性を考えます。今回の増加は小さいものの、この値だけで負荷の影響は判断できません。",
+      hint: "時間帯ごとの件数の推移と、処理の種類ごとの件数を確認します。原因は未特定です。",
+      next: [["app", "監視ツール", "時間帯ごとのリクエスト数の推移"], ["app", "監視ツール", "処理の種類ごとの件数"], ["doc", "社内の指標定義（架空）", "リクエスト数の数え方"]]
+    },
+    err: {
+      title: "エラー率の変化を読み解きます",
+      mean: "失敗したリクエストの件数と、全体に占める割合です。12件（0.2%）から48件（約0.8%）へ上昇しています。",
+      why: "期間ごとにリクエスト数が違うため、件数ではなく率で比べます。応答時間の上昇と同じ時間帯に起きているかも確認します。",
+      hint: "エラーの種類と発生箇所、応答時間が上がり始めた時刻との前後関係を確認します。原因は未特定です。",
+      next: [["app", "監視ツール", "エラーの種類と発生箇所"], ["app", "監視ツール", "応答時間の上昇とエラー増加の前後関係"], ["doc", "社内の監視基準（架空）", "エラー率の確認基準"]]
+    }
+  };
+  var a2 = { metric: "rt", open: false };
+  function a2Render() {
+    var d = A2[a2.metric];
+    $("#a2-metrics").innerHTML = tableHTML(true, a2.metric);
+    $("#a2-title").textContent = d.title;
+    $("#a2-mean").textContent = d.mean;
+    $("#a2-why").textContent = d.why;
+    $("#a2-hint").textContent = d.hint;
+    var list = $("#a2-next-list");
+    list.innerHTML = "";
+    d.next.forEach(function (n) {
+      var li = document.createElement("li");
+      var s = document.createElement("span");
+      s.className = "src " + n[0];
+      s.textContent = n[1];
+      li.appendChild(s);
+      li.appendChild(document.createTextNode(n[2]));
+      list.appendChild(li);
+    });
+    list.hidden = !a2.open;
+    var btn = $("#a2-next");
+    btn.textContent = a2.open ? "確認候補を閉じる" : "次に見る情報を確認";
+    btn.setAttribute("aria-expanded", String(a2.open));
+  }
+  $("#a2-metrics").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-metric]");
+    if (!b) return;
+    a2.metric = b.getAttribute("data-metric");
+    a2Render();
+    var nb = $('#a2-metrics [data-metric="' + a2.metric + '"]');
+    if (nb) nb.focus();
+  });
+  $("#a2-next").addEventListener("click", function () { a2.open = !a2.open; a2Render(); });
+  $("#a2-chip").addEventListener("click", function () {
+    a2.metric = "rt"; a2Render();
+    var g = $("#a2-guide");
+    g.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    g.classList.remove("is-target"); void g.offsetWidth; g.classList.add("is-target");
+    setTimeout(function () { g.classList.remove("is-target"); }, 1800);
+  });
+  function a2Next() { if (!a2.open) { a2.open = true; a2Render(); } else show("b"); }
+  function a2Back() { if (a2.open) { a2.open = false; a2Render(); } else show("a1"); }
+  function a2Reset() { a2.metric = "rt"; a2.open = false; a2Render(); }
+
+  /* ==================== デモB ==================== */
+  var SVC = "契約照会サービス（架空）";
+  var b = { step: 0, result: false, action: "" };
+  var BSTEP = [
+    { target: "#b-templates", tip: "① 専門家が確認済みのひな型から選びます",
+      op: "ひな型を選びます。今回は「サービスの状況確認（標準）」を選びます。",
+      why: "ひな型の意図：「サービスの状況確認（標準）」は、担当サービスの平均応答時間とエラー率を、同じ長さの期間で比べるためのひな型です。" },
+    { target: "#b-f-service", tip: "② 対象サービスを担当サービスに変えます",
+      op: "対象サービスを「契約照会サービス（架空）」に変えます。",
+      why: "変える理由：ひな型の既定は、すべてのサービスの合計です。担当サービスに絞らないと、他のサービスの変化が混ざります。" },
+    { target: "#b-f-range", tip: "③ 確認する時間帯を変えます",
+      op: "確認する時間帯を「直近24時間」に変えます。",
+      why: "変える理由：朝の事象の前後を含めて、1日の中でいつ上がり始めたかを確認するためです。" },
+    { target: "#b-changes", tip: "④ 変更箇所を見直します",
+      op: "変更したのは2か所です。指標の定義を変えていないことを確認して、結果を表示します。",
+      why: "変えない項目：指標の定義（平均応答時間・エラー率）は、専門家が決めたものをそのまま使います。変えるのは対象と時間帯だけです。" },
+    { target: "#b-result", tip: "⑤ 結果を確かめます",
+      op: "結果を確認し、保存するか、専門家に確認を依頼します。",
+      why: "結果の見方：10時台に平均応答時間が上がっています。デモA①で確認した時間帯と合っているかを確かめます。原因はこの画面だけでは特定できません。" }
+  ];
+  function bTpl() { var c = $('input[name="b-tpl"]:checked'); return c ? c.value : ""; }
+  function bSync() {
+    var tpl = bTpl(), svc = $("#b-service").value, rng = $("#b-range").value, wrong = null;
+    var ok = tpl === "t1";
+    $("#b-service").disabled = !ok;
+    $("#b-range").disabled = !ok || svc !== SVC;
+    if (!ok) { b.step = 0; b.result = false; if (tpl) wrong = "今回は応答時間の変化を見るため、「サービスの状況確認（標準）」を使います。"; }
+    else if (svc !== SVC) { b.step = 1; b.result = false; if (svc !== "all") wrong = "今回は担当の「契約照会サービス（架空）」に絞ります。"; }
+    else if (rng !== "24h") { b.step = 2; b.result = false; if (rng !== "2h") wrong = "今回は朝の事象の前後を見るため「直近24時間」にします。7日間は、日ごとの傾向を見るときに使います。"; }
+    else b.step = b.result ? 4 : 3;
+    if (!b.result) b.action = "";
+    bRender(wrong);
+  }
+  function chartSVG() {
+    // 1時間ごとの平均応答時間（架空）。前日11時台〜当日10時台の24本。
+    var hours = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    var v = [430, 450, 440, 420, 430, 440, 420, 400, 390, 380, 370, 360, 350, 340, 330, 330, 330, 340, 350, 370, 400, 430, 440, 610];
+    var W = 640, H = 250, L = 52, R = 18, T = 26, B = 36, max = 800;
+    var x = function (i) { return L + i * (W - L - R) / (v.length - 1); };
+    var y = function (val) { return T + (1 - val / max) * (H - T - B); };
+    var s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="平均応答時間の推移（架空）。10時台に610ミリ秒へ上昇。">';
+    [0, 200, 400, 600, 800].forEach(function (g) {
+      s += '<line class="c-grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(g) + '" y2="' + y(g) + '"/>';
+      s += '<text class="c-txt" x="' + (L - 8) + '" y="' + (y(g) + 4) + '" text-anchor="end">' + g + "</text>";
+    });
+    s += '<text class="c-txt" x="' + (L - 8) + '" y="12" text-anchor="end">ms</text>';
+    var pts = v.map(function (val, i) { return x(i).toFixed(1) + "," + y(val).toFixed(1); });
+    s += '<polygon class="c-area" points="' + x(0) + "," + y(0) + " " + pts.join(" ") + " " + x(v.length - 1) + "," + y(0) + '"/>';
+    s += '<polyline class="c-line" points="' + pts.join(" ") + '"/>';
+    [[0, "前日 11時", "start"], [6, "17時", "middle"], [12, "23時", "middle"], [18, "5時", "middle"], [23, "10時", "end"]].forEach(function (t) {
+      s += '<text class="c-txt" x="' + x(t[0]) + '" y="' + (H - 12) + '" text-anchor="' + t[2] + '">' + t[1] + "</text>";
+    });
+    var li = v.length - 1;
+    s += '<circle class="c-hit" cx="' + x(li) + '" cy="' + y(v[li]) + '" r="5"/>';
+    s += '<text class="c-hit-txt" x="' + (x(li) - 10) + '" y="' + (y(v[li]) - 12) + '" text-anchor="end">10時台 610 ms</text>';
+    return s + "</svg>";
+  }
+  function bRender(wrong) {
+    var scene = $("#scene-b");
+    clearGuide(scene);
+    var svc = $("#b-service").value, rng = $("#b-range").value;
+    // 変更箇所
+    var svcChanged = svc === SVC, rngChanged = rng === "24h";
+    $("#b-changes-list").innerHTML =
+      '<li><span class="k">対象サービス</span><span>すべてのサービス → ' + (svcChanged ? SVC : "（未変更）") + '</span><span class="st' + (svcChanged ? " on" : "") + '">' + (svcChanged ? "変更" : "未変更") + "</span></li>" +
+      '<li><span class="k">確認する時間帯</span><span>直近2時間 → ' + (rngChanged ? "直近24時間" : "（未変更）") + '</span><span class="st' + (rngChanged ? " on" : "") + '">' + (rngChanged ? "変更" : "未変更") + "</span></li>" +
+      '<li><span class="k">指標</span><span>平均応答時間・エラー率</span><span class="st">変更しない</span></li>';
+    // 結果
+    var slot = $("#b-result-slot");
+    if (b.step === 4) {
+      var msg = b.action === "ask"
+        ? "依頼内容（例）：変更箇所2点と結果の画面を添えて、専門家に確認を依頼します。デモのため送信はしません。"
+        : b.action === "save" ? "デモのため保存はしません。実環境では保存先と共有範囲を確認します。" : "";
+      slot.innerHTML = '<div class="result" id="b-result">' +
+        '<p class="result-head">結果：平均応答時間（1時間ごと）　' + SVC + "・直近24時間</p>" +
+        '<div class="chart-wrap">' + chartSVG() + "</div>" +
+        '<ul class="checks"><li>対象サービスが担当サービスになっている</li><li>時間帯が直近24時間になっている</li><li>10時台の上昇が、デモA①で確認した時間帯と合っている</li></ul>' +
+        '<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="ask">専門家に確認を依頼</button><button type="button" class="btn btn-app" data-act="save">保存する</button></div>' +
+        (msg ? '<p class="status" role="status">' + msg + "</p>" : "") +
+        '<p class="fine">数値はすべて架空です。</p></div>';
+    } else {
+      slot.innerHTML = '<div class="placeholder" id="b-result"><span>設定を変更して「結果の確認へ」を押すと、ここに結果が表示されます。</span></div>';
+    }
+    // ガイド
+    var st = BSTEP[b.step];
+    setSteps($("#b-steps"), b.step === 4 ? 4 : b.step);
+    if (b.step === 4) $(st.target).classList.add("is-target");
+    else point($(st.target), wrong ? "選び直します" : st.tip, !!wrong);
+    $("#b-count").textContent = (b.step + 1) + " / 5";
+    $("#b-op").textContent = st.op;
+    $("#b-why").textContent = st.why;
+    var alert = $("#b-alert");
+    alert.hidden = !wrong;
+    alert.textContent = wrong || "";
+    var next = $("#b-next");
+    next.hidden = b.step === 4;
+    next.textContent = b.step === 3 ? "結果の確認へ" : "次へ";
+    $("#b-back").disabled = b.step === 0;
+  }
+  function bNext() {
+    if (b.step === 0) { $("#b-tpl-t1").checked = true; }
+    else if (b.step === 1) { $("#b-service").value = SVC; }
+    else if (b.step === 2) { $("#b-range").value = "24h"; }
+    else if (b.step === 3) { b.result = true; }
+    else return;
+    bSync();
+  }
+  function bBack() {
+    if (b.step === 4) { b.result = false; }
+    else if (b.step === 3) { $("#b-range").value = "2h"; }
+    else if (b.step === 2) { $("#b-service").value = "all"; $("#b-range").value = "2h"; }
+    else if (b.step === 1) { $$('input[name="b-tpl"]').forEach(function (r) { r.checked = false; }); $("#b-service").value = "all"; $("#b-range").value = "2h"; }
+    bSync();
+  }
+  function bReset() {
+    $$('input[name="b-tpl"]').forEach(function (r) { r.checked = false; });
+    $("#b-service").value = "all"; $("#b-range").value = "2h";
+    b.result = false; b.action = ""; bSync();
+  }
+  $$('input[name="b-tpl"]').forEach(function (r) { r.addEventListener("change", bSync); });
+  $("#b-service").addEventListener("change", bSync);
+  $("#b-range").addEventListener("change", bSync);
+  $("#b-next").addEventListener("click", bNext);
+  $("#b-back").addEventListener("click", bBack);
+  $("#b-result-slot").addEventListener("click", function (e) {
+    var a = e.target.closest("[data-act]");
+    if (!a) return;
+    b.action = a.getAttribute("data-act");
+    bRender(null);
+  });
+
+  /* ==================== 画面切り替え・進行メモ・表示 ==================== */
+  var SCENES = ["a1", "a2", "b"];
+  var current = "a1";
+  function show(id) {
+    if (SCENES.indexOf(id) === -1) id = "a1";
+    current = id;
+    SCENES.forEach(function (s) {
+      $("#scene-" + s).hidden = s !== id;
+      $("#tab-" + s).setAttribute("aria-current", s === id ? "true" : "false");
+    });
+    $$("#notes [data-for]").forEach(function (ul) { ul.hidden = ul.getAttribute("data-for") !== id; });
+    try { history.replaceState(null, "", "#" + id); } catch (e) { /* 表示には影響なし */ }
+    window.scrollTo(0, 0);
+  }
+  $$("[data-go]").forEach(function (btn) {
+    btn.addEventListener("click", function () { show(btn.getAttribute("data-go")); });
+  });
+  function toggleNotes() {
+    var n = $("#notes"), btn = $("#notes-btn");
+    n.hidden = !n.hidden;
+    btn.setAttribute("aria-pressed", String(!n.hidden));
+  }
+  $("#notes-btn").addEventListener("click", toggleNotes);
+  var RESET = { a1: a1Reset, a2: a2Reset, b: bReset };
+  var NEXT = { a1: a1Next, a2: a2Next, b: bNext };
+  var BACK = { a1: a1Back, a2: a2Back, b: bBack };
+  $("#reset-btn").addEventListener("click", function () { RESET[current](); });
+
+  var THEME_KEY = "dt-tt-demo-theme";
+  var themes = ["", "light", "dark"], labels = { "": "自動", light: "ライト", dark: "ダーク" };
+  var theme = "";
+  function applyTheme(t, persist) {
+    theme = t;
+    if (t) document.documentElement.setAttribute("data-theme", t);
+    else if (persist) document.documentElement.removeAttribute("data-theme");
+    $("#theme-btn").textContent = "表示：" + labels[t];
+    if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* 保存できなくても表示は切り替わる */ } }
+  }
+  try { var saved = localStorage.getItem(THEME_KEY); if (saved === "light" || saved === "dark") applyTheme(saved, false); } catch (e) { /* 既定のまま */ }
+  $("#theme-btn").addEventListener("click", function () {
+    applyTheme(themes[(themes.indexOf(theme) + 1) % themes.length], true);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var tag = (e.target && e.target.tagName || "").toLowerCase();
+    if (tag === "select" || tag === "input" || tag === "textarea") return;
+    if (e.key === "ArrowRight") { NEXT[current](); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { BACK[current](); e.preventDefault(); }
+    else if (e.key === "1") show("a1");
+    else if (e.key === "2") show("a2");
+    else if (e.key === "3") show("b");
+    else if (e.key === "n" || e.key === "N") toggleNotes();
+    else if (e.key === "r" || e.key === "R") RESET[current]();
+  });
+
+  a1Sync();
+  a2Render();
+  bSync();
+  var h = (location.hash || "").replace("#", "");
+  show(SCENES.indexOf(h) !== -1 ? h : "a1");
+})();
+</script>
+<!-- fragment:body:end -->
+</body>
+</html>
