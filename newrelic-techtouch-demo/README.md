@@ -45,6 +45,23 @@ npm install                      # 撮影用フォント（Noto Sans JP、Roboto
 NODE_PATH="$(npm root -g)" FFMPEG=/path/to/ffmpeg node record.js
 ```
 
+## スライド（デモ①〜③）用の画面
+
+会議資料のデモ①〜③（p.11〜13）に貼る画面は、`slides/capture.js` でこのデモから撮影します。スライドの画像枠（11.4in × 4.293in）と同じ縦横比のPNGを `slides/shots/` に書き出します。
+
+| スライド | 撮影する場面 |
+|---|---|
+| デモ① | APM & services のサービス画面。Apply の後、ガイドが「⑥ 上がっている値を確認します」を案内（Golden metrics：420 ms → 980 ms） |
+| デモ② | Issue「High response time」の Logs タブ。ガイドがステップ3と「Time range を『5 minutes before issue』にします」を案内 |
+| デモ③ | Dashboards の Create from template。ガイドが「⑤ Time range を Last 24 hours に変えます」を案内し、AI Hub（例文）が変える理由を説明 |
+
+```sh
+cd slides
+NODE_PATH="$(npm root -g)" node capture.js   # 先に ../video で npm install（フォント）
+```
+
+- 会議資料（.pptx）そのものは、このリポジトリには置いていません。
+
 ## 画面デザインの根拠（New Relicの画面イメージ）
 
 | 項目 | 根拠 |
