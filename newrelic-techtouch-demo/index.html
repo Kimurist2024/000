@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- fragment:head:start -->
+<title>New Relic×テックタッチ 構想デモ</title>
+<style>
+/*
+  Layout: 業務の流れ → 場面説明 → ブラウザ枠の中に「New Relicの画面イメージを踏襲した架空画面」
+          （上にグローバルヘッダー、左にナビゲーション、アプリヘッダー、本文）→ 重なるテックタッチ（青）／AI Hub（紫）。
+  --nr-* の値は New Relic 公式のドキュメントサイト用テーマ @newrelic/gatsby-theme-newrelic 9.18.1（Apache-2.0）の
+  system トークンと、New Relic One Community Library @newrelic/nr1-community 1.2.0（Apache-2.0）の色に合わせた。
+  淡い青・淡い警告色など一部は、それらの間を補った値。製品画面そのものの定義値ではない。
+  テックタッチ・AI Hub の色は 10/1 資料（v2）の配色。
+*/
+:root {
+  --nr-base: #f9fafa;
+  --nr-surface: #ffffff;
+  --nr-container: #f4f5f5;
+  --nr-container-emph: #e8e8e8;
+  --nr-field: #ffffff;
+  --nr-field-hover: #edeeee;
+  --nr-text: #293338;
+  --nr-text-sub: #535e65;
+  --nr-border: #cdd3d5;
+  --nr-border-sub: #e3e4e4;
+  --nr-primary: #0c74df;
+  --nr-primary-accent: #0e74df;
+  --nr-primary-cont: #eef5fd;
+  --nr-primary-cont-emph: #dcebfb;
+  --nr-on-accent: #ffffff;
+  --nr-warning: #8a5a00;
+  --nr-warning-cont-emph: #fff4d1;
+  --nr-critical: #bf0015;
+  --nr-critical-cont: #fcf2f3;
+  --nr-success: #00ac69;
+  --nr-chart-1: #0e74df;
+  --nr-shadow-raised: 0 0 0 1px rgba(41, 51, 56, 0.07), 0 1px 3px rgba(41, 51, 56, 0.10);
+  --nr-shadow-float: 0 0 0 1px rgba(41, 51, 56, 0.06), 0 6px 18px rgba(41, 51, 56, 0.16);
+  --nr-shadow-field: inset 0 0 0 1px #cdd3d5;
+
+  --tt: #0B7FB5;
+  --tt-soft: #E7F3FA;
+  --tt-ink: #075E86;
+  --tt-ring: rgba(11, 127, 181, 0.35);
+  --hub: #6A4C9C;
+  --hub-soft: #F3EFF9;
+  --hub-ink: #553C80;
+  --ov-warn: #B4531A;
+  --ov-warn-soft: #FCF0E6;
+  --on-accent: #FFFFFF;
+  --scrim: rgba(13, 18, 18, 0.32);
+
+  --font: "Söhne", "Sohne", Inter, "Segoe UI", "Helvetica Neue", Helvetica, Arial, "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Yu Gothic", "游ゴシック", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  --font-demo: "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Yu Gothic", "游ゴシック", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  --dock-w: 196px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --nr-base: #0d1212; --nr-surface: #182125; --nr-container: #2a363c; --nr-container-emph: #404b53;
+    --nr-field: #182125; --nr-field-hover: #2a363c; --nr-text: #e9ecec; --nr-text-sub: #d0d6d7;
+    --nr-border: #3a444b; --nr-border-sub: #2a363c; --nr-primary: #3d9dff; --nr-primary-accent: #3d9dff;
+    --nr-primary-cont: #0d374a; --nr-primary-cont-emph: #0d374a; --nr-on-accent: #0d1212;
+    --nr-warning: #ffd23d; --nr-warning-cont-emph: #3a3320; --nr-critical: #ff6f66; --nr-critical-cont: #3a1f22;
+    --nr-success: #01cb81; --nr-chart-1: #3d9dff;
+    --nr-shadow-raised: 0 0 0 1px rgba(233, 236, 236, 0.06), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --nr-shadow-float: 0 0 0 1px rgba(233, 236, 236, 0.08), 0 6px 18px rgba(0, 0, 0, 0.5);
+    --nr-shadow-field: inset 0 0 0 1px #3a444b;
+    --tt: #45AEE0; --tt-soft: #12324A; --tt-ink: #8FD0EF; --tt-ring: rgba(69, 174, 224, 0.4);
+    --hub: #A88DD8; --hub-soft: #28213D; --hub-ink: #CDBDEB;
+    --ov-warn: #F2A465; --ov-warn-soft: #3A2616; --on-accent: #0B1420; --scrim: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --nr-base: #0d1212; --nr-surface: #182125; --nr-container: #2a363c; --nr-container-emph: #404b53;
+  --nr-field: #182125; --nr-field-hover: #2a363c; --nr-text: #e9ecec; --nr-text-sub: #d0d6d7;
+  --nr-border: #3a444b; --nr-border-sub: #2a363c; --nr-primary: #3d9dff; --nr-primary-accent: #3d9dff;
+  --nr-primary-cont: #0d374a; --nr-primary-cont-emph: #0d374a; --nr-on-accent: #0d1212;
+  --nr-warning: #ffd23d; --nr-warning-cont-emph: #3a3320; --nr-critical: #ff6f66; --nr-critical-cont: #3a1f22;
+  --nr-success: #01cb81; --nr-chart-1: #3d9dff;
+  --nr-shadow-raised: 0 0 0 1px rgba(233, 236, 236, 0.06), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --nr-shadow-float: 0 0 0 1px rgba(233, 236, 236, 0.08), 0 6px 18px rgba(0, 0, 0, 0.5);
+  --nr-shadow-field: inset 0 0 0 1px #3a444b;
+  --tt: #45AEE0; --tt-soft: #12324A; --tt-ink: #8FD0EF; --tt-ring: rgba(69, 174, 224, 0.4);
+  --hub: #A88DD8; --hub-soft: #28213D; --hub-ink: #CDBDEB;
+  --ov-warn: #F2A465; --ov-warn-soft: #3A2616; --on-accent: #0B1420; --scrim: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--nr-base);
+  color: var(--nr-text);
+  font-family: var(--font-demo);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1560px;
+  margin: 0 auto;
+  padding-inline: 24px;
+  padding-block: 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--tt); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; word-break: auto-phrase; margin: 0; }
+p { margin: 0; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- デモの外枠（ヘッダー・注記） ---------- */
+.topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; justify-content: space-between; }
+.brand { display: flex; flex-direction: column; line-height: 1.4; }
+.brand-name { font-weight: 700; font-size: 17px; }
+.brand-sub { font-size: 13px; color: var(--nr-text-sub); }
+.scene-nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.scene-nav button {
+  border: 1px solid var(--nr-border);
+  background: var(--nr-surface);
+  color: var(--nr-text-sub);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.scene-nav button[aria-current="true"] { background: var(--nr-text); border-color: var(--nr-text); color: var(--nr-base); font-weight: 700; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.tool { border: 1px solid var(--nr-border); background: transparent; color: var(--nr-text-sub); border-radius: 6px; padding: 5px 12px; font-size: 14px; }
+.tool[aria-pressed="true"] { background: var(--nr-container); color: var(--nr-text); font-weight: 700; }
+.disclaimer {
+  display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: center; justify-content: space-between;
+  border: 1px solid var(--nr-border); background: var(--nr-surface); border-radius: 9px;
+  padding: 8px 16px; font-size: 14px; color: var(--nr-text-sub);
+}
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.l-dt { background: var(--nr-surface); border: 1px solid var(--nr-primary); }
+.l-tt { background: var(--tt); }
+.l-hub { background: var(--hub); }
+
+.scene { display: flex; flex-direction: column; gap: 14px; }
+.scene-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.scene-head > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.eyebrow { font-size: 13px; color: var(--nr-text-sub); letter-spacing: 0.06em; }
+.scene-head h1 { font-size: clamp(22px, 2.2vw, 28px); line-height: 1.4; }
+.lede { font-size: 17px; color: var(--nr-text-sub); }
+.tag { border: 1px solid var(--nr-border); color: var(--nr-text-sub); border-radius: 6px; padding: 2px 10px; font-size: 13px; white-space: nowrap; }
+
+/* ---------- ブラウザ枠 ---------- */
+.window {
+  border: 1px solid var(--nr-border);
+  border-radius: 12px;
+  background: var(--nr-base);
+  box-shadow: var(--nr-shadow-float);
+  min-width: 0;
+}
+.win-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--nr-border-sub);
+  background: var(--nr-container);
+  border-radius: 12px 12px 0 0;
+  font-size: 12px; color: var(--nr-text-sub);
+}
+.dots { display: inline-flex; gap: 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--nr-field-hover); display: inline-block; }
+
+/* ---------- New Relicの画面イメージ（架空） ---------- */
+.dt {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--dock-w) minmax(0, 1fr) 364px;
+  grid-template-rows: auto;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.4286;
+  color: var(--nr-text);
+  min-height: 600px;
+}
+.dock {
+  grid-column: 1;
+  grid-row: 1;
+  background: var(--nr-container);
+  border-right: 1px solid var(--nr-border-sub);
+  padding: 10px 8px;
+  display: flex; flex-direction: column; gap: 2px;
+  border-radius: 0 0 0 12px;
+}
+.dock-group { display: grid; gap: 2px; }
+.dock-sep { height: 1px; background: var(--nr-border); margin: 6px 6px; }
+.dock-label { font-size: 12px; color: var(--nr-text-sub); padding: 4px 8px 2px; }
+.dock-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; border-radius: 6px;
+  color: var(--nr-text); font-size: 14px; white-space: nowrap;
+}
+.dock-item svg { width: 18px; height: 18px; flex: none; }
+.dock-item.active { background: var(--nr-primary-cont-emph); color: var(--nr-primary); font-weight: 500; }
+.dock-spacer { flex: 1; }
+.avatar {
+  width: 22px; height: 22px; border-radius: 50%; flex: none;
+  display: inline-grid; place-items: center; font-size: 11px; font-weight: 700;
+  background: var(--nr-primary-accent); color: var(--nr-on-accent);
+}
+.dt-app { grid-column: 2 / 4; grid-row: 1; display: flex; flex-direction: column; min-width: 0; background: var(--nr-base); border-radius: 0 0 12px 0; }
+.appheader {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 48px; padding: 0 16px;
+  background: var(--nr-surface);
+  border-bottom: 1px solid var(--nr-border-sub);
+}
+.ah-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex-wrap: wrap; }
+.app-icon {
+  width: 24px; height: 24px; border-radius: 6px; flex: none;
+  display: inline-grid; place-items: center;
+  background: var(--nr-primary-cont-emph); color: var(--nr-primary);
+}
+.app-icon svg { width: 16px; height: 16px; }
+.app-name { font-weight: 600; font-size: 14px; }
+.ah-nav { display: flex; gap: 2px; flex-wrap: wrap; }
+.ah-nav span { position: relative; padding: 13px 10px; color: var(--nr-text-sub); font-weight: 500; }
+.ah-nav span.active { color: var(--nr-primary); }
+.ah-nav span.active::after {
+  content: ""; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+  width: 20px; height: 2px; border-radius: 12px; background: currentColor;
+}
+.dt-look-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 6px; font-weight: 500; color: var(--nr-text);
+  background: var(--nr-field); box-shadow: var(--nr-shadow-field); white-space: nowrap;
+}
+.dt-look-btn svg { width: 14px; height: 14px; }
+.dt-page { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.crumbs { font-size: 12px; color: var(--nr-text-sub); }
+.tb-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.dt-h { font-size: 20px; font-weight: 600; line-height: 1.4; }
+.dt-h3 { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dt-field {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 4px 0 10px; min-height: 32px;
+  border-radius: 6px;
+  background: var(--nr-field);
+  box-shadow: var(--nr-shadow-field);
+}
+.dt-field label, .dt-field .pre { display: inline-flex; align-items: center; gap: 6px; color: var(--nr-text-sub); font-weight: 500; white-space: nowrap; }
+.dt-field svg { width: 14px; height: 14px; }
+.dt-field select {
+  border: 0; background: transparent; color: var(--nr-text);
+  font-size: 14px; font-weight: 500; padding: 6px 4px; min-width: 0; max-width: 100%;
+  border-radius: 4px;
+}
+.dt-field select:disabled { opacity: 0.5; cursor: not-allowed; }
+.dt-field:focus-within { box-shadow: var(--nr-shadow-field), 0 0 0 2px var(--nr-primary); }
+.dt-field.block { display: flex; flex-direction: column; align-items: stretch; gap: 2px; padding: 6px 8px 4px 10px; }
+.dt-field.block label, .dt-field.block .pre { font-size: 12px; }
+.dt-field.block select { padding: 2px 0 4px; }
+.locked { color: var(--nr-text-sub); font-weight: 500; padding: 2px 0 4px; }
+.tip-anchor { position: relative; display: inline-flex; border-radius: 6px; }
+.dt-accent {
+  border: 0; border-radius: 6px; padding: 6px 14px; min-height: 32px;
+  background: var(--nr-primary-accent); color: var(--nr-on-accent); font-weight: 500; font-size: 14px;
+}
+.dt-emph {
+  border: 0; border-radius: 6px; padding: 6px 14px; min-height: 32px;
+  background: var(--nr-field); color: var(--nr-text); font-weight: 500; font-size: 14px; box-shadow: var(--nr-shadow-field);
+}
+.surface {
+  background: var(--nr-surface);
+  border-radius: 12px;
+  box-shadow: var(--nr-shadow-raised);
+  padding: 14px 16px;
+  display: grid; gap: 10px;
+  min-width: 0;
+  position: relative;
+}
+.surface-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--nr-text-sub); }
+.chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.sw-cmp { background: var(--nr-container-emph); border: 1px solid var(--nr-border); }
+.sw-tgt { background: var(--nr-warning-cont-emph); border: 1px solid var(--nr-warning); }
+.sw-line { background: var(--nr-chart-1); }
+.chart-wrap { overflow-x: auto; }
+.chart { width: 100%; min-width: 420px; height: auto; display: block; }
+.c-grid { stroke: var(--nr-border-sub); stroke-width: 1; }
+.c-band-cmp { fill: var(--nr-container-emph); }
+.c-band-tgt { fill: var(--nr-warning-cont-emph); }
+.c-band-txt { fill: var(--nr-text-sub); font-size: 11px; font-family: var(--font); }
+.c-area { fill: var(--nr-chart-1); fill-opacity: 0.08; }
+.c-line { stroke: var(--nr-chart-1); stroke-width: 2; fill: none; }
+.c-txt { fill: var(--nr-text-sub); font-size: 11px; font-family: var(--font); }
+.c-hit { fill: var(--nr-warning); }
+.c-hit-txt { fill: var(--nr-warning); font-size: 12px; font-weight: 600; font-family: var(--font); }
+
+.table-wrap { overflow-x: auto; }
+.dtable { width: 100%; border-collapse: collapse; min-width: 440px; font-size: 14px; }
+.dtable th, .dtable td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--nr-border-sub); vertical-align: middle; }
+.dtable thead th { color: var(--nr-text-sub); font-weight: 500; font-size: 13px; line-height: 1.4; border-bottom-color: var(--nr-border); }
+.dtable tbody th { font-weight: 400; }
+.dtable .big { font-size: 20px; font-weight: 600; }
+.dtable .up { color: var(--nr-warning); }
+.dt-callout { background: var(--nr-container); border-radius: 9px; padding: 10px 14px; font-size: 14px; }
+.dt-fine { font-size: 12px; color: var(--nr-text-sub); }
+.empty {
+  display: grid; gap: 8px; justify-items: center; text-align: center;
+  padding: 36px 16px; color: var(--nr-text-sub);
+  background: var(--nr-surface); border-radius: 12px; box-shadow: var(--nr-shadow-raised);
+}
+.empty svg { width: 36px; height: 36px; color: var(--nr-border); }
+
+/* デモ②：問題一覧・問題の詳細 */
+.row-link { border: 0; background: transparent; padding: 0; color: var(--nr-primary); font-weight: 500; text-align: left; font-size: 14px; }
+.row-link:hover { text-decoration: underline; }
+.status { display: inline-block; font-size: 12px; font-weight: 500; border-radius: 999px; padding: 1px 10px; background: var(--nr-container); color: var(--nr-text-sub); white-space: nowrap; }
+.status.active { background: var(--nr-warning-cont-emph); color: var(--nr-warning); }
+.plist { min-width: 0; }
+.dt-tabs { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--nr-border); }
+.dt-tabs button { border: 0; background: transparent; padding: 8px 14px; font-weight: 500; font-size: 14px; color: var(--nr-text-sub); position: relative; border-radius: 6px 6px 0 0; }
+.dt-tabs button.active { color: var(--nr-primary); }
+.dt-tabs button.active::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: currentColor; }
+.kv { display: grid; grid-template-columns: minmax(8em, 13em) minmax(0, 1fr); margin: 0; }
+.kv > * { margin: 0; padding: 10px 4px; border-bottom: 1px solid var(--nr-border-sub); }
+.kv dt { color: var(--nr-text-sub); }
+.lv { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; }
+.lv.error { background: var(--nr-critical-cont); color: var(--nr-critical); }
+.lv.warn { background: var(--nr-warning-cont-emph); color: var(--nr-warning); }
+.lv.info { background: var(--nr-container); color: var(--nr-text-sub); }
+.logs td:first-child { white-space: nowrap; }
+.tt-modal {
+  position: absolute; grid-column: 2 / -1; grid-row: 1; inset: 0; z-index: 15;
+  background: var(--scrim);
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 96px 388px 24px 24px;
+  border-radius: 0 0 12px 0;
+}
+.tt-modal-card {
+  width: 100%; max-width: 560px;
+  background: var(--nr-surface); border-radius: 12px; border-top: 5px solid var(--tt);
+  box-shadow: var(--nr-shadow-float), 0 12px 32px -8px var(--tt-ring);
+  padding: 18px 20px; display: grid; gap: 10px;
+  font-family: var(--font-demo); font-size: 15px; line-height: 1.65; color: var(--nr-text);
+}
+.proc { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+.proc span { display: block; color: var(--nr-text-sub); font-size: 14px; }
+.msg { white-space: pre-wrap; background: var(--nr-container); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; margin-top: 4px; color: var(--nr-text); }
+
+/* デモ③：ひな型 */
+.section-label { font-size: 13px; font-weight: 600; color: var(--nr-text-sub); }
+.tpl-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; position: relative; border-radius: 12px; }
+.tpl {
+  position: relative; display: grid; gap: 4px; align-content: start;
+  background: var(--nr-surface); border-radius: 9px; box-shadow: var(--nr-shadow-raised);
+  padding: 12px 14px; cursor: pointer; min-width: 0; border: 1px solid transparent;
+}
+.tpl input { position: absolute; opacity: 0; pointer-events: none; }
+.tpl:has(input:checked) { border-color: var(--nr-primary); background: var(--nr-primary-cont); }
+.tpl:has(input:focus-visible) { outline: 2px solid var(--nr-primary); outline-offset: 2px; }
+.tpl-name { font-weight: 600; }
+.tpl-desc { color: var(--nr-text-sub); font-size: 13px; }
+.badge { justify-self: start; font-size: 11px; border-radius: 4px; padding: 1px 6px; background: var(--nr-container); color: var(--nr-text-sub); }
+.edit-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.changes ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.changes li { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; }
+.changes .k { color: var(--nr-text-sub); min-width: 7.5em; }
+.st { font-size: 11px; border-radius: 4px; padding: 1px 6px; background: var(--nr-container); color: var(--nr-text-sub); }
+.st.on { background: var(--nr-primary-accent); color: var(--nr-on-accent); }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.checks li::before { content: "✓"; color: var(--nr-success); font-weight: 700; margin-right: 8px; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.status { background: var(--nr-container); border-radius: 6px; padding: 8px 12px; }
+.dql { display: grid; gap: 2px; border-top: 1px solid var(--nr-border-sub); padding-top: 10px; }
+.dql span { color: var(--nr-text-sub); }
+
+/* ---------- テックタッチ／AI Hub（オーバーレイ） ---------- */
+.overlay {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: start;
+  position: sticky;
+  top: 16px;
+  margin: 60px 16px 16px 0;
+  z-index: 20;
+  background: var(--nr-surface);
+  border-radius: 12px;
+  border: 1px solid var(--nr-border);
+  border-top: 5px solid var(--tt);
+  box-shadow: var(--nr-shadow-float), 0 12px 32px -8px var(--tt-ring);
+  padding: 16px 18px 18px;
+  display: flex; flex-direction: column; gap: 12px;
+  font-family: var(--font-demo);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--nr-text);
+}
+.overlay.hub { border-top-color: var(--hub); }
+.has-overlay .dt-page { padding-right: 384px; }
+.ov-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ov-pill { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 10px; background: var(--tt); color: var(--on-accent); }
+.overlay.hub .ov-pill { background: var(--hub); }
+.ov-kicker { font-size: 12px; color: var(--nr-text-sub); }
+.ov-brand { font-weight: 700; color: var(--tt-ink); font-size: 16px; margin-top: -6px; }
+.overlay.hub .ov-brand { color: var(--hub-ink); }
+.ov-title { font-size: 18px; line-height: 1.45; }
+.ov-text { color: var(--nr-text-sub); font-size: 14px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: st; }
+.steps li {
+  counter-increment: st;
+  display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: center;
+  padding: 4px 8px; border-radius: 6px; font-size: 14px; color: var(--nr-text-sub);
+}
+.steps li::before {
+  content: counter(st);
+  display: inline-grid; place-items: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid var(--nr-border); font-size: 11px;
+}
+.steps li.done { color: var(--nr-text); }
+.steps li.done::before { content: "✓"; background: var(--nr-success); border-color: var(--nr-success); color: var(--on-accent); }
+.steps li.now { background: var(--tt-soft); color: var(--tt-ink); font-weight: 700; }
+.steps li.now::before { background: var(--tt); border-color: var(--tt); color: var(--on-accent); }
+.now-box { font-weight: 700; }
+.alert { background: var(--ov-warn-soft); border: 1px solid var(--ov-warn); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+.soft { background: var(--tt-soft); border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+.overlay.hub .soft { background: var(--hub-soft); }
+.refs { font-size: 12px; color: var(--nr-text-sub); }
+.part { border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; font-size: 14px; }
+.part.tt { background: var(--tt-soft); }
+.part.hub { background: var(--hub-soft); }
+.part-head { font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+.part.tt .part-head { color: var(--tt-ink); }
+.part.hub .part-head { color: var(--hub-ink); }
+.actions { display: flex; gap: 8px; }
+.btn { border: 1px solid transparent; border-radius: 8px; padding: 10px 16px; font-weight: 700; font-size: 15px; line-height: 1.4; }
+.btn-primary { background: var(--tt); color: var(--on-accent); flex: 1; }
+.overlay.hub .btn-primary { background: var(--hub); }
+.btn-ghost { background: transparent; border-color: var(--nr-border); color: var(--nr-text-sub); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* テックタッチが画面に追加する要素（入口ボタン・？アイコン） */
+.tt-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px dashed var(--tt); color: var(--tt-ink); background: var(--tt-soft);
+  border-radius: 6px; padding: 2px 10px; font-size: 13px; font-weight: 700; font-family: var(--font-demo);
+}
+
+/* ガイドの対象箇所と吹き出し */
+.is-target { outline: 3px solid var(--tt); outline-offset: 4px; animation: ring 1.8s ease-out infinite; }
+@keyframes ring {
+  0% { box-shadow: 0 0 0 0 var(--tt-ring); }
+  70% { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.dt-field.is-target, .tip-anchor.is-target { animation: none; }
+.balloon {
+  position: absolute; top: calc(100% + 12px); left: 0; z-index: 40;
+  width: max-content; max-width: min(360px, 78vw);
+  background: var(--tt); color: var(--on-accent);
+  border-radius: 8px; padding: 8px 12px;
+  font-family: var(--font-demo); font-size: 14px; font-weight: 700; line-height: 1.5;
+  box-shadow: var(--nr-shadow-float);
+  pointer-events: none;
+}
+.balloon::before {
+  content: ""; position: absolute; top: -8px; left: var(--ax, 20px);
+  border: 8px solid transparent; border-top: 0; border-bottom-color: var(--tt);
+}
+.balloon small { display: block; font-weight: 400; font-size: 12.5px; opacity: 0.95; }
+.balloon.r { left: auto; right: 0; }
+.balloon.r::before { left: auto; right: var(--axr, 20px); }
+.balloon.warn { background: var(--ov-warn); }
+.balloon.warn::before { border-bottom-color: var(--ov-warn); }
+
+/* ---------- 伺いたいこと・進行メモ ---------- */
+.ask {
+  display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline;
+  background: var(--nr-surface); border: 1px solid var(--nr-border); border-radius: 9px;
+  padding: 12px 18px; font-size: 18px;
+}
+.ask strong { font-size: 14px; background: var(--nr-text); color: var(--nr-base); border-radius: 999px; padding: 2px 12px; white-space: nowrap; }
+.ask span { min-width: 0; }
+.notes { background: var(--nr-container); border: 1px solid var(--nr-border); border-radius: 12px; padding: 16px 22px; display: grid; gap: 12px; font-size: 15px; }
+.notes h2 { font-size: 17px; }
+.notes h3 { font-size: 15px; color: var(--nr-text-sub); }
+.notes ul { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.notes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; }
+.notes-grid > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.kbd { font-size: 13px; color: var(--nr-text-sub); }
+.foot { font-size: 12px; color: var(--nr-text-sub); text-align: right; }
+
+/* ---------- 吹き出しの向き・ナビゲーションの基準位置 ---------- */
+.dock-item { position: relative; }
+.balloon.s { top: 50%; left: calc(100% + 14px); transform: translateY(-50%); }
+.balloon.s::before { top: 50%; left: -8px; margin-top: -8px; border-style: solid; border-width: 8px 8px 8px 0; border-color: transparent var(--tt) transparent transparent; }
+.balloon.warn.s::before { border-color: transparent var(--ov-warn) transparent transparent; }
+
+/* ---------- 業務の流れ（進行バー）・場面説明 ---------- */
+.journey { display: flex; flex-wrap: wrap; gap: 6px; }
+.jn {
+  flex: 1 1 210px;
+  display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 10px; align-items: center;
+  text-align: left; padding: 8px 12px; border-radius: 9px;
+  border: 1px solid var(--nr-border); background: var(--nr-surface); color: var(--nr-text-sub);
+}
+.jn .no {
+  grid-row: 1 / 3; width: 26px; height: 26px; border-radius: 50%;
+  display: inline-grid; place-items: center; font-size: 12px; font-weight: 700;
+  border: 1px solid var(--nr-border); background: var(--nr-surface);
+}
+.jn .jl { font-weight: 700; font-size: 14px; line-height: 1.4; color: var(--nr-text); }
+.jn .jt { font-size: 12px; line-height: 1.4; }
+.jn.now { border-color: var(--nr-text); box-shadow: inset 0 0 0 1px var(--nr-text); }
+.jn.now .no { background: var(--nr-text); border-color: var(--nr-text); color: var(--nr-base); }
+.jn.done .no { background: var(--nr-success); border-color: var(--nr-success); color: var(--on-accent); }
+.jn.todo .jl { color: var(--nr-text-sub); font-weight: 500; }
+.story {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 18px; align-items: start;
+  background: var(--nr-surface); border: 1px solid var(--nr-border); border-radius: 12px; padding: 14px 18px;
+}
+.story-time {
+  grid-row: 1 / 4; min-width: 4.4em; padding-right: 18px; border-right: 1px solid var(--nr-border);
+  font-size: 30px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums;
+}
+.story-time small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--nr-text-sub); }
+.story h1 { font-size: clamp(20px, 2vw, 26px); line-height: 1.4; }
+.story-text { color: var(--nr-text-sub); font-size: 15px; }
+.story-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.story-tags span { font-size: 12px; border-radius: 999px; padding: 1px 10px; background: var(--nr-container); color: var(--nr-text-sub); }
+
+/* ---------- ナビゲーション（押せる項目） ---------- */
+button.dock-item { width: 100%; border: 0; background: transparent; text-align: left; font: inherit; color: var(--nr-text); cursor: pointer; }
+button.dock-item:hover { background: var(--nr-container-emph); }
+button.dock-item.active:hover { background: var(--nr-primary-cont-emph); }
+
+/* ---------- 社内チャット（架空） ---------- */
+.chat {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 2px 12px; align-items: start;
+  background: var(--nr-surface); border-radius: 12px; box-shadow: var(--nr-shadow-float);
+  border-left: 4px solid var(--nr-text-sub); padding: 12px 14px; font-family: var(--font-demo);
+}
+.chat .av { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--nr-container-emph); font-weight: 700; }
+.chat .who { font-size: 13px; color: var(--nr-text-sub); }
+.chat .who b { color: var(--nr-text); margin-right: 8px; }
+.chat .say { font-size: 15px; line-height: 1.6; }
+.chat .src { font-size: 11px; color: var(--nr-text-sub); }
+.chat-close { border: 0; background: transparent; color: var(--nr-text-sub); font-size: 13px; padding: 2px 6px; }
+
+/* ---------- ホーム（架空） ---------- */
+.home-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.app-tile {
+  display: grid; gap: 6px; justify-items: start; text-align: left; font: inherit;
+  background: var(--nr-surface); border: 0; border-radius: 12px; box-shadow: var(--nr-shadow-raised);
+  padding: 14px 16px; color: var(--nr-text);
+}
+button.app-tile { cursor: pointer; }
+.app-tile .app-icon { width: 32px; height: 32px; }
+.app-tile .app-icon svg { width: 20px; height: 20px; }
+.app-tile b { font-weight: 600; }
+.app-tile span.d { color: var(--nr-text-sub); font-size: 13px; }
+
+/* ---------- テックタッチのツールチップ（案） ---------- */
+.tip-wrap { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.tt-q {
+  display: inline-grid; place-items: center; width: 20px; height: 20px; padding: 0; flex: none;
+  border-radius: 50%; border: 1px solid var(--tt); color: var(--tt); background: var(--tt-soft);
+  font-size: 12px; font-weight: 700; line-height: 1;
+}
+.tt-q[aria-expanded="true"] { background: var(--tt); color: var(--on-accent); }
+.tt-tip {
+  position: absolute; top: calc(100% + 10px); left: -10px; z-index: 35;
+  width: min(340px, 78vw); padding: 10px 12px;
+  background: var(--nr-surface); border: 2px solid var(--tt); border-radius: 10px; box-shadow: var(--nr-shadow-float);
+  font-family: var(--font-demo); font-size: 13.5px; font-weight: 400; line-height: 1.6; color: var(--nr-text); white-space: normal;
+}
+.tt-tip .lab { display: block; margin-bottom: 2px; font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* ---------- 画面内のお知らせ・ボタン ---------- */
+.dt-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; background: var(--nr-warning-cont-emph); border-radius: 9px; padding: 10px 14px; }
+.dt-banner b { color: var(--nr-warning); }
+.title-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
+.share-chip { font-size: 12px; border-radius: 999px; padding: 1px 10px; background: var(--nr-primary-cont-emph); color: var(--nr-primary); font-weight: 500; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--nr-surface); border-radius: 12px; box-shadow: var(--nr-shadow-raised); padding: 12px 14px; display: grid; gap: 2px; }
+.kpi span { font-size: 12.5px; color: var(--nr-text-sub); }
+.kpi b { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- パネル：ガイド一覧・記録 ---------- */
+.glist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.gitem {
+  width: 100%; display: grid; gap: 2px; text-align: left; font: inherit; font-family: var(--font-demo);
+  border: 1px solid var(--nr-border); border-radius: 9px; background: var(--nr-surface); padding: 9px 12px; color: var(--nr-text);
+}
+button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-soft); }
+.overlay.hub button.gitem { border-color: var(--hub); background: var(--hub-soft); }
+.gname { font-weight: 700; font-size: 14px; }
+.gmeta { font-size: 12px; color: var(--nr-text-sub); }
+.rec-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.rec-list li { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 8px; }
+.rec-list .t { color: var(--nr-text-sub); font-variant-numeric: tabular-nums; }
+.steps.compact li { padding: 2px 8px; font-size: 13.5px; }
+
+/* ---------- 振り返り ---------- */
+.summary { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; }
+.sum-card {
+  background: var(--nr-surface); border: 1px solid var(--nr-border); border-radius: 12px;
+  padding: 18px 20px; display: grid; gap: 12px; align-content: start; min-width: 0;
+}
+.sum-card.wide { grid-column: 1 / -1; }
+.sum-card h2 { font-size: 18px; line-height: 1.4; }
+.sum-note { font-size: 13px; color: var(--nr-text-sub); }
+.tl { list-style: none; margin: 0; padding: 0; display: grid; }
+.tl li { display: grid; grid-template-columns: 3.4em 16px minmax(0, 1fr); column-gap: 12px; }
+.tl .t { font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 1px; }
+.tl .rail { position: relative; }
+.tl .rail::before { content: ""; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--nr-border); }
+.tl li:first-child .rail::before { top: 9px; }
+.tl li:last-child .rail::before { bottom: auto; height: 9px; }
+.tl .rail::after { content: ""; position: absolute; left: 2px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--tt); }
+.tl .body { padding-bottom: 14px; }
+.tl .body b { display: block; }
+.tl .body span { color: var(--nr-text-sub); font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--nr-container); border-radius: 9px; padding: 10px 12px; display: grid; gap: 2px; align-content: start; }
+.stat b { font-size: 28px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--nr-text-sub); }
+.sum-list { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.flow3 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 20px; font-weight: 700; }
+.flow3 .arrow { color: var(--nr-text-sub); font-weight: 400; }
+
+@media (max-width: 1240px) {
+  :root { --dock-w: 56px; }
+  .dock-item .dl, .dock-label { display: none; }
+  .dock-item { justify-content: center; padding: 8px 0; }
+  .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1080px) {
+  .dt { grid-template-columns: var(--dock-w) minmax(0, 1fr); grid-template-rows: auto auto; }
+  .dock { grid-row: 1 / 3; }
+  .dt-app { grid-column: 2; border-radius: 0; }
+  .overlay { grid-column: 2; grid-row: 2; margin: 0 16px 16px; position: relative; top: auto; }
+  .has-overlay .dt-page { padding-right: 20px; }
+  .tt-modal { grid-column: 2; padding: 72px 24px 24px; border-radius: 0; }
+  .notes-grid, .summary { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .wrap { padding-inline: 16px; }
+  .dt { grid-template-columns: minmax(0, 1fr); }
+  .dock { display: none; }
+  .dt-app, .overlay { grid-column: 1; }
+  .tt-modal { grid-column: 1 / -1; padding: 48px 12px 12px; }
+  .kv { grid-template-columns: minmax(0, 1fr); }
+  .kv dt { border-bottom: 0; padding-bottom: 0; }
+  .dt-page { padding: 12px; }
+  .has-overlay .dt-page { padding-right: 12px; }
+  .overlay { margin: 0 12px 12px; padding: 14px; }
+  .toolbar > * { width: 100%; }
+  .dt-field select { flex: 1; }
+  .tip-anchor .dt-accent { width: 100%; }
+  .tpl-list, .edit-grid, .home-grid, .kpis, .stats { grid-template-columns: minmax(0, 1fr); }
+  .ah-nav span { padding: 10px 6px; }
+  .story { grid-template-columns: minmax(0, 1fr); }
+  .story-time { grid-row: auto; border-right: 0; padding-right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-target { animation: none; }
+}
+
+
+/* ---------- New Relicの画面イメージ（架空）：グローバルヘッダー・ナビゲーション ---------- */
+.gh {
+  display: flex; align-items: center; gap: 12px; padding: 7px 14px;
+  background: var(--nr-surface); border-bottom: 1px solid var(--nr-border-sub);
+  font-family: var(--font); font-size: 13px; color: var(--nr-text-sub);
+}
+.gh svg { width: 14px; height: 14px; flex: none; }
+.gh-acct { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--nr-border); border-radius: 6px; color: var(--nr-text); font-weight: 500; white-space: nowrap; }
+.gh-search { flex: 1 1 auto; max-width: 520px; min-width: 0; display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; background: var(--nr-container); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gh-right { margin-left: auto; display: inline-flex; align-items: center; gap: 12px; white-space: nowrap; }
+.dock { background: var(--nr-surface); }
+.dock-item.active { background: var(--nr-container-emph); color: var(--nr-text); font-weight: 600; box-shadow: inset 3px 0 0 var(--nr-primary); }
+button.dock-item.active:hover { background: var(--nr-container-emph); }
+.app-icon { background: var(--nr-container-emph); color: var(--nr-text); }
+.dtable .up, .c-hit-txt { color: var(--nr-critical); fill: var(--nr-critical); }
+.c-hit { fill: var(--nr-critical); }
+.dt-banner { background: var(--nr-critical-cont); }
+.dt-banner b { color: var(--nr-critical); }
+.status.active { background: var(--nr-critical-cont); color: var(--nr-critical); }
+.hd { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.hd.crit { background: var(--nr-critical); }
+.hd.ok { background: var(--nr-success); }
+
+/* テックタッチが画面に添える注記（案） */
+.tt-note {
+  border: 1px dashed var(--tt); background: var(--tt-soft); border-radius: 9px; padding: 9px 14px;
+  font-family: var(--font-demo); font-size: 14px; line-height: 1.6; color: var(--nr-text); display: grid; gap: 2px;
+}
+.tt-note .lab { font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+.tt-note ul { margin: 2px 0 0; padding-left: 1.2em; }
+@media (max-width: 700px) {
+  .gh-search { display: none; }
+}
+</style>
+<!-- fragment:head:end -->
+</head>
+<body>
+<!-- fragment:body:start -->
+<div class="wrap" lang="ja">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name">New Relic × テックタッチ　構想デモ</span>
+      <span class="brand-sub">運用担当者の一日（架空）：問い合わせから、再発への備えまで</span>
+    </div>
+    <div class="tools">
+      <button type="button" class="tool" id="notes-btn" aria-pressed="false" aria-controls="notes">進行メモ</button>
+      <button type="button" class="tool" id="reset-btn">この章を最初から</button>
+      <button type="button" class="tool" id="theme-btn">表示：自動</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    <span>構想デモ。画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。</span>
+    <span class="legend" aria-label="色の意味">
+      <span><i class="l-dt"></i>監視画面（New Relicの画面イメージ・架空）</span>
+      <span><i class="l-tt"></i>テックタッチ ガイド（案）</span>
+      <span><i class="l-hub"></i>AI Hub 理解支援（構想）</span>
+    </span>
+  </div>
+
+  <nav class="journey" id="journey" aria-label="業務の流れ"></nav>
+  <section class="story" id="story" aria-live="polite"></section>
+  <div id="stage"></div>
+  <p class="ask" id="ask"><strong>伺いたいこと</strong><span id="ask-text"></span></p>
+
+  <!-- ==================== 進行メモ（発表者用・既定は非表示） ==================== -->
+  <section class="notes" id="notes" hidden aria-label="進行メモ">
+    <h2>進行メモ（発表者用）</h2>
+    <div class="notes-grid">
+      <div>
+        <h3>この章の進め方</h3>
+        <ul data-for="1">
+          <li>仮説1「画面・操作で迷う」への支援案（テックタッチのガイド）。デモ①に対応します。</li>
+          <li>見せ場：ガイド一覧から開始 → 左のナビゲーションで「APM &amp; services」を探す → サービス・Time range・Compare with をそろえる → 「?」で社内の指標定義（架空）を表示。</li>
+          <li>Compare with に「09:00–10:00」を選ぶと、ガイドが選び直しを案内します（構想の表現）。</li>
+          <li>最後に、同じ時間帯に検知されたIssueから第2章へつなぎます。</li>
+          <li>問いかけ：「どこで迷いますか」</li>
+        </ul>
+        <ul data-for="2" hidden>
+          <li>仮説4「実務で再現できない」・仮説5「学びを再利用できない」への支援案（テックタッチのステップガイド）。デモ②に対応します。</li>
+          <li>4ステップ：Overview（概要）→ Impact（影響範囲。優先度の基準を表示）→ Logs（期間は 5 minutes before issue）→ 社内手順に沿って連絡。</li>
+          <li>Impact の前に「Logs」タブを開くと、社内手順の順番を案内します（構想の表現）。</li>
+          <li>社内手順・連絡先は架空です。お客様の実際の手順に置き換える前提です。</li>
+          <li>問いかけ：「人によって手順がばらつくのはどこですか」</li>
+        </ul>
+        <ul data-for="3" hidden>
+          <li>仮説3「作成・修正で止まる」への支援案（ひな型編集の案内＋AI Hub＋New Relic AI）。デモ③に対応します。</li>
+          <li>見せ場：ひな型から作成 → 変える項目と理由（AI Hub欄は例文）→ 専門家に確認を依頼 → 承認後に保存して共有。</li>
+          <li>NRQLの作成が必要な場面では、New Relic AI（自然言語からNRQLへの変換）の利用状況（利用条件を満たすか）も伺います。</li>
+          <li>問いかけ：「どこで依頼しますか」</li>
+        </ul>
+        <ul data-for="4" hidden>
+          <li>振り返りの回数は、このデモを操作した回数です。効果の数値ではありません。</li>
+          <li>「本日伺いたいこと」「最初の一歩のご提案」へつなげます。</li>
+        </ul>
+        <h3>全体</h3>
+        <ul>
+          <li>冒頭で「構想デモです。画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません」とお伝えする。</li>
+          <li>問い合わせ → 状況確認 → 一次確認・連絡 → 再発への備え、を一つの業務の流れとして見せます。章の終わりごとに止めて質問できます。</li>
+          <li>デモはテックタッチ（DAP）中心。仮説2（AI Hubの理解支援）は専用デモを持たず、支援案のスライドで説明します。</li>
+          <li>削減率などの数値はお約束しない。確かめ方は自力完了率・所要時間・依頼件数・再実行。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>想定問答</h3>
+        <ul>
+          <li>「実際のNew Relic画面で動きますか」→ ブラウザで操作する画面が対象です。御社環境での動作確認は導入時に実施します。</li>
+          <li>「New Relic AIと何が違いますか」→ New Relic AIはNew Relic上のデータを扱う支援です（自然言語からNRQLへの変換など）。AI Hubは御社の社内資料側の知見を補う構想で、重複する部分はNew Relicの機能を優先します。</li>
+          <li>「効果はどれくらいですか」→ 現時点で数値はお約束しません。一つの作業で、自力完了率・所要時間・依頼件数を測って確かめます。</li>
+          <li>「セキュリティは」→ 拡張機能の配布手続きと、AI Hubに渡す情報の範囲を御社方針に沿って決めます。AI Hubは外部のAIサービスを利用します。</li>
+        </ul>
+        <p class="kbd">キー操作：→ 次へ ／ ← 戻る ／ 1〜4 章の切り替え ／ N 進行メモ ／ R この章を最初から</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">構想デモ（New Relic版）　2026年10月1日作成</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  document.documentElement.lang = "ja";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(t) {
+    return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+
+  /* ---------- アイコン（汎用の図形。製品のアイコンではありません） ---------- */
+  var ICON = {
+    home: '<path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/>',
+    search: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/>',
+    dashboards: '<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/>',
+    services: '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.5 10.5 16M16 7.5 13.5 16M8.5 6h7"/>',
+    notebooks: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18M12 8h4M12 12h4"/>',
+    logs: '<path d="M4 6h16M4 10h12M4 14h16M4 18h9"/>',
+    problems: '<path d="M12 3 2.5 20h19z"/><path d="M12 10v4M12 17v.5"/>',
+    hide: '<path d="m15 6-6 6 6 6"/>',
+    help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.7M12 17v.5"/>',
+    clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    segment: '<path d="M4 5h16l-6 7.5V19l-4 2v-8.5z"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    grid: '<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',
+    entities: '<path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/>',
+    bell: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+    code: '<path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/>',
+    chevron: '<path d="m7 10 5 5 5-5"/>',
+    empty: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 15l3-4 3 3 4-6"/>'
+  };
+  function svg(name) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[name] + "</svg>";
+  }
+
+  /* ---------- 数値・ログ（すべて架空） ---------- */
+  var SVC = "契約照会サービス（架空）";
+  // 1分ごとの平均応答時間。09:30〜10:30の61点。09:45〜10:00の平均は420 ms、10:00〜10:15の平均は980 ms。
+  var MIN_VALUES = [432, 418, 425, 440, 428, 415, 421, 436, 424, 419, 430, 427, 416, 433, 422,
+    410, 425, 415, 430, 420, 405, 428, 418, 422, 431, 412, 419, 426, 414, 425,
+    600, 750, 880, 990, 1080, 1120, 1150, 1130, 1100, 1060, 1020, 980, 950, 920, 970,
+    820, 760, 700, 650, 610, 580, 560, 540, 520, 510, 500, 490, 480, 470, 465, 460];
+  // 1時間ごとの平均応答時間。前日15時台〜当日14時台の24本。10時台は10:00〜10:15の上昇を含む。
+  var HOUR_VALUES = [430, 440, 420, 400, 390, 380, 370, 360, 350, 340, 330, 330, 330, 340, 350, 370, 400, 430, 440, 610, 470, 445, 435, 425];
+  var LOGS = [
+    ["08:30:00", "info", "INFO", "定時バッチが完了しました（架空）"],
+    ["09:58:12", "warn", "WARN", "契約DBへの接続待ちが長くなっています（架空）"],
+    ["09:59:40", "warn", "WARN", "契約DBへの接続待ちが長くなっています（架空）"],
+    ["10:01:05", "error", "ERROR", "契約DBへの接続がタイムアウトしました（架空）"],
+    ["10:02:31", "error", "ERROR", "照会処理がタイムアウトしました（架空）"],
+    ["10:03:10", "info", "INFO", "接続の再試行に成功しました（架空）"]
+  ];
+  var PERIOD_FROM = { during: "10:02:00", "5min": "09:57:00", "2h": "08:05:00" };
+
+  function lineChart(o) {
+    var W = 680, H = o.bands ? 230 : 210, L = 44, R = 14, T = o.bands ? 30 : 16, B = 28, n = o.values.length;
+    var x = function (i) { return L + i * (W - L - R) / (n - 1); };
+    var y = function (v) { return T + (1 - v / o.yMax) * (H - T - B); };
+    var s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + o.aria + '">';
+    (o.bands || []).forEach(function (b) {
+      s += '<rect class="' + b.cls + '" x="' + x(b.from) + '" y="' + T + '" width="' + (x(b.to) - x(b.from)) + '" height="' + (H - T - B) + '"/>';
+      s += '<text class="c-band-txt" x="' + ((x(b.from) + x(b.to)) / 2) + '" y="' + (T - 8) + '" text-anchor="middle">' + b.label + "</text>";
+    });
+    o.yTicks.forEach(function (g) {
+      s += '<line class="c-grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(g) + '" y2="' + y(g) + '"/>';
+      s += '<text class="c-txt" x="' + (L - 6) + '" y="' + (y(g) + 4) + '" text-anchor="end">' + g + "</text>";
+    });
+    s += '<text class="c-txt" x="' + (L - 6) + '" y="' + (T - 8 < 10 ? 10 : T - 8) + '" text-anchor="end">ms</text>';
+    var pts = o.values.map(function (v, i) { return x(i).toFixed(1) + "," + y(v).toFixed(1); });
+    s += '<polygon class="c-area" points="' + x(0) + "," + y(0) + " " + pts.join(" ") + " " + x(n - 1) + "," + y(0) + '"/>';
+    s += '<polyline class="c-line" points="' + pts.join(" ") + '"/>';
+    o.xLabels.forEach(function (t) {
+      s += '<text class="c-txt" x="' + x(t[0]) + '" y="' + (H - 8) + '" text-anchor="' + (t[2] || "middle") + '">' + t[1] + "</text>";
+    });
+    if (o.mark) {
+      s += '<circle class="c-hit" cx="' + x(o.mark.i) + '" cy="' + y(o.values[o.mark.i]) + '" r="4.5"/>';
+      s += '<text class="c-hit-txt" x="' + (x(o.mark.i) - 8) + '" y="' + (y(o.values[o.mark.i]) - 10) + '" text-anchor="end">' + o.mark.label + "</text>";
+    }
+    return s + "</svg>";
+  }
+  function minuteChart() {
+    return '<div class="surface"><div class="surface-head"><p class="dt-h3">Response time (1 min)</p>' +
+      '<p class="chart-legend"><span><i class="sw-line"></i>Response time</span><span><i class="sw-cmp"></i>Compare</span><span><i class="sw-tgt"></i>Selected</span></p></div>' +
+      '<div class="chart-wrap">' + lineChart({
+        values: MIN_VALUES, yMax: 1200, yTicks: [0, 400, 800, 1200],
+        bands: [{ from: 15, to: 30, cls: "c-band-cmp", label: "Compare" }, { from: 30, to: 45, cls: "c-band-tgt", label: "Selected" }],
+        xLabels: [[0, "09:30", "start"], [15, "09:45"], [30, "10:00"], [45, "10:15"], [60, "10:30", "end"]],
+        aria: "応答時間の推移（架空）。比較期間の平均420ミリ秒に対し、選択した期間は平均980ミリ秒に上昇。"
+      }) + "</div></div>";
+  }
+  function hourChart() {
+    return lineChart({
+      values: HOUR_VALUES, yMax: 800, yTicks: [0, 200, 400, 600, 800],
+      xLabels: [[0, "Yesterday 15:00", "start"], [6, "21:00"], [12, "03:00"], [18, "09:00"], [23, "14:00", "end"]],
+      mark: { i: 19, label: "10:00 610 ms" },
+      aria: "応答時間の推移（架空）。10時台に610ミリ秒へ上昇し、その後は元の水準に戻っている。"
+    });
+  }
+
+  /* ---------- 章 ---------- */
+  var CH = {
+    1: { time: "10:16", timeSub: "問い合わせ", title: "問い合わせを受けて、担当サービスの状況を確認する",
+      text: "業務部門から「10時過ぎから契約照会の画面が遅い」と連絡が入りました。担当者がNew Relicを使うのは月に数回です（想定の人物像）。",
+      tags: ["第1章", "デモ①", "仮説1　画面・操作で迷う"], ask: "画面の探し方、絞り込み、時間帯の指定のどこで迷いますか？" },
+    2: { time: "10:18", timeSub: "Issueを検知", title: "障害の一次確認を、社内手順どおりに進めて連絡する",
+      text: "同じ時間帯にIssue（問題）が検知されていました。人によって順番がばらつかないよう、社内手順（架空）に沿って一次確認し、関係者に連絡します。",
+      tags: ["第2章", "デモ②", "仮説4・5　実務で再現できない／学びを再利用できない"], ask: "障害時の一次確認で、人によって手順がばらつくのはどこですか？" },
+    3: { time: "14:05", timeSub: "専門家の助言", title: "再発に備えて、ダッシュボードを自分で作る",
+      text: "専門家（架空）から、毎朝確認できるダッシュボードを作るよう助言がありました。ひな型を使って自分で作り、確認を受けてからチームに共有します。",
+      tags: ["第3章", "デモ③", "仮説3　作成・修正で止まる"], ask: "ひな型選択、条件の変更、結果の検証のどこで依頼しますか？" },
+    4: { time: "まとめ", timeSub: "振り返り", title: "問い合わせから再発への備えまで、一つの業務の流れで見る",
+      text: "今日の流れと、テックタッチが手当てした場面を振り返ります。どこで迷い、どこで依頼しているかを伺い、最初に支援する作業を一つ決めます。",
+      tags: ["振り返り"], ask: "" }
+  };
+  var JOURNEY = [
+    [1, "第1章　問い合わせ・状況確認", "10:16　デモ①"],
+    [2, "第2章　一次確認・連絡", "10:18　デモ②"],
+    [3, "第3章　再発に備える", "14:05　デモ③"],
+    [4, "振り返り", "まとめ"]
+  ];
+
+  /* ---------- ガイドの手順 ---------- */
+  var G1 = [null,
+    { label: "APM & services を開く", target: '.dock [data-arg="services"]', tip: "① 左のナビゲーションから「APM & services」を開きます", sub: "画面の場所を覚えていなくても進められます",
+      now: "左のナビゲーションから「APM & services」を開きます。", reason: "確認する理由：担当サービスの応答時間やエラーは「APM & services」で確認します。" },
+    { label: "対象サービスを開く", target: "#w-svc-pick", tip: "② 問い合わせのあったサービスを開きます", sub: "「契約照会サービス（架空）」",
+      now: "一覧から、問い合わせのあった「契約照会サービス（架空）」を開きます。", reason: "確認する理由：対象がずれると、別のサービスの値を見ることになります。" },
+    { label: "Time range を選ぶ", target: "#f-c1-period", tip: "③ 事象が起きた時間帯を「Time range」で選びます", sub: "問い合わせの「10時過ぎ」に合わせて 10:00–10:15",
+      now: "問い合わせの「10時過ぎ」に合わせて、Time range を 10:00–10:15 にします。", reason: "確認する理由：問い合わせの時間帯と、画面の時間範囲をそろえます。" },
+    { label: "比べる期間を選ぶ", target: "#f-c1-compare", tip: "④ 「Compare with」で比べる時間帯を選びます", sub: "直前の同じ長さ（15分）：09:45–10:00",
+      now: "Compare with を、直前の同じ長さ「09:45–10:00」にします。", reason: "確認する理由：対象や時間帯が違うと、比較結果の解釈も変わります。" },
+    { label: "条件を確認して適用する", target: "#w-c1-apply", tip: "⑤ 条件を確認して「Apply」を押します", sub: "サービス・Time range・Compare with の3つ",
+      now: "3つの条件を見直してから「Apply」を押します。", reason: "確認する理由：条件がそろっているかを、表示の前に見直します。" },
+    { label: "上がっている値と定義を確認する", target: "#w-tip-rt", tip: "⑥ 上がっている値を確認します", sub: "「?」で社内の指標の定義（架空）を表示します",
+      now: "Response time が 420 ms から 980 ms に上がっています。「?」で社内の定義を確認します。", reason: "確認する理由：値の意味を社内の定義でそろえてから判断します。" },
+    { label: "検知されたIssueを開く", target: "#w-c1-problem", tip: "⑦ 同じ時間帯に検知されたIssueを開きます", sub: "障害の一次確認（社内手順）に切り替えます",
+      now: "同じ時間帯にIssue「High response time」が検知されています。Issueを開きます。", reason: "確認する理由：Issueが検知されている場合は、社内手順の一次確認に切り替えます。" }
+  ];
+  var G2 = [null,
+    { label: "Issueの概要を確認する", target: "#c2-kv", tip: "ステップ1／4：Issueの概要を確認します", sub: "何が・いつから・どこで起きているか",
+      reason: "確認する理由：何が・いつから起きているかを先にそろえると、以降の確認がぶれません。" },
+    { label: "影響範囲を確認する", target: "#w-tab-impact", tip: "ステップ2／4：影響範囲を確認します", sub: "「Impact」タブを開きます",
+      reason: "確認する理由：影響範囲を先に確かめると、連絡の優先度を判断できます。" },
+    { label: "関連ログを確認する", target: "#w-tab-logs", tip: "ステップ3／4：関連ログを確認します", sub: "期間は「5 minutes before issue」（問題の開始5分前から）に設定します",
+      reason: "確認する理由：問題の開始前後のログを見ると、いつから異常が出ていたかを確かめられます。原因はこの段階では確定しません。" },
+    { label: "社内手順に沿って連絡する", target: "#w-c2-contact", tip: "ステップ4／4：社内手順に沿って連絡します", sub: "「社内手順で連絡」から連絡内容を確認します",
+      reason: "確認する理由：連絡の宛先と内容を、担当者によらず同じ手順にそろえます。" }
+  ];
+  var G3 = [null,
+    { label: "Dashboards を開く", target: '.dock [data-arg="dashboards"]', tip: "① 左のナビゲーションから「Dashboards」を開きます", sub: "",
+      op: "左のナビゲーションから「Dashboards」を開きます。", hub: "" },
+    { label: "ひな型から作成する", target: "#w-c3-create", tip: "② 「Create from template」を押します", sub: "一から作らず、専門家が確認済みのひな型を使います",
+      op: "「Create from template」を押します。", hub: "ひな型を使う理由：指標の定義や集計のしかたを、専門家が確認済みの設定にそろえるためです。" },
+    { label: "ひな型を選ぶ", target: "#c3-templates", tip: "③ 専門家が確認済みのひな型から選びます", sub: "助言のあった「サービスの状況確認（標準）」",
+      op: "助言のあった「サービスの状況確認（標準）」を選びます。", hub: "ひな型の意図：「サービスの状況確認（標準）」は、担当サービスの応答時間とエラー率を、同じ長さの期間で比べるためのひな型です。" },
+    { label: "対象サービスを変える", target: "#f-c3-service", tip: "④ 「Entity」を担当サービスに変えます", sub: "",
+      op: "Entity を「契約照会サービス（架空）」に変えます。", hub: "変える理由：ひな型の既定は、すべてのサービスの合計です。担当サービスに絞らないと、他のサービスの変化が混ざります。" },
+    { label: "Time range を変える", target: "#f-c3-range", tip: "⑤ 「Time range」を「Last 24 hours」に変えます", sub: "",
+      op: "Time range を「Last 24 hours」（過去 24 時間）に変えます。", hub: "変える理由：問題が起きた10時台の前後を含めて、1日の中でいつ上がり始めたかを確認するためです。" },
+    { label: "変更箇所を見直す", target: "#c3-changes", tip: "⑥ 変更箇所を見直します", sub: "指標の定義は変えていないことを確認します",
+      op: "変更したのは2か所です。指標の定義を変えていないことを確認して、「Preview」で結果を表示します。", hub: "変えない項目：指標の定義（応答時間・エラー率）は、専門家が決めたものをそのまま使います。変えるのは対象と時間範囲だけです。" },
+    { label: "結果を確認し、専門家に依頼する", target: "#w-c3-ask", tip: "⑦ 保存の前に、専門家に確認を依頼します", sub: "「Request review」で変更箇所2点と結果を送ります",
+      op: "結果を確認し、保存の前に「Request review」で専門家に確認を依頼します。", hub: "結果の見方：10時台に応答時間が上がっています。第1章で確認した時間帯と合っているかを確かめます。原因はこの画面だけでは特定できません。" },
+    { label: "保存して運用チームに共有する", target: "#w-c3-save", tip: "⑧ 保存して、運用チームに共有します", sub: "専門家の確認が済みました",
+      op: "専門家の確認が済みました。「Save & share」で運用チーム（架空）に共有します。", hub: "共有の意図：同じダッシュボードをチームで見ることで、毎朝の確認の手順をそろえます。" }
+  ];
+  var C1_KEYS = ["service", "period", "compare"];
+  var C1_EXP = [SVC, "10:00–10:15", "09:45–10:00"];
+  var TAB_LABEL = { overview: "Overview", impact: "Impact", logs: "Logs", events: "Activity" };
+  var APP_LABEL = { home: "All entities", services: "APM & services", problems: "Alerts", dashboards: "Dashboards" };
+  var CHATS = {
+    inquiry: { av: "業", who: "業務部門（架空）", time: "10:16", say: "10時過ぎから、契約照会の画面が遅いという声が出ています。状況を確認してもらえますか？" },
+    advice: { av: "専", who: "専門家（架空）", time: "14:05", say: "今回の件、毎朝確認できるようにダッシュボードを作っておきましょう。ひな型「サービスの状況確認（標準）」を使ってください。" },
+    approved: { av: "専", who: "専門家（架空）", time: "14:12", say: "確認しました。この設定で保存して、運用チームに共有してください。" }
+  };
+
+  /* ---------- 状態 ---------- */
+  function fresh() {
+    return {
+      ch: 1, app: "home", chat: "inquiry", tip: null, warn: null,
+      c1: { step: 0, service: "", period: "", compare: "", applied: false, started: false },
+      c2: { step: 0, view: "list", tab: "overview", period: "during", popup: false, modal: false, started: false },
+      c3: { step: 0, view: "list", tpl: "", service: "all", range: "2h", preview: false, asked: false, saved: false, started: false },
+      stats: { fixes: 0, notes: 0 }
+    };
+  }
+  var S = fresh();
+  var hist = [];
+  var pendingTop = false;
+  function snap() { hist.push(JSON.stringify(S)); if (hist.length > 300) hist.shift(); }
+  function undo() { if (!hist.length) return; S = JSON.parse(hist.pop()); render(); }
+  function done(c) { S[c].step++; }
+  function fix(msg) { S.warn = msg; S.stats.fixes++; }
+
+  function goChapter(n) {
+    var keep = { c1: S.c1.started, c2: S.c2.started, c3: S.c3.started };
+    var s = fresh();
+    s.stats = S.stats;
+    if (n >= 2) s.c1 = { step: 8, service: SVC, period: "10:00–10:15", compare: "09:45–10:00", applied: true, started: keep.c1 };
+    if (n >= 3) s.c2 = { step: 5, view: "detail", tab: "logs", period: "5min", popup: false, modal: false, started: keep.c2 };
+    if (n >= 4) s.c3 = { step: 9, view: "saved", tpl: "t1", service: SVC, range: "24h", preview: true, asked: true, saved: true, started: keep.c3 };
+    s.ch = n;
+    s.app = n === 2 ? "problems" : n === 4 ? "dashboards" : "home";
+    s.chat = n === 1 ? "inquiry" : n === 3 ? "advice" : null;
+    if (n === 2) { s.c2.view = "detail"; s.c2.popup = true; }
+    S = s; hist = []; pendingTop = true;
+    render();
+  }
+  function expectedApp() {
+    if (S.ch === 1) return S.c1.step >= 2 && S.c1.step <= 7 ? "services" : null;
+    if (S.ch === 2) return S.c2.step <= 4 ? "problems" : null;
+    if (S.ch === 3) return S.c3.step >= 2 && S.c3.step <= 8 ? "dashboards" : null;
+    return null;
+  }
+  function offGuide() { var e = expectedApp(); return e && S.app !== e ? e : null; }
+  function stepsDone() {
+    var n = 0;
+    if (S.c1.started) n += Math.max(0, Math.min(S.c1.step, 8) - 1);
+    if (S.c2.started) n += Math.max(0, Math.min(S.c2.step, 5) - 1);
+    if (S.c3.started) n += Math.max(0, Math.min(S.c3.step, 9) - 1);
+    return n;
+  }
+
+  /* ---------- 操作 ---------- */
+  function nav(app) {
+    S.app = app;
+    if ((S.chat === "inquiry" || S.chat === "advice") && app !== "home") S.chat = null;
+    if (S.ch === 1 && S.c1.step === 1 && app === "services") { S.c1.service = ""; done("c1"); }
+    if (S.ch === 3 && S.c3.step === 1 && app === "dashboards") done("c3");
+  }
+  function start() {
+    if (S.ch === 1 && S.c1.step === 0) { S.c1.step = 1; S.c1.started = true; }
+    else if (S.ch === 3 && S.c3.step === 0) { S.c3.step = 1; S.c3.started = true; }
+  }
+  function tip(arg) {
+    S.tip = S.tip === arg ? null : arg;
+    if (!S.tip) return;
+    S.stats.notes++;
+    if (arg === "rt" && S.ch === 1 && S.c1.step === 6) done("c1");
+    if (arg === "prio" && S.ch === 2 && S.c2.step === 2 && S.c2.tab === "impact") done("c2");
+  }
+  function c1Wrong(i, v) {
+    if (i === 0) return "今回は問い合わせのあった「契約照会サービス（架空）」を開きます。別のサービスを開くと、別のサービスの値を見ることになります。";
+    if (i === 1) return "問い合わせは「10時過ぎ」です。Time range は 10:00–10:15 に合わせます。";
+    if (v === "09:00–10:00") return "選んだ期間（15分）と長さが違います。件数を比べるときは、期間の長さをそろえます。";
+    return "前日（Yesterday）の同じ時間帯と比べる方法もあります。今回は直前の15分（09:45–10:00）と比べます。";
+  }
+  function c1Pick(name) {
+    var c = S.c1;
+    if (S.ch !== 1 || c.step < 2) { if (name === SVC) c.service = SVC; return; }
+    setC1(0, name);
+  }
+  function setC1(i, v) {
+    var c = S.c1;
+    c[C1_KEYS[i]] = v;
+    if (S.ch !== 1 || c.step < 2) return;
+    var first = -1;
+    for (var k = 0; k < 3; k++) { if (c[C1_KEYS[k]] !== C1_EXP[k]) { first = k; break; } }
+    if (first === -1) { if (c.step < 5) c.step = 5; }
+    else { c.applied = false; c.step = 2 + first; }
+    if (v && v !== C1_EXP[i]) fix(c1Wrong(i, v));
+  }
+  function c1Apply() {
+    var c = S.c1;
+    if (S.ch !== 1) return;
+    if (c.step === 5) { c.applied = true; done("c1"); }
+    else if (c.step >= 2 && c.step < 5) fix("条件がまだそろっていません。ガイドの順に選びます。");
+  }
+  function c1Problem() {
+    if (S.ch === 1 && S.c1.step === 7) {
+      done("c1");
+      S.ch = 2; S.app = "problems"; S.chat = null;
+      S.c2.view = "detail"; S.c2.tab = "overview"; S.c2.popup = true;
+      S.stats.notes++;
+      pendingTop = true;
+    } else if (S.ch === 1 && S.c1.step === 6) {
+      fix("ガイドでは、先に上がっている値と社内の定義を確認します。");
+    } else {
+      S.app = "problems"; S.c2.view = "detail";
+    }
+  }
+  function c2Open() {
+    if (S.ch === 1 && S.c1.step === 7) { c1Problem(); return; }
+    S.c2.view = "detail";
+    if (S.ch === 2 && S.c2.step === 0) S.c2.popup = true;
+  }
+  function c2Start() {
+    var c = S.c2;
+    if (c.step !== 0) return;
+    c.popup = false; c.step = 1; c.started = true; c.view = "detail"; c.tab = "overview";
+  }
+  function c2Tab(t) {
+    var c = S.c2;
+    c.tab = t;
+    if (S.ch !== 2 || c.step === 0 || c.step === 5 || t === "overview") return;
+    if (t === "impact") { if (c.step === 1) done("c2"); return; }
+    if (t === "logs") {
+      if (c.step < 3) fix("社内手順では、ログの前に影響範囲を確かめ、連絡の優先度を先に判断します。次は「Impact」（影響範囲）です。");
+      else if (c.step === 3 && c.period === "5min") done("c2");
+      return;
+    }
+    fix("社内手順では、次は「" + (c.step <= 2 ? "Impact" : c.step === 3 ? "Logs" : "社内手順で連絡") + "」を確認します。");
+  }
+  function c2Period(v) {
+    var c = S.c2;
+    c.period = v;
+    if (S.ch !== 2 || c.step !== 3) return;
+    if (v === "5min") done("c2");
+    else if (v === "during") fix("Issueの発生後（Since issue opened）だけでは、発生直前の変化を見落とすことがあります。社内手順どおり「5 minutes before issue」にします。");
+    else fix("Last 2 hours では範囲が広く、関係の薄いログが混ざります。社内手順どおり「5 minutes before issue」にします。");
+  }
+  function c2Contact() {
+    var c = S.c2;
+    if (S.ch === 2 && c.step >= 1 && c.step < 4) { fix("社内手順では、連絡の前に影響範囲と関連ログを確認します。"); return; }
+    c.modal = true;
+    S.stats.notes++;
+  }
+  function c2ModalDone() {
+    S.c2.modal = false;
+    if (S.ch === 2 && S.c2.step === 4) done("c2");
+  }
+  function toChapter3() { S.ch = 3; S.app = "home"; S.chat = "advice"; S.c2.modal = false; pendingTop = true; }
+  function toChapter4() { S.ch = 4; S.chat = null; pendingTop = true; }
+  function c3Create() {
+    S.c3.view = "edit";
+    if (S.ch === 3 && S.c3.step === 2) done("c3");
+  }
+  function c3Eval() {
+    var c = S.c3;
+    if (S.ch !== 3 || c.step < 3 || c.step > 8) return;
+    var t = c.tpl !== "t1" ? 3 : c.service !== SVC ? 4 : c.range !== "24h" ? 5 : 6;
+    if (t < 6) {
+      c.step = t; c.preview = false;
+      if (c.asked) { c.asked = false; if (S.chat === "approved") S.chat = null; }
+    } else if (c.step < 6) c.step = 6;
+  }
+  function c3Tpl(v) {
+    S.c3.tpl = v;
+    if (v !== "t1") fix("今回は助言のあった「サービスの状況確認（標準）」を使います。");
+    c3Eval();
+  }
+  function c3Service(v) {
+    S.c3.service = v;
+    if (v !== SVC && v !== "all") fix("今回は担当の「契約照会サービス（架空）」に絞ります。");
+    c3Eval();
+  }
+  function c3Range(v) {
+    S.c3.range = v;
+    if (v === "7d") fix("今回は10時台の前後を見るため「Last 24 hours」にします。Last 7 days は、日ごとの傾向を見るときに使います。");
+    c3Eval();
+  }
+  function c3Preview() {
+    var c = S.c3;
+    if (S.ch === 3 && c.step >= 3 && c.step < 6) { fix("先に設定を変更します。ガイドの順に進めます。"); return; }
+    c.preview = true;
+    if (S.ch === 3 && c.step === 6) done("c3");
+  }
+  function c3Ask() {
+    var c = S.c3;
+    if (S.ch === 3 && c.step === 7) { c.asked = true; S.chat = "approved"; done("c3"); }
+  }
+  function c3Save() {
+    var c = S.c3;
+    if (S.ch === 3 && c.step === 7) { fix("保存の前に、「Request review」で専門家に確認を依頼します（社内ルール・架空）。"); return; }
+    if (S.ch === 3 && c.step === 8) { c.saved = true; c.view = "saved"; S.chat = null; done("c3"); }
+  }
+
+  // パネルの主ボタン（→キーでも実行）
+  function primary() {
+    var off = offGuide();
+    if (off) return { label: "ガイドの画面に戻る", run: function () { nav(off); } };
+    if (S.ch === 1) {
+      switch (S.c1.step) {
+        case 0: return { label: "ガイドを開始", run: start };
+        case 1: return { label: "APM & services を開く", run: function () { nav("services"); } };
+        case 2: return { label: "サービスを開く", run: function () { c1Pick(SVC); } };
+        case 3: return { label: "次へ", run: function () { setC1(1, C1_EXP[1]); } };
+        case 4: return { label: "次へ", run: function () { setC1(2, C1_EXP[2]); } };
+        case 5: return { label: "条件を確認して適用", run: c1Apply };
+        case 6: return { label: "定義を表示", run: function () { tip("rt"); } };
+        case 7: return { label: "Issueを開く", run: c1Problem };
+      }
+    }
+    if (S.ch === 2) {
+      var d = S.c2;
+      switch (d.step) {
+        case 0: return { label: "ガイドを開始", run: c2Start };
+        case 1: return { label: "確認した", run: function () { done("c2"); } };
+        case 2: return d.tab !== "impact" ? { label: "Impact を開く", run: function () { c2Tab("impact"); } } : { label: "優先度の基準を表示", run: function () { tip("prio"); } };
+        case 3: return d.tab !== "logs" ? { label: "Logs を開く", run: function () { c2Tab("logs"); } } : { label: "期間を設定する", run: function () { c2Period("5min"); } };
+        case 4: return d.modal ? { label: "連絡内容を確認した", run: c2ModalDone } : { label: "社内手順を開く", run: c2Contact };
+        case 5: return { label: "第3章へ進む", run: toChapter3 };
+      }
+    }
+    if (S.ch === 3) {
+      switch (S.c3.step) {
+        case 0: return { label: "ガイドを開始", run: start };
+        case 1: return { label: "Dashboards を開く", run: function () { nav("dashboards"); } };
+        case 2: return { label: "ひな型から作成", run: c3Create };
+        case 3: return { label: "次へ", run: function () { c3Tpl("t1"); } };
+        case 4: return { label: "次へ", run: function () { c3Service(SVC); } };
+        case 5: return { label: "次へ", run: function () { c3Range("24h"); } };
+        case 6: return { label: "結果の確認へ", run: c3Preview };
+        case 7: return { label: "専門家に確認を依頼", run: c3Ask };
+        case 8: return { label: "保存して共有", run: c3Save };
+        case 9: return { label: "振り返りへ", run: toChapter4 };
+      }
+    }
+    return { label: "次へ", run: function () {} };
+  }
+
+  function act(name, arg, value) {
+    if (name === "back") { undo(); return; }
+    if (name === "chapter") { goChapter(+arg); return; }
+    snap();
+    S.warn = null;
+    if (name !== "tip") S.tip = null;
+    switch (name) {
+      case "next": primary().run(); break;
+      case "nav": nav(arg); break;
+      case "start": start(); break;
+      case "chat-close": S.chat = null; break;
+      case "tip": tip(arg); break;
+      case "c1-service": setC1(0, value); break;
+      case "c1-period": setC1(1, value); break;
+      case "c1-compare": setC1(2, value); break;
+      case "c1-pick": c1Pick(arg); break;
+      case "c1-list": setC1(0, ""); break;
+      case "c1-apply": c1Apply(); break;
+      case "c1-problem": c1Problem(); break;
+      case "c2-open": c2Open(); break;
+      case "c2-start": c2Start(); break;
+      case "c2-tab": c2Tab(arg); break;
+      case "c2-period": c2Period(value); break;
+      case "c2-contact": c2Contact(); break;
+      case "c2-modal-done": c2ModalDone(); break;
+      case "c2-modal-close": S.c2.modal = false; break;
+      case "c3-create": c3Create(); break;
+      case "c3-tpl": c3Tpl(value); break;
+      case "c3-service": c3Service(value); break;
+      case "c3-range": c3Range(value); break;
+      case "c3-preview": c3Preview(); break;
+      case "c3-ask": c3Ask(); break;
+      case "c3-save": c3Save(); break;
+    }
+    render();
+  }
+
+  /* ---------- 画面の組み立て ---------- */
+  function sel(id, change, opts, val, disabled) {
+    return '<select id="' + id + '" data-change="' + change + '"' + (disabled ? " disabled" : "") + ">" + opts.map(function (o) {
+      var v = typeof o === "string" ? o : o[0], t = typeof o === "string" ? o : o[1];
+      return '<option value="' + esc(v) + '"' + (v === val ? " selected" : "") + ">" + esc(t) + "</option>";
+    }).join("") + "</select>";
+  }
+  function dockHTML(active) {
+    var item = function (icon, label, navTo) {
+      var cls = "dock-item" + (navTo && navTo === active ? " active" : "");
+      var inner = svg(icon) + '<span class="dl">' + label + "</span>";
+      if (navTo) return '<button type="button" class="' + cls + '" data-act="nav" data-arg="' + navTo + '" data-tip-side="s" title="' + label + '">' + inner + "</button>";
+      return '<span class="' + cls + '" title="' + label + '">' + inner + "</span>";
+    };
+    return '<div class="dock-group">' + item("search", "Search") + item("plus", "Add data") + item("grid", "All capabilities") + item("entities", "All entities", "home") + "</div>" +
+      '<div class="dock-sep"></div>' +
+      '<div class="dock-group">' + item("services", "APM & services", "services") + item("dashboards", "Dashboards", "dashboards") +
+      item("bell", "Alerts", "problems") + item("logs", "Logs") + item("code", "Query your data") + "</div>" +
+      '<div class="dock-spacer"></div>' +
+      '<div class="dock-group">' + item("help", "Help") + item("hide", "Collapse") + "</div>";
+  }
+  function appHeader() {
+    var icon = { home: "entities", services: "services", problems: "bell", dashboards: "dashboards" }[S.app];
+    var name = APP_LABEL[S.app], navs = [], activeIdx = 0;
+    if (S.app === "services" && S.c1.service === SVC) { name = SVC; navs = ["Summary", "Distributed tracing", "Transactions", "Errors inbox", "Logs"]; }
+    else if (S.app === "problems") { navs = ["Overview", "Issues & activity", "Alert conditions"]; activeIdx = 1; }
+    var nav = navs.map(function (n, i) { return "<span" + (i === activeIdx ? ' class="active"' : "") + ">" + n + "</span>"; }).join("");
+    return '<div class="appheader"><div class="ah-left"><span class="app-icon" aria-hidden="true">' + svg(icon) + '</span><span class="app-name">' + name + "</span>" +
+      (nav ? '<div class="ah-nav" aria-hidden="true">' + nav + "</div>" : "") + '</div><span class="dt-look-btn" aria-hidden="true">Share</span></div>';
+  }
+  function chatHTML() { return S.chat && S.chat !== "approved" ? chatCard(S.chat) : ""; }
+  function chatCard(key) {
+    var c = CHATS[key];
+    return '<div class="chat" role="status"><span class="av" aria-hidden="true">' + c.av + '</span><div><p class="who"><b>' + c.who + "</b>" + c.time +
+      '</p><p class="say">' + c.say + '</p><p class="src">社内チャット（架空）の通知</p></div><button type="button" class="chat-close" data-act="chat-close">閉じる</button></div>';
+  }
+  function tipHTML(key) {
+    if (S.tip !== key) return "";
+    if (key === "rt") {
+      return '<span class="tt-tip" role="tooltip"><span class="lab">テックタッチ ツールチップ（案）：社内の指標定義（架空）</span>Response time（平均応答時間）は、画面の操作から結果が返るまでの時間の平均です。社内の目安は 500 ms 以下（架空）。平均だけでは、一部の遅い操作は見えません。</span>';
+    }
+    return '<span class="tt-tip" role="tooltip"><span class="lab">テックタッチ ツールチップ（案）：優先度の基準（社内・架空）</span>全利用者に影響 → 高／一部の利用者に影響 → 中／影響なし → 低。今回は「Webからの照会の一部」のため「中」です。</span>';
+  }
+  function qBtn(key, label) {
+    return '<button type="button" class="tt-q" data-act="tip" data-arg="' + key + '" aria-expanded="' + (S.tip === key) + '" aria-label="' + label + '">?</button>';
+  }
+
+  function pageHome() {
+    var crit = S.ch <= 2;
+    var rows = [[SVC, "Service - APM", crit], ["保険料計算サービス（架空）", "Service - APM", false], ["代理店ポータル（架空）", "Browser application", false], ["契約DB（架空）", "Database", false]];
+    return '<div><p class="crumbs">All entities</p><h2 class="dt-h">All entities</h2></div>' +
+      '<div class="toolbar" aria-hidden="true"><span class="dt-field"><span class="pre">' + svg("search") + "Filter by name, type, or tag</span></span></div>" +
+      '<div class="surface"><table class="dtable" style="min-width:0"><thead><tr><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Alert status</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        return '<tr><th scope="row">' + r[0] + "</th><td>" + r[1] + '</td><td><span class="hd ' + (r[2] ? "crit" : "ok") + '" aria-hidden="true"></span>' + (r[2] ? "Critical" : "Healthy") + "</td></tr>";
+      }).join("") + "</tbody></table></div>" +
+      '<p class="dt-fine">エンティティ名はすべて架空です。</p>';
+  }
+
+  function pageServices() {
+    var c = S.c1;
+    if (c.service !== SVC) {
+      var rows = [[SVC, "760 ms", "410 rpm", "0.52 %", "crit"], ["保険料計算サービス（架空）", "210 ms", "120 rpm", "0.10 %", "ok"], ["代理店ポータル（架空）", "340 ms", "85 rpm", "0.00 %", "ok"]];
+      return '<div><p class="crumbs">APM & services</p><h2 class="dt-h">APM & services</h2></div>' +
+        '<div class="toolbar" aria-hidden="true"><span class="dt-field"><span class="pre">' + svg("search") + 'Filter by name</span></span>' +
+        '<span class="dt-field"><span class="pre">' + svg("clock") + 'Time range</span><span class="locked">Last 30 minutes</span></span></div>' +
+        '<div class="surface"><table class="dtable num" style="min-width:0"><thead><tr><th scope="col">Name</th><th scope="col">Response time</th><th scope="col">Throughput</th><th scope="col">Error rate</th></tr></thead><tbody>' +
+        rows.map(function (r, i) {
+          var link = '<button type="button" class="row-link" data-act="c1-pick" data-arg="' + esc(r[0]) + '">' + r[0] + "</button>";
+          return '<tr><th scope="row"><span class="hd ' + r[4] + '" aria-hidden="true"></span>' + (i === 0 ? '<span class="tip-anchor" id="w-svc-pick">' + link + "</span>" : link) +
+            "</th><td>" + r[1] + "</td><td>" + r[2] + "</td><td>" + r[3] + "</td></tr>";
+        }).join("") + "</tbody></table></div>" +
+        '<p class="dt-fine">サービス名・数値はすべて架空です（Last 30 minutes の値）。</p>';
+    }
+    var lock = !(S.ch === 1 && c.step >= 2);
+    var h = '<div><p class="crumbs">APM & services ＞ ' + SVC + '</p><h2 class="dt-h"><span class="hd ' + (S.ch >= 3 ? "ok" : "crit") + '" aria-hidden="true"></span>Summary</h2></div>' +
+      '<div class="toolbar">' +
+      '<div class="dt-field" id="f-c1-period"><label for="c1-period">' + svg("clock") + "Time range</label>" +
+      sel("c1-period", "c1-period", [["", "Last 30 minutes"], "09:45–10:00", "10:00–10:15", "10:15–10:30"], c.period, lock) + "</div>" +
+      '<div class="dt-field" id="f-c1-compare" data-tip-side="right"><label for="c1-compare">Compare with</label>' +
+      sel("c1-compare", "c1-compare", [["", "None"], "09:00–10:00", "09:45–10:00", "Yesterday 10:00–10:15"], c.compare, lock) + "</div>" +
+      '<span class="tip-anchor" id="w-c1-apply" data-tip-side="right"><button type="button" class="dt-accent" data-act="c1-apply"' + (lock ? " disabled" : "") + ">Apply</button></span></div>";
+    if (!c.applied) {
+      return h + '<div class="empty">' + svg("empty") + "<span>Set Time range and Compare with, then select Apply.</span></div>" +
+        '<p class="dt-fine">サービス名・数値・時刻はすべて架空です。</p>';
+    }
+    return h + '<div class="dt-banner"><b>Related issue</b><span>High response time（Active since 10:02）</span>' +
+      '<span class="tip-anchor" id="w-c1-problem" data-tip-side="right"><button type="button" class="row-link" data-act="c1-problem">Open issue</button></span></div>' +
+      '<div class="surface"><p class="dt-h3">Golden metrics</p><table class="dtable num" style="min-width:0"><thead><tr><th scope="col">Metric</th>' +
+      '<th scope="col">Compare<br>09:45–10:00</th><th scope="col">Selected<br>10:00–10:15</th></tr></thead><tbody>' +
+      '<tr><th scope="row"><span class="tip-wrap" id="w-tip-rt">Response time' + qBtn("rt", "Response time の定義") + tipHTML("rt") + "</span></th>" +
+      '<td class="big">420 ms</td><td class="big up">980 ms</td></tr>' +
+      '<tr><th scope="row">Throughput</th><td>400 rpm</td><td>413 rpm</td></tr>' +
+      '<tr><th scope="row">Error rate</th><td>0.20 %</td><td>0.77 %</td></tr></tbody></table></div>' +
+      minuteChart() + '<p class="dt-fine">サービス名・数値・時刻はすべて架空です。</p>';
+  }
+
+  function c2TabHTML() {
+    var c = S.c2;
+    if (c.tab === "overview") {
+      return '<div class="surface" id="c2-kv"><p class="dt-h3">Analysis summary</p><dl class="kv">' +
+        "<dt>Affected entity</dt><dd>" + SVC + "</dd>" +
+        "<dt>Impact</dt><dd>Webからの照会の一部（架空）</dd>" +
+        "<dt>Possible cause</dt><dd>契約DBへの接続待ち（架空・未確定）</dd></dl></div>";
+    }
+    if (c.tab === "impact") {
+      return '<div style="display:grid;gap:14px">' +
+        '<div class="surface"><p class="dt-h3">What\'s impacted?</p><table class="dtable num" style="min-width:0"><thead><tr><th scope="col">Entity</th><th scope="col">Response time</th><th scope="col">Error rate</th></tr></thead>' +
+        '<tbody><tr><th scope="row">' + SVC + '</th><td class="up">980 ms (baseline 420 ms)</td><td>0.77 % (baseline 0.20 %)</td></tr></tbody></table></div>' +
+        '<div class="surface"><p class="dt-h3"><span class="tip-wrap" id="w-tip-prio">End-user impact' + qBtn("prio", "優先度の基準") + tipHTML("prio") + "</span></p>" +
+        '<table class="dtable" style="min-width:0"><thead><tr><th scope="col">Entry point</th><th scope="col">Impact</th></tr></thead>' +
+        '<tbody><tr><th scope="row">Webからの照会（架空）</th><td class="up">Partially slow</td></tr><tr><th scope="row">代理店ポータルからの照会（架空）</th><td>No impact</td></tr></tbody></table></div></div>';
+    }
+    if (c.tab === "logs") {
+      var from = PERIOD_FROM[c.period];
+      var rows = LOGS.filter(function (l) { return l[0] >= from; }).map(function (l) {
+        return "<tr><td>" + l[0] + '</td><td><span class="lv ' + l[1] + '">' + l[2] + "</span></td><td>" + l[3] + "</td></tr>";
+      }).join("");
+      return '<div style="display:grid;gap:12px"><div class="toolbar">' +
+        '<div class="dt-field" id="f-c2-period"><label for="c2-period">' + svg("clock") + "Time range</label>" +
+        sel("c2-period", "c2-period", [["during", "Since issue opened (10:02)"], ["5min", "5 minutes before issue (09:57)"], ["2h", "Last 2 hours"]], c.period) + "</div>" +
+        '<span class="dt-field" aria-hidden="true"><span class="pre">Entity</span><span class="locked">' + SVC + "</span></span></div>" +
+        '<div class="surface"><div class="table-wrap"><table class="dtable num logs"><thead><tr><th scope="col">timestamp</th><th scope="col">level</th><th scope="col">message</th></tr></thead><tbody>' +
+        rows + "</tbody></table></div></div>" +
+        (c.period === "5min" ? '<p class="dt-callout">10:02の開始より前（09:58）から、接続待ちの警告が出ています（架空）。原因はこの段階では確定しません。</p>' : "") +
+        "</div>";
+    }
+    return '<div class="surface"><div class="table-wrap"><table class="dtable num"><thead><tr><th scope="col">Time</th><th scope="col">Activity</th></tr></thead><tbody>' +
+      "<tr><td>10:02</td><td>Issue created (High response time)</td></tr>" +
+      "<tr><td>10:04</td><td>Entity added to issue（架空）</td></tr>" +
+      "<tr><td>10:06</td><td>Correlated event added（架空）</td></tr></tbody></table></div></div>";
+  }
+  function pageProblems() {
+    var c = S.c2;
+    if (c.view === "list") {
+      return '<div><p class="crumbs">Alerts ＞ Issues &amp; activity</p><h2 class="dt-h">Issues &amp; activity</h2></div>' +
+        '<div class="toolbar" aria-hidden="true"><span class="dt-field"><span class="pre">' + svg("clock") + 'Time range</span><span class="locked">Last 24 hours</span></span></div>' +
+        '<div class="surface"><table class="dtable" style="min-width:0"><thead><tr><th scope="col">Issue</th><th scope="col">State</th><th scope="col">Opened</th><th scope="col">Entity</th></tr></thead><tbody>' +
+        '<tr><th scope="row"><button type="button" class="row-link" data-act="c2-open">High response time</button></th><td><span class="status active">Active</span></td><td>10:02</td><td>' + SVC + "</td></tr>" +
+        '<tr><th scope="row">High error rate</th><td><span class="status">Closed</span></td><td>Yesterday 16:40</td><td>保険料計算サービス（架空）</td></tr>' +
+        '<tr><th scope="row">High response time</th><td><span class="status">Closed</span></td><td>Yesterday 09:15</td><td>代理店ポータル（架空）</td></tr></tbody></table></div>' +
+        '<p class="dt-fine">Issue・サービス名・時刻はすべて架空です。</p>';
+    }
+    var tabs = ["overview", "impact", "logs", "events"].map(function (t) {
+      return '<span class="tip-anchor" id="w-tab-' + t + '"><button type="button" role="tab" data-act="c2-tab" data-arg="' + t + '" aria-selected="' + (c.tab === t) + '"' +
+        (c.tab === t ? ' class="active"' : "") + ">" + TAB_LABEL[t] + "</button></span>";
+    }).join("");
+    return '<div><p class="crumbs">Alerts ＞ Issues &amp; activity ＞ Issue</p><h2 class="dt-h">High response time</h2></div>' +
+      '<div class="tb-row"><span class="status active">Active</span><span class="dt-fine">Opened 10:02</span><span class="dt-fine">' + SVC + "</span>" +
+      '<span class="tip-anchor" id="w-c2-contact" data-tip-side="right"><button type="button" class="tt-chip" data-act="c2-contact">社内手順で連絡</button></span></div>' +
+      '<div class="dt-tabs" role="tablist" aria-label="Issue">' + tabs + "</div>" +
+      c2TabHTML() + '<p class="dt-fine">Issue・サービス名・手順・数値はすべて架空です。</p>';
+  }
+
+  function pageDashboards() {
+    var c = S.c3;
+    if (c.view === "list") {
+      return '<div class="title-row"><div><p class="crumbs">Dashboards</p><h2 class="dt-h">Dashboards</h2></div>' +
+        '<span class="tip-anchor" id="w-c3-create" data-tip-side="right"><button type="button" class="dt-accent" data-act="c3-create">Create from template</button></span></div>' +
+        '<div class="surface"><table class="dtable" style="min-width:0"><thead><tr><th scope="col">Name</th><th scope="col">Created by</th><th scope="col">Last edited</th></tr></thead><tbody>' +
+        '<tr><th scope="row">インフラの概要</th><td>基盤チーム（架空）</td><td>Yesterday</td></tr>' +
+        '<tr><th scope="row">代理店ポータルの状況</th><td>代理店システム担当（架空）</td><td>3 days ago</td></tr>' +
+        '<tr><th scope="row">保険料計算の夜間処理</th><td>運用チーム（架空）</td><td>Last week</td></tr></tbody></table></div>' +
+        '<p class="dt-fine">ダッシュボード名・作成者はすべて架空です。</p>';
+    }
+    if (c.view === "saved") {
+      return '<div class="title-row"><div><p class="crumbs">Dashboards ＞ 契約照会サービスの状況（架空）</p><h2 class="dt-h">契約照会サービスの状況（架空）</h2></div>' +
+        '<span class="share-chip">Shared with 運用チーム（架空）</span></div>' +
+        '<div class="kpis"><div class="kpi"><span>Response time (14:00)</span><b>425 ms</b></div>' +
+        '<div class="kpi"><span>Max response time (last 24 hours)</span><b>610 ms</b></div>' +
+        '<div class="kpi"><span>Error rate (14:00)</span><b>0.20 %</b></div></div>' +
+        '<div class="surface"><div class="surface-head"><p class="dt-h3">Response time (hourly)</p><p class="chart-legend"><span>' + SVC + "</span><span>Last 24 hours</span></p></div>" +
+        '<div class="chart-wrap">' + hourChart() + "</div></div>" +
+        '<p class="dt-fine">ひな型「サービスの状況確認（標準）」から作成。数値はすべて架空です。デモのため実際には保存していません。</p>';
+    }
+    var ok = c.tpl === "t1", svcChanged = c.service === SVC, rngChanged = c.range === "24h";
+    var tpl = function (v, name, desc) {
+      return '<label class="tpl"><input type="radio" name="c3-tpl" value="' + v + '" data-change="c3-tpl"' + (c.tpl === v ? " checked" : "") + '><span class="tpl-name">' + name +
+        '</span><span class="tpl-desc">' + desc + '</span><span class="badge">専門家が確認済み</span></label>';
+    };
+    var st = function (on) { return '<span class="st' + (on ? " on" : "") + '">' + (on ? "Changed" : "Unchanged") + "</span>"; };
+    var h = '<div><p class="crumbs">Dashboards ＞ Create from template</p><h2 class="dt-h">Create from template</h2></div>' +
+      '<p class="section-label">Choose a template</p><div class="tpl-list" id="c3-templates" role="radiogroup" aria-label="Templates">' +
+      tpl("t1", "サービスの状況確認（標準）", "応答時間とエラー率を期間で比べる") +
+      tpl("t2", "エラーの内訳（標準）", "エラーの種類と発生箇所を一覧する") +
+      tpl("t3", "利用の多い時間帯（標準）", "スループットの推移を見る") + "</div>" +
+      '<p class="section-label">Configure</p><div class="edit-grid">' +
+      '<div class="dt-field block" id="f-c3-service"><label for="c3-service">Entity</label>' +
+      sel("c3-service", "c3-service", [["all", "All services (default)"], SVC, "保険料計算サービス（架空）", "代理店ポータル（架空）"], c.service, !ok) + "</div>" +
+      '<div class="dt-field block" id="f-c3-range"><label for="c3-range">' + svg("clock") + "Time range</label>" +
+      sel("c3-range", "c3-range", [["2h", "Last 2 hours (default)"], ["24h", "Last 24 hours"], ["7d", "Last 7 days"]], c.range, !ok || !svcChanged) + "</div>" +
+      '<div class="dt-field block"><span class="pre">Metrics (locked)</span><span class="locked">Response time, Error rate</span></div></div>' +
+      '<p class="tt-note"><span class="lab">テックタッチ（案）</span><b>専門家が確認済みの設定内容を使用する想定</b>対象サービス、集計期間、指標の定義を確認してから変更します。</p>' +
+      '<div class="surface changes" id="c3-changes"><div class="surface-head"><p class="section-label">Changes</p>' +
+      '<button type="button" class="dt-emph" data-act="c3-preview">Preview</button></div><ul>' +
+      '<li><span class="k">Entity</span><span>All services → ' + (svcChanged ? SVC : "(unchanged)") + "</span>" + st(svcChanged) + "</li>" +
+      '<li><span class="k">Time range</span><span>Last 2 hours → ' + (rngChanged ? "Last 24 hours" : "(unchanged)") + "</span>" + st(rngChanged) + "</li>" +
+      '<li><span class="k">Metrics</span><span>Response time, Error rate</span><span class="st">Locked</span></li></ul></div>';
+    if (c.preview) {
+      h += '<div class="surface" id="c3-result"><div class="surface-head"><p class="dt-h3">Response time (hourly)</p><p class="chart-legend"><span>' + SVC + "</span><span>Last 24 hours</span></p></div>" +
+        '<div class="chart-wrap">' + hourChart() + "</div>" +
+        '<div class="tt-note"><span class="lab">テックタッチ（案）：確認すること</span><ul class="checks"><li>Entity が担当サービスになっている</li><li>Time range が Last 24 hours になっている</li><li>10時台の上昇が、第1章で確認した時間帯と合っている</li></ul></div>' +
+        '<div class="row-actions"><span class="tip-anchor" id="w-c3-ask"><button type="button" class="dt-emph" data-act="c3-ask">Request review</button></span>' +
+        '<span class="tip-anchor" id="w-c3-save"><button type="button" class="dt-accent" data-act="c3-save">Save &amp; share</button></span></div>' +
+        (c.asked ? '<p class="status" role="status">Review requested（変更箇所2点と結果を添えて、専門家（架空）に依頼しました。デモのため送信はしません）</p>' : "") +
+        (S.chat === "approved" ? chatCard("approved") : "") +
+        '<p class="dt-fine">数値はすべて架空です。</p></div>';
+    } else {
+      h += '<div class="empty" id="c3-result">' + svg("empty") + "<span>Configure the template, then select Preview.</span></div>";
+    }
+    return h + '<div class="dql"><strong>NRQLの作成が必要な場合</strong><span>利用条件を満たすNew Relic AI（自然言語からNRQLへの変換）の活用を含めて確認します。</span></div>';
+  }
+  function pageHTML() {
+    return { home: pageHome, services: pageServices, problems: pageProblems, dashboards: pageDashboards }[S.app]();
+  }
+
+  function modalHTML() {
+    if (S.app !== "problems" || S.c2.view !== "detail") return "";
+    if (S.ch === 2 && S.c2.popup) {
+      return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
+        '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ポップアップ（案）</span></div>' +
+        '<h3 class="ov-title" id="m-title">障害の一次確認は、社内手順どおりに進めます</h3>' +
+        "<p>Overview（概要）→ Impact（影響範囲）→ Logs（関連ログ）→ 連絡、の4つのステップを順番に案内します。所要の目安は約10分です（架空）。</p>" +
+        '<p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。</p>' +
+        '<div class="actions"><button type="button" class="btn btn-primary" data-act="c2-start" id="m-start">ガイドを開始</button></div></div></div>';
+    }
+    if (S.c2.modal) {
+      return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
+        '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ステップ4／4　社内手順（架空）</span></div>' +
+        '<h3 class="ov-title" id="m-title">障害の一次連絡</h3><ol class="proc">' +
+        "<li><b>優先度を決める</b><span>影響の範囲が「Webからの照会の一部」のため、優先度は「中」（社内基準・架空）</span></li>" +
+        "<li><b>連絡先</b><span>システム運用チーム（架空）、業務部門の窓口（架空）</span></li>" +
+        '<li><b>伝える内容（例）</b><div class="msg">【障害一次連絡】応答時間の悪化（Issue「High response time」・Active）\n・開始：10:02\n・影響：契約照会サービス（架空）、Webからの照会の一部\n・関連ログ：09:58から契約DBへの接続待ちの警告（原因は未確定）\n・次の連絡：原因を確認したあと</div></li></ol>' +
+        '<p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。デモのため送信はしません。</p>' +
+        '<div class="actions"><button type="button" class="btn btn-ghost" data-act="c2-modal-close">閉じる</button>' +
+        '<button type="button" class="btn btn-primary" data-act="c2-modal-done" id="m-done">連絡内容を確認した</button></div></div></div>';
+    }
+    return "";
+  }
+
+  function stepsList(G, step) {
+    return '<ol class="steps compact">' + G.slice(1).map(function (g, i) {
+      var n = i + 1;
+      return '<li class="' + (n < step ? "done" : n === step ? "now" : "") + '">' + g.label + "</li>";
+    }).join("") + "</ol>";
+  }
+  function actions() {
+    return '<div class="actions"><button type="button" class="btn btn-ghost" data-act="back"' + (hist.length ? "" : " disabled") + ">戻る</button>" +
+      '<button type="button" class="btn btn-primary" data-act="next" id="panel-next">' + primary().label + "</button></div>";
+  }
+  function guideBody(now, reason) {
+    var off = offGuide();
+    if (off) return '<p class="alert" role="alert">ガイドの画面から離れています。「' + APP_LABEL[off] + "」の画面に戻ると、続きから進められます。</p>";
+    return '<p class="now-box">' + now + "</p>" + (S.warn ? '<p class="alert" role="alert">' + S.warn + "</p>" : "") + '<p class="soft">' + reason + "</p>";
+  }
+  function panelC1() {
+    var c = S.c1;
+    var h = '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">' + (c.step === 0 ? "ガイド一覧（案）" : "ガイド（案）") + "</span></div>";
+    if (c.step === 0) {
+      return h + '<h3 class="ov-title">この画面で使えるガイド</h3>' +
+        '<p class="ov-text">問い合わせのあったサービスの状況を確認します。ガイドを選ぶと、操作する場所を順番に案内します。</p>' +
+        '<ul class="glist"><li><button type="button" class="gitem" data-act="start" id="g-start"><span class="gname">担当サービスの状況を確認する</span><span class="gmeta">7ステップ・目安5分（架空）・おすすめ</span></button></li>' +
+        '<li><div class="gitem"><span class="gname">障害の一次確認（社内手順）</span><span class="gmeta">Alerts（Issue）の画面で表示されます</span></div></li>' +
+        '<li><div class="gitem"><span class="gname">ダッシュボードをひな型から作る</span><span class="gmeta">Dashboards の画面で表示されます</span></div></li></ul>' + actions();
+    }
+    var g = G1[Math.min(c.step, 7)];
+    return h + '<h3 class="ov-title">担当サービスの状況を確認する</h3>' + stepsList(G1, c.step) + guideBody(g.now, g.reason) + actions();
+  }
+  function c2Now() {
+    var c = S.c2;
+    if (c.step === 1) return c.tab === "overview" ? "影響を受けたエンティティ・開始時刻・原因の候補を確認します。" : "「Overview」タブに戻り、事象と開始時刻を確認します。";
+    if (c.step === 2) return c.tab !== "impact" ? "「Impact」タブで、影響を受けたサービスと影響の範囲を確認します。" : "影響の範囲を社内の基準（架空）に当てはめて、優先度を判断します。「?」で基準を表示します。";
+    if (c.step === 3) return c.tab !== "logs" ? "「Logs」タブで関連ログを開きます。" : "期間を「5 minutes before issue」（問題の開始5分前から）に設定します。";
+    return c.modal ? "優先度・連絡先・伝える内容を確認します。" : "「社内手順で連絡」から、社内手順に沿った連絡内容を確認します。";
+  }
+  function panelC2() {
+    var c = S.c2;
+    var h = '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ガイド（案）・社内手順（架空）</span></div>' +
+      '<h3 class="ov-title">障害の一次確認（社内手順）</h3>' + stepsList(G2, c.step);
+    if (c.step === 0) return h + (offGuide() ? guideBody("", "") : '<p class="now-box">ポップアップの「ガイドを開始」から始めます。</p>') + actions();
+    if (c.step === 5) {
+      return h + '<p class="now-box">一次確認の4ステップが完了しました。</p>' +
+        '<div class="soft"><p><b>一次確認の記録（例）</b></p><ul class="rec-list">' +
+        '<li><span class="t">10:18</span><span>概要を確認（High response time・Active）</span></li>' +
+        '<li><span class="t">10:19</span><span>影響範囲を確認（Webからの照会の一部 → 優先度「中」）</span></li>' +
+        '<li><span class="t">10:21</span><span>関連ログを確認（09:58から接続待ちの警告・原因は未確定）</span></li>' +
+        '<li><span class="t">10:22</span><span>社内手順に沿って連絡（システム運用チーム・業務部門の窓口）</span></li></ul></div>' +
+        '<p class="refs">時刻・記録はすべて架空です。</p>' + actions();
+    }
+    return h + guideBody(c2Now(), G2[c.step].reason) + actions();
+  }
+  function panelC3() {
+    var c = S.c3;
+    var h = '<div class="ov-head"><span class="ov-pill">テックタッチ＋AI Hub</span><span class="ov-kicker">支援案3</span></div>';
+    if (c.step === 0) {
+      return h + '<h3 class="ov-title">おすすめのガイド</h3><p class="ov-text">専門家の助言にあったダッシュボードを、ひな型から自分で作ります。</p>' +
+        '<ul class="glist"><li><button type="button" class="gitem" data-act="start" id="g-start"><span class="gname">ダッシュボードをひな型から作る</span><span class="gmeta">8ステップ・目安10分（架空）</span></button></li></ul>' + actions();
+    }
+    h += '<h3 class="ov-title">ダッシュボードをひな型から作る</h3>' + stepsList(G3, c.step);
+    if (c.step === 9) {
+      return h + '<p class="now-box">保存して、運用チーム（架空）に共有しました。</p><p class="soft">デモのため実際には保存していません。実環境では保存先と共有範囲を確認します。</p>' + actions();
+    }
+    if (offGuide()) return h + guideBody("", "") + actions();
+    var g = G3[c.step];
+    h += '<div class="part tt"><p class="part-head"><span>テックタッチ 操作ガイド</span><span class="num">' + c.step + " / 8</span></p><p>" + g.op + "</p></div>";
+    if (S.warn) h += '<p class="alert" role="alert">' + S.warn + "</p>";
+    if (g.hub) h += '<div class="part hub"><p class="part-head"><span>AI Hub（例文）</span></p><p>' + g.hub + "</p></div>";
+    return h + '<p class="refs">実環境の項目名やデータ構造に合わせた説明・検証が必要です。</p>' + actions();
+  }
+  function panelHTML() { return S.ch === 1 ? panelC1() : S.ch === 2 ? panelC2() : panelC3(); }
+
+  function summaryHTML() {
+    var any = S.c1.started || S.c2.started || S.c3.started;
+    var stat = function (v, label) { return '<div class="stat"><b>' + (any ? v : "—") + "</b><span>" + label + "</span></div>"; };
+    var tl = function (t, title, desc) { return '<li><span class="t">' + t + '</span><span class="rail" aria-hidden="true"></span><div class="body"><b>' + title + "</b><span>" + desc + "</span></div></li>"; };
+    return '<div class="summary">' +
+      '<section class="sum-card"><h2>今日の業務の流れ（架空）</h2><ol class="tl">' +
+      tl("10:16", "業務部門から問い合わせ", "「10時過ぎから契約照会の画面が遅い」") +
+      tl("10:17", "第1章　担当サービスの状況を確認", "ガイド7ステップ。Response time 420 ms → 980 ms を確認し、検知されたIssueに気づく") +
+      tl("10:18", "第2章　障害の一次確認と連絡", "ガイド4ステップ。影響範囲から優先度「中」と判断し、社内手順どおりに連絡") +
+      tl("14:05", "第3章　再発に備えてダッシュボードを作成", "ガイド8ステップ。ひな型から作り、専門家の確認を受けて運用チームに共有") +
+      "</ol></section>" +
+      '<section class="sum-card"><h2>このデモで、テックタッチが手当てした場面</h2><div class="stats">' +
+      stat(stepsDone(), "ガイドで進めたステップ") + stat(S.stats.fixes, "選び直し・順番の案内") + stat(S.stats.notes, "定義・基準・社内手順の表示") + "</div>" +
+      '<p class="sum-note">' + (any ? "このデモを操作した回数です。効果の数値ではありません。" : "章を順に進めると、操作した回数を数えます。効果の数値ではありません。") + "</p></section>" +
+      '<section class="sum-card"><h2>確かめ方（案）</h2><ul class="sum-list">' +
+      "<li>自力完了率：依頼せずに作業を終えられた割合</li><li>所要時間：作業の開始から完了まで</li><li>依頼件数：専門家への問い合わせの件数</li><li>再実行：同じ作業を、次回も自力でできるか</li></ul>" +
+      '<p class="sum-note">数値の目標は、現状を伺ってから設定します。ガイドの完了率だけでは判断せず、作業の結果で確かめます。</p></section>' +
+      '<section class="sum-card"><h2>本日伺いたいこと</h2><ul class="sum-list">' +
+      "<li>" + CH[1].ask + "</li><li>" + CH[2].ask + "</li><li>" + CH[3].ask + "</li>" +
+      "<li>対象者・止まる場面・現在の解決方法・既存の支援・自走の判断基準</li></ul></section>" +
+      '<section class="sum-card wide"><h2>最初の一歩</h2><p class="flow3"><span>対象を一つ決める</span><span class="arrow">→</span><span>実画面で確かめる</span><span class="arrow">→</span><span>変化を測る</span></p>' +
+      '<p class="sum-note">画面・サービス名・手順・数値は架空です。御社環境での実画面の確認は、導入時の通常手順として実施します。</p></section></div>';
+  }
+
+  /* ---------- 吹き出し ---------- */
+  function point(target, text, warn, sub) {
+    target.classList.add("is-target");
+    var side = target.getAttribute("data-tip-side");
+    var b = document.createElement("div");
+    b.className = "balloon" + (warn ? " warn" : "") + (side === "right" ? " r" : side === "s" ? " s" : "");
+    b.textContent = text;
+    if (sub) { var sm = document.createElement("small"); sm.textContent = sub; b.appendChild(sm); }
+    target.appendChild(b);
+    keepInside(b, side === "right" ? "r" : side === "s" ? "s" : "l");
+  }
+  // 吹き出し・ツールチップが画面の端からはみ出さないよう、内側にずらす
+  function keepInside(el, mode) {
+    var vw = document.documentElement.clientWidth, pad = 8, r = el.getBoundingClientRect();
+    if (mode === "s") {
+      if (r.right > vw - pad) { el.classList.remove("s"); keepInside(el, "l"); }
+      return;
+    }
+    if (mode === "l" && r.right > vw - pad) {
+      var shift = Math.min(r.right - (vw - pad), Math.max(0, r.left - pad));
+      el.style.left = (parseFloat(getComputedStyle(el).left) - shift) + "px";
+      el.style.setProperty("--ax", Math.min(20 + shift, r.width - 24) + "px");
+    } else if (mode === "r" && r.left < pad) {
+      var back = Math.min(pad - r.left, Math.max(0, vw - pad - r.right));
+      el.style.right = (parseFloat(getComputedStyle(el).right) - back) + "px";
+      el.style.setProperty("--axr", Math.min(20 + back, r.width - 24) + "px");
+    }
+  }
+  function guideTarget() {
+    if (S.ch === 4 || offGuide()) return null;
+    var c, g;
+    if (S.ch === 1) {
+      c = S.c1; g = G1[c.step];
+      if (!g) return null;
+      if (S.warn && c.step >= 2 && c.step <= 4) return { sel: g.target, tip: c.step === 2 ? "「" + SVC + "」を開きます" : "「" + C1_EXP[c.step - 2] + "」を選び直します", warn: true };
+      return { sel: g.target, tip: g.tip, sub: g.sub };
+    }
+    if (S.ch === 2) {
+      c = S.c2;
+      if (c.step < 1 || c.step > 4 || c.modal) return null;
+      if (c.step === 1 && c.tab !== "overview") return { sel: "#w-tab-overview", tip: "ステップ1／4：「Overview」タブに戻ります" };
+      if (c.step === 2 && c.tab === "impact") return { sel: "#w-tip-prio", tip: "優先度の基準を確認します", sub: "「?」で社内の基準（架空）を表示します" };
+      if (c.step === 3 && c.tab === "logs") return { sel: "#f-c2-period", tip: "Time range を「5 minutes before issue」にします", warn: !!S.warn };
+      g = G2[c.step];
+      return { sel: g.target, tip: g.tip, sub: g.sub };
+    }
+    c = S.c3; g = G3[c.step];
+    if (!g) return null;
+    var bad = !!S.warn && c.step >= 3 && c.step <= 5;
+    return { sel: g.target, tip: bad ? "選び直します" : g.tip, sub: bad ? "" : g.sub, warn: bad };
+  }
+
+  /* ---------- 描画 ---------- */
+  function renderJourney() {
+    $("#journey").innerHTML = JOURNEY.map(function (j) {
+      var st = j[0] < S.ch ? "done" : j[0] === S.ch ? "now" : "todo";
+      return '<button type="button" class="jn ' + st + '" data-act="chapter" data-arg="' + j[0] + '"' + (st === "now" ? ' aria-current="step"' : "") + ">" +
+        '<span class="no">' + (st === "done" ? "✓" : j[0]) + '</span><span class="jl">' + j[1] + '</span><span class="jt">' + j[2] + "</span></button>";
+    }).join("");
+  }
+  function renderStory() {
+    var c = CH[S.ch];
+    $("#story").innerHTML = '<p class="story-time">' + c.time + "<small>" + c.timeSub + "</small></p><h1>" + c.title + '</h1><p class="story-text">' + c.text + "</p>" +
+      '<p class="story-tags">' + c.tags.map(function (t) { return "<span>" + t + "</span>"; }).join("") + "</p>";
+  }
+  function renderStage() {
+    var st = $("#stage");
+    if (S.ch === 4) { st.innerHTML = summaryHTML(); return; }
+    st.innerHTML = '<div class="window"><div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>監視画面（架空）　New Relicの画面イメージを踏襲</span></div>' +
+      '<div class="gh" aria-hidden="true"><span class="gh-acct">運用チーム（架空）' + svg("chevron") + '</span>' +
+      '<span class="gh-search">' + svg("search") + 'Search entities, dashboards, and more</span>' +
+      '<span class="gh-right"><span>Help</span><span class="avatar">運</span></span></div>' +
+      '<div class="dt has-overlay"><nav class="dock" aria-label="ナビゲーション（架空）">' + dockHTML(S.app) + "</nav>" +
+      '<div class="dt-app">' + appHeader() + '<div class="dt-page">' + chatHTML() + pageHTML() + "</div></div>" +
+      '<aside class="overlay' + (S.ch === 3 ? " hub" : "") + '" aria-label="テックタッチのガイド">' + panelHTML() + "</aside>" +
+      modalHTML() + "</div></div>";
+  }
+  function render() {
+    var active = document.activeElement, focusId = active && active.id;
+    renderJourney();
+    renderStory();
+    renderStage();
+    $("#ask").hidden = S.ch === 4;
+    $("#ask-text").textContent = CH[S.ch].ask;
+    $$("#notes [data-for]").forEach(function (ul) { ul.hidden = ul.getAttribute("data-for") !== String(S.ch); });
+    var t = guideTarget(), el = t && $(t.sel);
+    if (el) point(el, t.tip, t.warn, t.sub);
+    $$(".tt-tip").forEach(function (tt) { keepInside(tt, "l"); });
+    if (focusId) { var f = document.getElementById(focusId); if (f && f !== document.activeElement) { try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); } } }
+    if (pendingTop) { window.scrollTo(0, 0); pendingTop = false; }
+    try { history.replaceState(null, "", "#c" + S.ch); } catch (e) { /* 表示には影響なし */ }
+  }
+
+  /* ---------- 入力 ---------- */
+  document.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-act]");
+    if (!el || el.disabled) return;
+    act(el.getAttribute("data-act"), el.getAttribute("data-arg"));
+  });
+  document.addEventListener("change", function (e) {
+    var el = e.target.closest("[data-change]");
+    if (!el) return;
+    act(el.getAttribute("data-change"), null, el.value);
+  });
+  function toggleNotes() {
+    var n = $("#notes"), btn = $("#notes-btn");
+    n.hidden = !n.hidden;
+    btn.setAttribute("aria-pressed", String(!n.hidden));
+  }
+  $("#notes-btn").addEventListener("click", toggleNotes);
+  $("#reset-btn").addEventListener("click", function () { goChapter(S.ch); });
+
+  var THEME_KEY = "nr-tt-demo-theme";
+  var themes = ["", "light", "dark"], labels = { "": "自動", light: "ライト", dark: "ダーク" };
+  var theme = "";
+  function applyTheme(t, persist) {
+    theme = t;
+    if (t) document.documentElement.setAttribute("data-theme", t);
+    else if (persist) document.documentElement.removeAttribute("data-theme");
+    $("#theme-btn").textContent = "表示：" + labels[t];
+    if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* 保存できなくても表示は切り替わる */ } }
+  }
+  try { var saved = localStorage.getItem(THEME_KEY); if (saved === "light" || saved === "dark") applyTheme(saved, false); } catch (e) { /* 既定のまま */ }
+  $("#theme-btn").addEventListener("click", function () { applyTheme(themes[(themes.indexOf(theme) + 1) % themes.length], true); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var tag = (e.target && e.target.tagName || "").toLowerCase();
+    if (tag === "select" || tag === "input" || tag === "textarea") return;
+    if (e.key === "ArrowRight") { act("next"); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { act("back"); e.preventDefault(); }
+    else if (e.key >= "1" && e.key <= "4") goChapter(+e.key);
+    else if (e.key === "n" || e.key === "N") toggleNotes();
+    else if (e.key === "r" || e.key === "R") goChapter(S.ch);
+  });
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 150); });
+
+  var m = /^#c([1-4])$/.exec(location.hash || "");
+  goChapter(m ? +m[1] : 1);
+})();
+</script>
+<!-- fragment:body:end -->
+</body>
+</html>
