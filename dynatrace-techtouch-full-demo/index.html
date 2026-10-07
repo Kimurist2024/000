@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- fragment:head:start -->
+<title>Dynatrace×テックタッチ 本格デモ（イメージ）</title>
+<style>
+/*
+  Layout: 業務の流れ（7場面＋振り返り）→ 場面説明 → ブラウザ枠の中に「Dynatraceの画面イメージを踏襲した架空画面」
+          （左にDock、上にアプリヘッダー、本文）→ 重なるテックタッチ（青）／AI Hub（紫）のオーバーレイ → 伺いたいこと。
+  --dt-* の値は Dynatrace 公式デザイントークン @dynatrace/strato-design-tokens 1.7.1（Apache-2.0）のライト／ダーク値に合わせた。
+  テックタッチ・AI Hub の色は 10/1 資料（v2）の配色。場面7はテックタッチ管理画面のイメージ（架空）。
+*/
+:root {
+  --dt-base: #f9f9fa;
+  --dt-surface: #ffffff;
+  --dt-container: #f2f2f5;
+  --dt-container-emph: #ebecf0;
+  --dt-field: #e4e5eb;
+  --dt-field-hover: #dadbe4;
+  --dt-text: #2f2f4f;
+  --dt-text-sub: #595a7d;
+  --dt-border: #dadbe4;
+  --dt-border-sub: #e4e5eb;
+  --dt-primary: #464cce;
+  --dt-primary-accent: #474fcf;
+  --dt-primary-cont: #f1f2f9;
+  --dt-primary-cont-emph: #e9ecf8;
+  --dt-on-accent: #f4f4fb;
+  --dt-warning: #855400;
+  --dt-warning-cont-emph: #f9f3ec;
+  --dt-critical: #bb0731;
+  --dt-critical-cont: #f9f1f2;
+  --dt-success: #2d6761;
+  --dt-chart-1: #0057bf;
+  --dt-shadow-raised: 0 0 0 1px #2d2e4e08, 0 1px 2px #2d2e4e0d, 0 4px 8px -2px #2d2e4e12;
+  --dt-shadow-float: 0 0 0 1px #2d2e4e08, 0 1px 2px #2d2e4e0d, 0 5px 11px -2px #2d2e4e29;
+  --dt-shadow-field: inset 0 0 0 1px #2f2f4f1f, inset 0 -1px 0 #2f2f4f14, 0 1px 1px -1px #2d2e4e1f;
+
+  --tt: #0B7FB5;
+  --tt-soft: #E7F3FA;
+  --tt-ink: #075E86;
+  --tt-ring: rgba(11, 127, 181, 0.35);
+  --hub: #6A4C9C;
+  --hub-soft: #F3EFF9;
+  --hub-ink: #553C80;
+  --ov-warn: #B4531A;
+  --ov-warn-soft: #FCF0E6;
+  --on-accent: #FFFFFF;
+  --scrim: rgba(17, 17, 34, 0.32);
+
+  --font: Roboto, Helvetica, "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Yu Gothic", "游ゴシック", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  --font-demo: "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Yu Gothic", "游ゴシック", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  --dock-w: 184px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --dt-base: #19192c; --dt-surface: #111122; --dt-container: #212135; --dt-container-emph: #292a3e;
+    --dt-field: #323248; --dt-field-hover: #3b3b52; --dt-text: #ebecff; --dt-text-sub: #b1b2d2;
+    --dt-border: #3b3b52; --dt-border-sub: #323248; --dt-primary: #adb0ff; --dt-primary-accent: #999bed;
+    --dt-primary-cont: #212138; --dt-primary-cont-emph: #292944; --dt-on-accent: #1f2037;
+    --dt-warning: #eea83f; --dt-warning-cont-emph: #332c34; --dt-critical: #ff999c; --dt-critical-cont: #251c2e; --dt-success: #6fc3ba; --dt-chart-1: #0072f5;
+    --dt-shadow-raised: 0 0 0 1px #f0f0f514, 0 1px 2px #111122, 0 4px 8px #111122cc;
+    --dt-shadow-float: 0 0 0 1px #f0f0f514, 0 1px 2px #111122, 0 7px 8px #111122cc;
+    --dt-shadow-field: inset 0 0 0 1px #ebecff1f, inset 0 1px 0 #ebecff14, 0 1px 1px -1px #11112280;
+    --tt: #45AEE0; --tt-soft: #12324A; --tt-ink: #8FD0EF; --tt-ring: rgba(69, 174, 224, 0.4);
+    --hub: #A88DD8; --hub-soft: #28213D; --hub-ink: #CDBDEB;
+    --ov-warn: #F2A465; --ov-warn-soft: #3A2616; --on-accent: #0B1420; --scrim: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --dt-base: #19192c; --dt-surface: #111122; --dt-container: #212135; --dt-container-emph: #292a3e;
+  --dt-field: #323248; --dt-field-hover: #3b3b52; --dt-text: #ebecff; --dt-text-sub: #b1b2d2;
+  --dt-border: #3b3b52; --dt-border-sub: #323248; --dt-primary: #adb0ff; --dt-primary-accent: #999bed;
+  --dt-primary-cont: #212138; --dt-primary-cont-emph: #292944; --dt-on-accent: #1f2037;
+  --dt-warning: #eea83f; --dt-warning-cont-emph: #332c34; --dt-critical: #ff999c; --dt-critical-cont: #251c2e; --dt-success: #6fc3ba; --dt-chart-1: #0072f5;
+  --dt-shadow-raised: 0 0 0 1px #f0f0f514, 0 1px 2px #111122, 0 4px 8px #111122cc;
+  --dt-shadow-float: 0 0 0 1px #f0f0f514, 0 1px 2px #111122, 0 7px 8px #111122cc;
+  --dt-shadow-field: inset 0 0 0 1px #ebecff1f, inset 0 1px 0 #ebecff14, 0 1px 1px -1px #11112280;
+  --tt: #45AEE0; --tt-soft: #12324A; --tt-ink: #8FD0EF; --tt-ring: rgba(69, 174, 224, 0.4);
+  --hub: #A88DD8; --hub-soft: #28213D; --hub-ink: #CDBDEB;
+  --ov-warn: #F2A465; --ov-warn-soft: #3A2616; --on-accent: #0B1420; --scrim: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--dt-base);
+  color: var(--dt-text);
+  font-family: var(--font-demo);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1560px;
+  margin: 0 auto;
+  padding-inline: 24px;
+  padding-block: 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--tt); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; word-break: auto-phrase; margin: 0; }
+p { margin: 0; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- デモの外枠（ヘッダー・注記） ---------- */
+.topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; justify-content: space-between; }
+.brand { display: flex; flex-direction: column; line-height: 1.4; }
+.brand-name { font-weight: 700; font-size: 17px; }
+.brand-sub { font-size: 13px; color: var(--dt-text-sub); }
+.scene-nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.scene-nav button {
+  border: 1px solid var(--dt-border);
+  background: var(--dt-surface);
+  color: var(--dt-text-sub);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.scene-nav button[aria-current="true"] { background: var(--dt-text); border-color: var(--dt-text); color: var(--dt-base); font-weight: 700; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.tool { border: 1px solid var(--dt-border); background: transparent; color: var(--dt-text-sub); border-radius: 6px; padding: 5px 12px; font-size: 14px; }
+.tool[aria-pressed="true"] { background: var(--dt-container); color: var(--dt-text); font-weight: 700; }
+.disclaimer {
+  display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: center; justify-content: space-between;
+  border: 1px solid var(--dt-border); background: var(--dt-surface); border-radius: 9px;
+  padding: 8px 16px; font-size: 14px; color: var(--dt-text-sub);
+}
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.l-dt { background: var(--dt-surface); border: 1px solid var(--dt-primary); }
+.l-tt { background: var(--tt); }
+.l-hub { background: var(--hub); }
+
+.scene { display: flex; flex-direction: column; gap: 14px; }
+.scene-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.scene-head > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.eyebrow { font-size: 13px; color: var(--dt-text-sub); letter-spacing: 0.06em; }
+.scene-head h1 { font-size: clamp(22px, 2.2vw, 28px); line-height: 1.4; }
+.lede { font-size: 17px; color: var(--dt-text-sub); }
+.tag { border: 1px solid var(--dt-border); color: var(--dt-text-sub); border-radius: 6px; padding: 2px 10px; font-size: 13px; white-space: nowrap; }
+
+/* ---------- ブラウザ枠 ---------- */
+.window {
+  border: 1px solid var(--dt-border);
+  border-radius: 12px;
+  background: var(--dt-base);
+  box-shadow: var(--dt-shadow-float);
+  min-width: 0;
+}
+.win-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--dt-border-sub);
+  background: var(--dt-container);
+  border-radius: 12px 12px 0 0;
+  font-size: 12px; color: var(--dt-text-sub);
+}
+.dots { display: inline-flex; gap: 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--dt-field-hover); display: inline-block; }
+
+/* ---------- Dynatraceの画面イメージ（架空） ---------- */
+.dt {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--dock-w) minmax(0, 1fr) 364px;
+  grid-template-rows: auto;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.4286;
+  color: var(--dt-text);
+  min-height: 600px;
+}
+.dock {
+  grid-column: 1;
+  grid-row: 1;
+  background: var(--dt-container);
+  border-right: 1px solid var(--dt-border-sub);
+  padding: 10px 8px;
+  display: flex; flex-direction: column; gap: 2px;
+  border-radius: 0 0 0 12px;
+}
+.dock-group { display: grid; gap: 2px; }
+.dock-sep { height: 1px; background: var(--dt-border); margin: 6px 6px; }
+.dock-label { font-size: 12px; color: var(--dt-text-sub); padding: 4px 8px 2px; }
+.dock-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; border-radius: 6px;
+  color: var(--dt-text); font-size: 14px; white-space: nowrap;
+}
+.dock-item svg { width: 18px; height: 18px; flex: none; }
+.dock-item.active { background: var(--dt-primary-cont-emph); color: var(--dt-primary); font-weight: 500; }
+.dock-spacer { flex: 1; }
+.avatar {
+  width: 22px; height: 22px; border-radius: 50%; flex: none;
+  display: inline-grid; place-items: center; font-size: 11px; font-weight: 700;
+  background: var(--dt-primary-accent); color: var(--dt-on-accent);
+}
+.dt-app { grid-column: 2 / 4; grid-row: 1; display: flex; flex-direction: column; min-width: 0; background: var(--dt-base); border-radius: 0 0 12px 0; }
+.appheader {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 48px; padding: 0 16px;
+  background: var(--dt-surface);
+  border-bottom: 1px solid var(--dt-border-sub);
+}
+.ah-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex-wrap: wrap; }
+.app-icon {
+  width: 24px; height: 24px; border-radius: 6px; flex: none;
+  display: inline-grid; place-items: center;
+  background: var(--dt-primary-cont-emph); color: var(--dt-primary);
+}
+.app-icon svg { width: 16px; height: 16px; }
+.app-name { font-weight: 600; font-size: 14px; }
+.ah-nav { display: flex; gap: 2px; flex-wrap: wrap; }
+.ah-nav span { position: relative; padding: 13px 10px; color: var(--dt-text-sub); font-weight: 500; }
+.ah-nav span.active { color: var(--dt-primary); }
+.ah-nav span.active::after {
+  content: ""; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+  width: 20px; height: 2px; border-radius: 12px; background: currentColor;
+}
+.dt-look-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 6px; font-weight: 500; color: var(--dt-text);
+  background: var(--dt-field); box-shadow: var(--dt-shadow-field); white-space: nowrap;
+}
+.dt-look-btn svg { width: 14px; height: 14px; }
+.dt-page { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.crumbs { font-size: 12px; color: var(--dt-text-sub); }
+.tb-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.dt-h { font-size: 20px; font-weight: 600; line-height: 1.4; }
+.dt-h3 { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dt-field {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 4px 0 10px; min-height: 32px;
+  border-radius: 6px;
+  background: var(--dt-field);
+  box-shadow: var(--dt-shadow-field);
+}
+.dt-field label, .dt-field .pre { display: inline-flex; align-items: center; gap: 6px; color: var(--dt-text-sub); font-weight: 500; white-space: nowrap; }
+.dt-field svg { width: 14px; height: 14px; }
+.dt-field select {
+  border: 0; background: transparent; color: var(--dt-text);
+  font-size: 14px; font-weight: 500; padding: 6px 4px; min-width: 0; max-width: 100%;
+  border-radius: 4px;
+}
+.dt-field select:disabled { opacity: 0.5; cursor: not-allowed; }
+.dt-field:focus-within { box-shadow: var(--dt-shadow-field), 0 0 0 2px var(--dt-primary); }
+.dt-field.block { display: flex; flex-direction: column; align-items: stretch; gap: 2px; padding: 6px 8px 4px 10px; }
+.dt-field.block label, .dt-field.block .pre { font-size: 12px; }
+.dt-field.block select { padding: 2px 0 4px; }
+.locked { color: var(--dt-text-sub); font-weight: 500; padding: 2px 0 4px; }
+.tip-anchor { position: relative; display: inline-flex; border-radius: 6px; }
+.dt-accent {
+  border: 0; border-radius: 6px; padding: 6px 14px; min-height: 32px;
+  background: var(--dt-primary-accent); color: var(--dt-on-accent); font-weight: 500; font-size: 14px;
+}
+.dt-emph {
+  border: 0; border-radius: 6px; padding: 6px 14px; min-height: 32px;
+  background: var(--dt-field); color: var(--dt-text); font-weight: 500; font-size: 14px; box-shadow: var(--dt-shadow-field);
+}
+.surface {
+  background: var(--dt-surface);
+  border-radius: 12px;
+  box-shadow: var(--dt-shadow-raised);
+  padding: 14px 16px;
+  display: grid; gap: 10px;
+  min-width: 0;
+  position: relative;
+}
+.surface-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--dt-text-sub); }
+.chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.sw-cmp { background: var(--dt-container-emph); border: 1px solid var(--dt-border); }
+.sw-tgt { background: var(--dt-warning-cont-emph); border: 1px solid var(--dt-warning); }
+.sw-line { background: var(--dt-chart-1); }
+.chart-wrap { overflow-x: auto; }
+.chart { width: 100%; min-width: 420px; height: auto; display: block; }
+.c-grid { stroke: var(--dt-border-sub); stroke-width: 1; }
+.c-band-cmp { fill: var(--dt-container-emph); }
+.c-band-tgt { fill: var(--dt-warning-cont-emph); }
+.c-band-txt { fill: var(--dt-text-sub); font-size: 11px; font-family: var(--font); }
+.c-area { fill: var(--dt-chart-1); fill-opacity: 0.08; }
+.c-line { stroke: var(--dt-chart-1); stroke-width: 2; fill: none; }
+.c-txt { fill: var(--dt-text-sub); font-size: 11px; font-family: var(--font); }
+.c-hit { fill: var(--dt-warning); }
+.c-hit-txt { fill: var(--dt-warning); font-size: 12px; font-weight: 600; font-family: var(--font); }
+
+.table-wrap { overflow-x: auto; }
+.dtable { width: 100%; border-collapse: collapse; min-width: 440px; font-size: 14px; }
+.dtable th, .dtable td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--dt-border-sub); vertical-align: middle; }
+.dtable thead th { color: var(--dt-text-sub); font-weight: 500; font-size: 13px; line-height: 1.4; border-bottom-color: var(--dt-border); }
+.dtable tbody th { font-weight: 400; }
+.dtable .big { font-size: 20px; font-weight: 600; }
+.dtable .up { color: var(--dt-warning); }
+.dt-callout { background: var(--dt-container); border-radius: 9px; padding: 10px 14px; font-size: 14px; }
+.dt-fine { font-size: 12px; color: var(--dt-text-sub); }
+.empty {
+  display: grid; gap: 8px; justify-items: center; text-align: center;
+  padding: 36px 16px; color: var(--dt-text-sub);
+  background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-raised);
+}
+.empty svg { width: 36px; height: 36px; color: var(--dt-border); }
+
+/* デモ②：問題一覧・問題の詳細 */
+.row-link { border: 0; background: transparent; padding: 0; color: var(--dt-primary); font-weight: 500; text-align: left; font-size: 14px; }
+.row-link:hover { text-decoration: underline; }
+.status { display: inline-block; font-size: 12px; font-weight: 500; border-radius: 999px; padding: 1px 10px; background: var(--dt-container); color: var(--dt-text-sub); white-space: nowrap; }
+.status.active { background: var(--dt-warning-cont-emph); color: var(--dt-warning); }
+.plist { min-width: 0; }
+.dt-tabs { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--dt-border); }
+.dt-tabs button { border: 0; background: transparent; padding: 8px 14px; font-weight: 500; font-size: 14px; color: var(--dt-text-sub); position: relative; border-radius: 6px 6px 0 0; }
+.dt-tabs button.active { color: var(--dt-primary); }
+.dt-tabs button.active::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: currentColor; }
+.kv { display: grid; grid-template-columns: minmax(8em, 13em) minmax(0, 1fr); margin: 0; }
+.kv > * { margin: 0; padding: 10px 4px; border-bottom: 1px solid var(--dt-border-sub); }
+.kv dt { color: var(--dt-text-sub); }
+.lv { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; }
+.lv.error { background: var(--dt-critical-cont); color: var(--dt-critical); }
+.lv.warn { background: var(--dt-warning-cont-emph); color: var(--dt-warning); }
+.lv.info { background: var(--dt-container); color: var(--dt-text-sub); }
+.logs td:first-child { white-space: nowrap; }
+.tt-modal {
+  position: absolute; grid-column: 2 / -1; grid-row: 1; inset: 0; z-index: 15;
+  background: var(--scrim);
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 96px 388px 24px 24px;
+  border-radius: 0 0 12px 0;
+}
+.tt-modal-card {
+  width: 100%; max-width: 560px;
+  background: var(--dt-surface); border-radius: 12px; border-top: 5px solid var(--tt);
+  box-shadow: var(--dt-shadow-float), 0 12px 32px -8px var(--tt-ring);
+  padding: 18px 20px; display: grid; gap: 10px;
+  font-family: var(--font-demo); font-size: 15px; line-height: 1.65; color: var(--dt-text);
+}
+.proc { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+.proc span { display: block; color: var(--dt-text-sub); font-size: 14px; }
+.msg { white-space: pre-wrap; background: var(--dt-container); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; margin-top: 4px; color: var(--dt-text); }
+
+/* デモ③：ひな型 */
+.section-label { font-size: 13px; font-weight: 600; color: var(--dt-text-sub); }
+.tpl-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; position: relative; border-radius: 12px; }
+.tpl {
+  position: relative; display: grid; gap: 4px; align-content: start;
+  background: var(--dt-surface); border-radius: 9px; box-shadow: var(--dt-shadow-raised);
+  padding: 12px 14px; cursor: pointer; min-width: 0; border: 1px solid transparent;
+}
+.tpl input { position: absolute; opacity: 0; pointer-events: none; }
+.tpl:has(input:checked) { border-color: var(--dt-primary); background: var(--dt-primary-cont); }
+.tpl:has(input:focus-visible) { outline: 2px solid var(--dt-primary); outline-offset: 2px; }
+.tpl-name { font-weight: 600; }
+.tpl-desc { color: var(--dt-text-sub); font-size: 13px; }
+.badge { justify-self: start; font-size: 11px; border-radius: 4px; padding: 1px 6px; background: var(--dt-container); color: var(--dt-text-sub); }
+.edit-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.changes ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.changes li { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; }
+.changes .k { color: var(--dt-text-sub); min-width: 7.5em; }
+.st { font-size: 11px; border-radius: 4px; padding: 1px 6px; background: var(--dt-container); color: var(--dt-text-sub); }
+.st.on { background: var(--dt-primary-accent); color: var(--dt-on-accent); }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.checks li::before { content: "✓"; color: var(--dt-success); font-weight: 700; margin-right: 8px; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.status { background: var(--dt-container); border-radius: 6px; padding: 8px 12px; }
+.dql { display: grid; gap: 2px; border-top: 1px solid var(--dt-border-sub); padding-top: 10px; }
+.dql span { color: var(--dt-text-sub); }
+
+/* ---------- テックタッチ／AI Hub（オーバーレイ） ---------- */
+.overlay {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: start;
+  position: sticky;
+  top: 16px;
+  margin: 60px 16px 16px 0;
+  z-index: 20;
+  background: var(--dt-surface);
+  border-radius: 12px;
+  border: 1px solid var(--dt-border);
+  border-top: 5px solid var(--tt);
+  box-shadow: var(--dt-shadow-float), 0 12px 32px -8px var(--tt-ring);
+  padding: 16px 18px 18px;
+  display: flex; flex-direction: column; gap: 12px;
+  font-family: var(--font-demo);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--dt-text);
+}
+.overlay.hub { border-top-color: var(--hub); }
+.has-overlay .dt-page { padding-right: 384px; }
+.ov-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ov-pill { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 10px; background: var(--tt); color: var(--on-accent); }
+.overlay.hub .ov-pill { background: var(--hub); }
+.ov-kicker { font-size: 12px; color: var(--dt-text-sub); }
+.ov-brand { font-weight: 700; color: var(--tt-ink); font-size: 16px; margin-top: -6px; }
+.overlay.hub .ov-brand { color: var(--hub-ink); }
+.ov-title { font-size: 18px; line-height: 1.45; }
+.ov-text { color: var(--dt-text-sub); font-size: 14px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: st; }
+.steps li {
+  counter-increment: st;
+  display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: center;
+  padding: 4px 8px; border-radius: 6px; font-size: 14px; color: var(--dt-text-sub);
+}
+.steps li::before {
+  content: counter(st);
+  display: inline-grid; place-items: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid var(--dt-border); font-size: 11px;
+}
+.steps li.done { color: var(--dt-text); }
+.steps li.done::before { content: "✓"; background: var(--dt-success); border-color: var(--dt-success); color: var(--on-accent); }
+.steps li.now { background: var(--tt-soft); color: var(--tt-ink); font-weight: 700; }
+.steps li.now::before { background: var(--tt); border-color: var(--tt); color: var(--on-accent); }
+.now-box { font-weight: 700; }
+.alert { background: var(--ov-warn-soft); border: 1px solid var(--ov-warn); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+.soft { background: var(--tt-soft); border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+.overlay.hub .soft { background: var(--hub-soft); }
+.refs { font-size: 12px; color: var(--dt-text-sub); }
+.part { border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; font-size: 14px; }
+.part.tt { background: var(--tt-soft); }
+.part.hub { background: var(--hub-soft); }
+.part-head { font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+.part.tt .part-head { color: var(--tt-ink); }
+.part.hub .part-head { color: var(--hub-ink); }
+.actions { display: flex; gap: 8px; }
+.btn { border: 1px solid transparent; border-radius: 8px; padding: 10px 16px; font-weight: 700; font-size: 15px; line-height: 1.4; }
+.btn-primary { background: var(--tt); color: var(--on-accent); flex: 1; }
+.overlay.hub .btn-primary { background: var(--hub); }
+.btn-ghost { background: transparent; border-color: var(--dt-border); color: var(--dt-text-sub); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* テックタッチが画面に追加する要素（入口ボタン・？アイコン） */
+.tt-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px dashed var(--tt); color: var(--tt-ink); background: var(--tt-soft);
+  border-radius: 6px; padding: 2px 10px; font-size: 13px; font-weight: 700; font-family: var(--font-demo);
+}
+
+/* ガイドの対象箇所と吹き出し */
+.is-target { outline: 3px solid var(--tt); outline-offset: 4px; animation: ring 1.8s ease-out infinite; }
+@keyframes ring {
+  0% { box-shadow: 0 0 0 0 var(--tt-ring); }
+  70% { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.dt-field.is-target, .tip-anchor.is-target { animation: none; }
+.balloon {
+  position: absolute; top: calc(100% + 12px); left: 0; z-index: 40;
+  width: max-content; max-width: min(360px, 78vw);
+  background: var(--tt); color: var(--on-accent);
+  border-radius: 8px; padding: 8px 12px;
+  font-family: var(--font-demo); font-size: 14px; font-weight: 700; line-height: 1.5;
+  box-shadow: var(--dt-shadow-float);
+  pointer-events: none;
+}
+.balloon::before {
+  content: ""; position: absolute; top: -8px; left: var(--ax, 20px);
+  border: 8px solid transparent; border-top: 0; border-bottom-color: var(--tt);
+}
+.balloon small { display: block; font-weight: 400; font-size: 12.5px; opacity: 0.95; }
+.balloon.r { left: auto; right: 0; }
+.balloon.r::before { left: auto; right: var(--axr, 20px); }
+.balloon.warn { background: var(--ov-warn); }
+.balloon.warn::before { border-bottom-color: var(--ov-warn); }
+
+/* ---------- 伺いたいこと・進行メモ ---------- */
+.ask {
+  display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline;
+  background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 9px;
+  padding: 12px 18px; font-size: 18px;
+}
+.ask strong { font-size: 14px; background: var(--dt-text); color: var(--dt-base); border-radius: 999px; padding: 2px 12px; white-space: nowrap; }
+.ask span { min-width: 0; }
+.notes { background: var(--dt-container); border: 1px solid var(--dt-border); border-radius: 12px; padding: 16px 22px; display: grid; gap: 12px; font-size: 15px; }
+.notes h2 { font-size: 17px; }
+.notes h3 { font-size: 15px; color: var(--dt-text-sub); }
+.notes ul { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.notes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; }
+.notes-grid > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.kbd { font-size: 13px; color: var(--dt-text-sub); }
+.foot { font-size: 12px; color: var(--dt-text-sub); text-align: right; }
+
+/* ---------- 吹き出しの向き・Dockの基準位置 ---------- */
+.dock-item { position: relative; }
+.balloon.s { top: 50%; left: calc(100% + 14px); transform: translateY(-50%); }
+.balloon.s::before { top: 50%; left: -8px; margin-top: -8px; border-style: solid; border-width: 8px 8px 8px 0; border-color: transparent var(--tt) transparent transparent; }
+.balloon.warn.s::before { border-color: transparent var(--ov-warn) transparent transparent; }
+
+/* ---------- 業務の流れ（進行バー）・場面説明 ---------- */
+.journey { display: flex; flex-wrap: wrap; gap: 6px; }
+.jn {
+  flex: 1 1 210px;
+  display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 10px; align-items: center;
+  text-align: left; padding: 8px 12px; border-radius: 9px;
+  border: 1px solid var(--dt-border); background: var(--dt-surface); color: var(--dt-text-sub);
+}
+.jn .no {
+  grid-row: 1 / 3; width: 26px; height: 26px; border-radius: 50%;
+  display: inline-grid; place-items: center; font-size: 12px; font-weight: 700;
+  border: 1px solid var(--dt-border); background: var(--dt-surface);
+}
+.jn .jl { font-weight: 700; font-size: 14px; line-height: 1.4; color: var(--dt-text); }
+.jn .jt { font-size: 12px; line-height: 1.4; }
+.jn.now { border-color: var(--dt-text); box-shadow: inset 0 0 0 1px var(--dt-text); }
+.jn.now .no { background: var(--dt-text); border-color: var(--dt-text); color: var(--dt-base); }
+.jn.done .no { background: var(--dt-success); border-color: var(--dt-success); color: var(--on-accent); }
+.jn.todo .jl { color: var(--dt-text-sub); font-weight: 500; }
+.story {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 18px; align-items: start;
+  background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 12px; padding: 14px 18px;
+}
+.story-time {
+  grid-row: 1 / 4; min-width: 4.4em; padding-right: 18px; border-right: 1px solid var(--dt-border);
+  font-size: 30px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums;
+}
+.story-time small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--dt-text-sub); }
+.story h1 { font-size: clamp(20px, 2vw, 26px); line-height: 1.4; }
+.story-text { color: var(--dt-text-sub); font-size: 15px; }
+.story-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.story-tags span { font-size: 12px; border-radius: 999px; padding: 1px 10px; background: var(--dt-container); color: var(--dt-text-sub); }
+
+/* ---------- Dock（押せる項目） ---------- */
+button.dock-item { width: 100%; border: 0; background: transparent; text-align: left; font: inherit; color: var(--dt-text); cursor: pointer; }
+button.dock-item:hover { background: var(--dt-container-emph); }
+button.dock-item.active:hover { background: var(--dt-primary-cont-emph); }
+
+/* ---------- 社内チャット（架空） ---------- */
+.chat {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 2px 12px; align-items: start;
+  background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-float);
+  border-left: 4px solid var(--dt-text-sub); padding: 12px 14px; font-family: var(--font-demo);
+}
+.chat .av { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--dt-container-emph); font-weight: 700; }
+.chat .who { font-size: 13px; color: var(--dt-text-sub); }
+.chat .who b { color: var(--dt-text); margin-right: 8px; }
+.chat .say { font-size: 15px; line-height: 1.6; }
+.chat .src { font-size: 11px; color: var(--dt-text-sub); }
+.chat-close { border: 0; background: transparent; color: var(--dt-text-sub); font-size: 13px; padding: 2px 6px; }
+
+/* ---------- ホーム（架空） ---------- */
+.home-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.app-tile {
+  display: grid; gap: 6px; justify-items: start; text-align: left; font: inherit;
+  background: var(--dt-surface); border: 0; border-radius: 12px; box-shadow: var(--dt-shadow-raised);
+  padding: 14px 16px; color: var(--dt-text);
+}
+button.app-tile { cursor: pointer; }
+.app-tile .app-icon { width: 32px; height: 32px; }
+.app-tile .app-icon svg { width: 20px; height: 20px; }
+.app-tile b { font-weight: 600; }
+.app-tile span.d { color: var(--dt-text-sub); font-size: 13px; }
+
+/* ---------- テックタッチのツールチップ（案） ---------- */
+.tip-wrap { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.tt-q {
+  display: inline-grid; place-items: center; width: 20px; height: 20px; padding: 0; flex: none;
+  border-radius: 50%; border: 1px solid var(--tt); color: var(--tt); background: var(--tt-soft);
+  font-size: 12px; font-weight: 700; line-height: 1;
+}
+.tt-q[aria-expanded="true"] { background: var(--tt); color: var(--on-accent); }
+.tt-tip {
+  position: absolute; top: calc(100% + 10px); left: -10px; z-index: 35;
+  width: min(340px, 78vw); padding: 10px 12px;
+  background: var(--dt-surface); border: 2px solid var(--tt); border-radius: 10px; box-shadow: var(--dt-shadow-float);
+  font-family: var(--font-demo); font-size: 13.5px; font-weight: 400; line-height: 1.6; color: var(--dt-text); white-space: normal;
+}
+.tt-tip .lab { display: block; margin-bottom: 2px; font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* ---------- 画面内のお知らせ・ボタン ---------- */
+.dt-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; background: var(--dt-warning-cont-emph); border-radius: 9px; padding: 10px 14px; }
+.dt-banner b { color: var(--dt-warning); }
+.title-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
+.share-chip { font-size: 12px; border-radius: 999px; padding: 1px 10px; background: var(--dt-primary-cont-emph); color: var(--dt-primary); font-weight: 500; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px; display: grid; gap: 2px; }
+.kpi span { font-size: 12.5px; color: var(--dt-text-sub); }
+.kpi b { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- パネル：ガイド一覧・記録 ---------- */
+.glist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.gitem {
+  width: 100%; display: grid; gap: 2px; text-align: left; font: inherit; font-family: var(--font-demo);
+  border: 1px solid var(--dt-border); border-radius: 9px; background: var(--dt-surface); padding: 9px 12px; color: var(--dt-text);
+}
+button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-soft); }
+.overlay.hub button.gitem { border-color: var(--hub); background: var(--hub-soft); }
+.gname { font-weight: 700; font-size: 14px; }
+.gmeta { font-size: 12px; color: var(--dt-text-sub); }
+.rec-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.rec-list li { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 8px; }
+.rec-list .t { color: var(--dt-text-sub); font-variant-numeric: tabular-nums; }
+.steps.compact li { padding: 2px 8px; font-size: 13.5px; }
+
+/* ---------- 振り返り ---------- */
+.summary { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; }
+.sum-card {
+  background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 12px;
+  padding: 18px 20px; display: grid; gap: 12px; align-content: start; min-width: 0;
+}
+.sum-card.wide { grid-column: 1 / -1; }
+.sum-card h2 { font-size: 18px; line-height: 1.4; }
+.sum-note { font-size: 13px; color: var(--dt-text-sub); }
+.tl { list-style: none; margin: 0; padding: 0; display: grid; }
+.tl li { display: grid; grid-template-columns: 3.4em 16px minmax(0, 1fr); column-gap: 12px; }
+.tl .t { font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 1px; }
+.tl .rail { position: relative; }
+.tl .rail::before { content: ""; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--dt-border); }
+.tl li:first-child .rail::before { top: 9px; }
+.tl li:last-child .rail::before { bottom: auto; height: 9px; }
+.tl .rail::after { content: ""; position: absolute; left: 2px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--tt); }
+.tl .body { padding-bottom: 14px; }
+.tl .body b { display: block; }
+.tl .body span { color: var(--dt-text-sub); font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--dt-container); border-radius: 9px; padding: 10px 12px; display: grid; gap: 2px; align-content: start; }
+.stat b { font-size: 28px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--dt-text-sub); }
+.sum-list { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.flow3 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 20px; font-weight: 700; }
+.flow3 .arrow { color: var(--dt-text-sub); font-weight: 400; }
+
+@media (max-width: 1240px) {
+  :root { --dock-w: 56px; }
+  .dock-item .dl, .dock-label { display: none; }
+  .dock-item { justify-content: center; padding: 8px 0; }
+  .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1080px) {
+  .dt { grid-template-columns: var(--dock-w) minmax(0, 1fr); grid-template-rows: auto auto; }
+  .dock { grid-row: 1 / 3; }
+  .dt-app { grid-column: 2; border-radius: 0; }
+  .overlay { grid-column: 2; grid-row: 2; margin: 0 16px 16px; position: relative; top: auto; }
+  .has-overlay .dt-page { padding-right: 20px; }
+  .tt-modal { grid-column: 2; padding: 72px 24px 24px; border-radius: 0; }
+  .notes-grid, .summary { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .wrap { padding-inline: 16px; }
+  .dt { grid-template-columns: minmax(0, 1fr); }
+  .dock { display: none; }
+  .dt-app, .overlay { grid-column: 1; }
+  .tt-modal { grid-column: 1 / -1; padding: 48px 12px 12px; }
+  .kv { grid-template-columns: minmax(0, 1fr); }
+  .kv dt { border-bottom: 0; padding-bottom: 0; }
+  .dt-page { padding: 12px; }
+  .has-overlay .dt-page { padding-right: 12px; }
+  .overlay { margin: 0 12px 12px; padding: 14px; }
+  .toolbar > * { width: 100%; }
+  .dt-field select { flex: 1; }
+  .tip-anchor .dt-accent { width: 100%; }
+  .tpl-list, .edit-grid, .home-grid, .kpis, .stats { grid-template-columns: minmax(0, 1fr); }
+  .ah-nav span { padding: 10px 6px; }
+  .story { grid-template-columns: minmax(0, 1fr); }
+  .story-time { grid-row: auto; border-right: 0; padding-right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-target { animation: none; }
+}
+
+/* ==================== 本格デモで追加した部品 ==================== */
+.status { border-radius: 999px; padding: 1px 10px; }
+.done-msg { background: var(--dt-container); border-radius: 6px; padding: 8px 12px; font-size: 14px; }
+.dt-accent:disabled, .dt-emph:disabled { opacity: 0.45; cursor: not-allowed; }
+.info { background: var(--dt-container); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; color: var(--dt-text-sub); }
+.jn { flex: 1 1 140px; }
+.sum-list.plain { padding-left: 1.1em; font-size: 14px; }
+
+/* 説明用の進行（場面7：テックタッチ管理画面の上） */
+.overlay.note { border-top-color: var(--dt-text-sub); box-shadow: var(--dt-shadow-float); }
+.overlay.note .ov-pill { background: var(--dt-text-sub); }
+.overlay.note .steps li.now { background: var(--dt-container); color: var(--dt-text); }
+.overlay.note .steps li.now::before { background: var(--dt-text-sub); border-color: var(--dt-text-sub); }
+.overlay.note .btn-primary { background: var(--dt-text); color: var(--dt-base); }
+.overlay.note .soft { background: var(--dt-container); }
+.balloon.note { background: var(--dt-text); color: var(--dt-base); }
+.balloon.note::before { border-bottom-color: var(--dt-text); }
+.is-target.note-target { outline-color: var(--dt-text-sub); animation: none; }
+
+/* ポップアップ：役割を選ぶ */
+.role-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.role {
+  display: grid; gap: 2px; text-align: left; font: inherit; font-family: var(--font-demo);
+  border: 1px solid var(--dt-border); border-radius: 9px; background: var(--dt-surface); padding: 10px 12px; color: var(--dt-text); cursor: pointer;
+}
+.role b { font-size: 15px; }
+.role span { font-size: 12.5px; color: var(--dt-text-sub); line-height: 1.5; }
+.role.rec { border-color: var(--tt); background: var(--tt-soft); }
+
+/* ダッシュボードのタイル */
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile {
+  position: relative; display: grid; gap: 4px; align-content: start; min-width: 0;
+  text-align: left; font: inherit; color: var(--dt-text);
+  background: var(--dt-surface); border: 0; border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px;
+}
+button.tile { cursor: pointer; }
+button.tile:hover { box-shadow: var(--dt-shadow-float); }
+.t-name { font-size: 13px; color: var(--dt-text-sub); font-weight: 500; }
+.t-val { font-size: 24px; font-weight: 600; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.t-val.ok { color: var(--dt-success); }
+.t-val.bad { color: var(--dt-warning); }
+.t-sub { font-size: 12px; color: var(--dt-text-sub); }
+.spark { width: 100%; height: 30px; display: block; }
+.spark polyline { fill: none; stroke: var(--dt-chart-1); stroke-width: 1.6; }
+.bar { height: 8px; border-radius: 999px; background: var(--dt-container-emph); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 999px; background: var(--dt-success); }
+
+/* 根本原因・推薦 */
+.rc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.flowline { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.flowline .n { border-radius: 6px; padding: 2px 8px; background: var(--dt-container); font-size: 13px; }
+.flowline .n.root { background: var(--dt-warning-cont-emph); color: var(--dt-warning); font-weight: 600; }
+.flowline .a { color: var(--dt-text-sub); }
+
+/* ノートブック・Dynatrace Assist */
+.nb-sec { background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.nb-sec-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.nb-kind { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; background: var(--dt-container); color: var(--dt-text-sub); }
+.code {
+  margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--dt-container); color: var(--dt-text);
+  font-family: "SFMono-Regular", Consolas, Menlo, "BIZ UDGothic", "Yu Gothic", monospace; font-size: 13px; line-height: 1.6;
+  white-space: pre-wrap; overflow-x: auto;
+}
+.assist { border: 1px solid var(--dt-primary); border-radius: 12px; background: var(--dt-surface); padding: 12px 14px; display: grid; gap: 8px; box-shadow: var(--dt-shadow-raised); }
+.assist-head { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--dt-primary); }
+.assist-head svg, .dt-emph svg, .dt-accent svg { width: 15px; height: 15px; vertical-align: -2px; }
+.bubble { justify-self: end; max-width: 85%; background: var(--dt-primary-cont-emph); border-radius: 12px 12px 4px 12px; padding: 8px 12px; }
+.assist ul { margin: 0; padding-left: 1.2em; font-size: 13.5px; color: var(--dt-text-sub); }
+.ai-label { font-size: 11.5px; color: var(--dt-text-sub); }
+.c-bar { fill: var(--dt-chart-1); }
+.c-bar.hot { fill: var(--dt-warning); }
+
+/* ワークフロー */
+.wf { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 14px; align-items: start; }
+.wf-flow { display: grid; justify-items: stretch; }
+.wf-node { background: var(--dt-surface); border-radius: 10px; box-shadow: var(--dt-shadow-raised); padding: 10px 12px; display: grid; gap: 2px; }
+.wf-node .k { font-size: 11px; font-weight: 700; color: var(--dt-text-sub); }
+.wf-node b { font-weight: 600; }
+.wf-node .v { font-size: 13px; color: var(--dt-text-sub); }
+.wf-node.unset b { color: var(--dt-text-sub); font-weight: 500; }
+.wf-arrow { justify-self: center; width: 2px; height: 20px; background: var(--dt-border); position: relative; }
+.wf-arrow::after { content: ""; position: absolute; bottom: -2px; left: -4px; border: 5px solid transparent; border-bottom: 0; border-top-color: var(--dt-border); }
+.wf-form { align-content: start; }
+button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%; }
+.tpl[aria-pressed="true"] { border-color: var(--dt-primary); background: var(--dt-primary-cont); }
+.tpl-list > .tip-anchor { display: grid; }
+
+/* テックタッチが画面に添える注記（案） */
+.tt-note {
+  border: 1px dashed var(--tt); background: var(--tt-soft); border-radius: 9px; padding: 9px 14px;
+  font-family: var(--font-demo); font-size: 14px; line-height: 1.6; color: var(--dt-text); display: grid; gap: 2px;
+}
+.tt-note .lab { font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* テックタッチ管理画面（イメージ・架空） */
+.tt-admin .dock { background: var(--dt-surface); }
+.tt-admin .dock-item.active { background: var(--tt-soft); color: var(--tt-ink); font-weight: 700; }
+.app-icon.tt { background: var(--tt-soft); color: var(--tt-ink); }
+.rate-low { color: var(--dt-warning); font-weight: 700; }
+.funnel { display: grid; gap: 6px; }
+.fn-row { display: grid; grid-template-columns: minmax(9em, 15em) minmax(0, 1fr) 3.2em; gap: 10px; align-items: center; font-size: 13.5px; }
+.fn-bar { height: 18px; border-radius: 4px; background: var(--dt-container); overflow: hidden; }
+.fn-bar i { display: block; height: 100%; background: var(--tt); }
+.fn-row.hot { font-weight: 700; }
+.fn-row.hot .fn-bar i { background: var(--ov-warn); }
+.fn-row .cnt { text-align: right; font-variant-numeric: tabular-nums; }
+.edit-card { display: grid; gap: 8px; }
+.edit-field { display: grid; gap: 2px; }
+.edit-field .k { font-size: 12px; color: var(--dt-text-sub); font-weight: 600; }
+.edit-field .v { border-radius: 8px; padding: 8px 10px; background: var(--dt-container); font-size: 14px; }
+.edit-field.new .v { background: var(--tt-soft); border: 1px dashed var(--tt); }
+.measure { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.measure th, .measure td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--dt-border-sub); vertical-align: top; }
+.measure thead th { color: var(--dt-text-sub); font-weight: 600; font-size: 12.5px; }
+
+@media (max-width: 1240px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wf { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 1080px) {
+  .rc-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .tiles, .role-list { grid-template-columns: minmax(0, 1fr); }
+  .fn-row { grid-template-columns: minmax(0, 1fr) 3em; }
+  .fn-row .fn-bar { grid-column: 1 / -1; grid-row: 2; }
+}
+</style>
+<!-- fragment:head:end -->
+</head>
+<body>
+<!-- fragment:body:start -->
+<div class="wrap" lang="ja">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name">Dynatrace × テックタッチ　本格デモ（イメージ）</span>
+      <span class="brand-sub">運用チームの一日（架空）：新任者の立ち上がりから、定着の見える化まで（15〜20分）</span>
+    </div>
+    <div class="tools">
+      <button type="button" class="tool" id="notes-btn" aria-pressed="false" aria-controls="notes">進行メモ</button>
+      <button type="button" class="tool" id="reset-btn">この場面を最初から</button>
+      <button type="button" class="tool" id="theme-btn">表示：自動</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    <span>イメージデモ。画面・人物・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。</span>
+    <span class="legend" aria-label="色の意味">
+      <span><i class="l-dt"></i>監視画面（Dynatraceの画面イメージ・架空）</span>
+      <span><i class="l-tt"></i>テックタッチ ガイド（案）</span>
+      <span><i class="l-hub"></i>AI Hub 理解支援（構想）</span>
+    </span>
+  </div>
+
+  <nav class="journey" id="journey" aria-label="業務の流れ"></nav>
+  <section class="story" id="story" aria-live="polite"></section>
+  <div id="stage"></div>
+  <p class="ask" id="ask"><strong>伺いたいこと</strong><span id="ask-text"></span></p>
+
+  <!-- ==================== 進行メモ（発表者用・既定は非表示） ==================== -->
+  <section class="notes" id="notes" hidden aria-label="進行メモ">
+    <h2>進行メモ（発表者用）</h2>
+    <div class="notes-grid">
+      <div>
+        <h3>この場面の進め方</h3>
+        <ul data-for="1">
+          <li>目安2分。新任者が初めてログインした場面です。</li>
+          <li>見せ場：ポップアップで役割を選ぶ → ツアーでDock・チームのダッシュボード・担当範囲（セグメント）・「問題」の場所を覚える。</li>
+          <li>古いダッシュボードを開くと、ガイドが正しい1枚を案内します（構想の表現）。</li>
+          <li>話すこと：製品の使い方はDynatraceの入門コンテンツを優先し、テックタッチは「このチームのやり方」だけを案内します。</li>
+          <li>問いかけ：「新任の方が一人で使えるまで、どれくらいかかっていますか」</li>
+        </ul>
+        <ul data-for="2" hidden>
+          <li>目安2分。毎朝の確認を、チェックリスト型のガイドで進めます。</li>
+          <li>見せ場：「?」のツールチップで社内の目安（架空）を表示 → SLOのエラーバジェットを社内の報告基準で判断 → 同じ形で記録。</li>
+          <li>話すこと：数値を見せるのはDynatrace、判断の基準を画面の上に置くのがテックタッチです。</li>
+          <li>問いかけ：「毎朝の確認で、人によって見る場所や判断が違うのはどこですか」</li>
+        </ul>
+        <ul data-for="3" hidden>
+          <li>目安2分30秒。10/1のデモ①を、担当範囲（セグメント）の設定済みの状態から始めます。</li>
+          <li>比較期間に「09:00–10:00」を選ぶと、ガイドが選び直しを案内します（構想の表現）。</li>
+          <li>最後に、同じ時間帯に検知された問題から場面4へつなぎます。</li>
+          <li>問いかけ：「どこで迷いますか」</li>
+        </ul>
+        <ul data-for="4" hidden>
+          <li>目安3分。10/1のデモ②に「根本原因の候補」のステップを加えた5ステップです。</li>
+          <li>話すこと：根本原因の分析はDynatraceの機能です。テックタッチは、社内手順の順番・判断の基準・連絡先を案内し、原因は断定しません。</li>
+          <li>影響範囲の前に「ログ」や「根本原因」を開くと、社内手順の順番を案内します（構想の表現）。</li>
+          <li>問いかけ：「人によって手順や判断がばらつくのはどこですか」</li>
+        </ul>
+        <ul data-for="5" hidden>
+          <li>目安2分30秒。Dynatraceが推薦した調査ガイド（ノートブック）を、専門家と一緒に使います。</li>
+          <li>AIの分担を言い分けます：根本原因の分析・調査ガイドの推薦・DQLの作成と説明はDynatraceの機能。AI Hub（構想）は社内の過去事例など、社内資料の側だけを補います。</li>
+          <li>Dynatrace Assistの回答は事前に確かめた例で見せます（実機）。</li>
+          <li>問いかけ：「原因の調査のどの段階で、専門家に依頼していますか」</li>
+        </ul>
+        <ul data-for="6" hidden>
+          <li>目安3分。10/1のデモ③（ダッシュボード）に、通知のワークフローを加えます。</li>
+          <li>見せ場：ひな型の意図と変える理由（AI Hub欄は例文）→ 専門家の確認 → 通知先の入力チェック（個人宛てを選ぶと案内）→ テスト実行 → 有効化。</li>
+          <li>Dynatraceの画面上で作るのは利用者本人。テックタッチは、社内のルールに沿った値と順番を案内します。</li>
+          <li>問いかけ：「ひな型選択、条件の変更、結果の検証のどこで依頼しますか」</li>
+        </ul>
+        <ul data-for="7" hidden>
+          <li>目安2分。テックタッチの管理画面（イメージ・架空）で、推進担当が定着の状況を確かめます。</li>
+          <li>話すこと：完了率だけで自走を判断しません。止まる手順を見つけて直し、持ち主と見直し日を決めて、Dynatraceの画面更新に合わせて点検します。</li>
+          <li>数値はすべて架空で、効果を示すものではありません。</li>
+          <li>問いかけ：「定着したかどうかを、どの指標で判断しますか」</li>
+        </ul>
+        <ul data-for="8" hidden>
+          <li>目安1分。回数はこのデモを操作した回数です。効果の数値ではありません。</li>
+          <li>「本日伺いたいこと」から一つ選んで直近の具体例を伺い、最初に支援する作業を一つ決めます。</li>
+        </ul>
+        <h3>全体</h3>
+        <ul>
+          <li>冒頭で「イメージデモです。画面・人物・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません」とお伝えする。</li>
+          <li>15分版：場面2と場面7を口頭の説明に替える。20分版：全場面を通す。各場面の終わりで止めて質問できます。</li>
+          <li>Dynatrace＝観測、テックタッチ＝介入。Dynatrace内で完結する支援（Dynatrace Assist、調査ガイドの推薦）は、Dynatraceの機能として先に見せます。</li>
+          <li>削減率などの数値はお約束しない。確かめ方は自力完了率・所要時間・依頼件数・再実行。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>想定問答</h3>
+        <ul>
+          <li>「実際のDynatrace画面で動きますか」→ ブラウザで操作するDynatraceの画面が対象です。御社環境での動作確認は導入時に実施します。</li>
+          <li>「Dynatrace Assistと何が違いますか」→ Dynatrace AssistはDynatraceの情報と環境のデータを使う支援です。AI Hubは御社の社内資料の側を補う構想で、重なる部分はDynatraceの機能を優先します。</li>
+          <li>「Dynatraceの画面が変わったらどうなりますか」→ ガイドごとに持ち主と見直し日を決め、画面の更新に合わせて点検します（場面7）。</li>
+          <li>「効果はどれくらいですか」→ 現時点で数値はお約束しません。一つの作業で、自力完了率・所要時間・依頼件数を測って確かめます。</li>
+          <li>「セキュリティは」→ 拡張機能の配布手続きと、AI Hubに渡す情報の範囲を御社方針に沿って決めます。AI Hubは外部のAIサービスを利用します。</li>
+        </ul>
+        <p class="kbd">キー操作：→ 次へ ／ ← 戻る ／ 1〜8 場面の切り替え ／ N 進行メモ ／ R この場面を最初から</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">イメージデモ（本格デモの構築用）　2026年10月7日作成</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  document.documentElement.lang = "ja";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(t) {
+    return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+  function val(v, c) { return typeof v === "function" ? v(c) : v; }
+
+  /* ---------- アイコン（汎用の図形。製品のアイコンではありません） ---------- */
+  var ICON = {
+    home: '<path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/>',
+    search: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/>',
+    dashboards: '<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/>',
+    services: '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.5 10.5 16M16 7.5 13.5 16M8.5 6h7"/>',
+    notebooks: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18M12 8h4M12 12h4"/>',
+    logs: '<path d="M4 6h16M4 10h12M4 14h16M4 18h9"/>',
+    problems: '<path d="M12 3 2.5 20h19z"/><path d="M12 10v4M12 17v.5"/>',
+    workflows: '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="12" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8.5 6h2.5a3 3 0 0 1 3 3v.5M8.5 18h2.5a3 3 0 0 0 3-3v-.5"/>',
+    slo: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+    hide: '<path d="m15 6-6 6 6 6"/>',
+    help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.7M12 17v.5"/>',
+    clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    segment: '<path d="M4 5h16l-6 7.5V19l-4 2v-8.5z"/>',
+    empty: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 15l3-4 3 3 4-6"/>',
+    play: '<path d="M8 5.5v13l10-6.5z"/>',
+    spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
+    share: '<circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/>',
+    guide: '<path d="M4 5h11l5 7-5 7H4z"/>',
+    cog: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>'
+  };
+  function svg(name) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[name] + "</svg>";
+  }
+
+  /* ---------- 数値・ログ（すべて架空） ---------- */
+  var SVC = "契約照会サービス（架空）";
+  var SVC2 = "保険料計算サービス（架空）";
+  // 1分ごとの平均応答時間。09:30〜10:30の61点。09:45〜10:00の平均は420 ms、10:00〜10:15の平均は980 ms。
+  var MIN_VALUES = [432, 418, 425, 440, 428, 415, 421, 436, 424, 419, 430, 427, 416, 433, 422,
+    410, 425, 415, 430, 420, 405, 428, 418, 422, 431, 412, 419, 426, 414, 425,
+    600, 750, 880, 990, 1080, 1120, 1150, 1130, 1100, 1060, 1020, 980, 950, 920, 970,
+    820, 760, 700, 650, 610, 580, 560, 540, 520, 510, 500, 490, 480, 470, 465, 460];
+  // 1時間ごとの平均応答時間。前日15時台〜当日14時台の24本。
+  var HOUR_VALUES = [430, 440, 420, 400, 390, 380, 370, 360, 350, 340, 330, 330, 330, 340, 350, 370, 400, 430, 440, 610, 470, 445, 435, 425];
+  // 朝の平均応答時間（ダッシュボードの小さなグラフ）
+  var SPARK = [436, 428, 431, 425, 440, 433, 427, 430, 422, 429, 434, 430];
+  // SLO：過去28日の日ごとの可用性（%）
+  var SLO_VALUES = [99.97, 99.98, 99.96, 99.99, 99.97, 99.95, 99.98, 99.97, 99.99, 99.96, 99.94, 99.97, 99.98, 99.97,
+    99.92, 99.96, 99.98, 99.97, 99.99, 99.96, 99.95, 99.97, 99.98, 99.96, 99.97, 99.98, 99.96, 99.95];
+  // ノートブック：「接続待ち」の警告の件数（09:55〜10:30、1分ごと）
+  var NB_COUNTS = [0, 0, 0, 2, 4, 7, 10, 13, 12, 11, 9, 8, 6, 5, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  var LOGS = [
+    ["08:30:00", "info", "INFO", "定時バッチが完了しました（架空）"],
+    ["09:58:12", "warn", "WARN", "契約DBへの接続待ちが長くなっています（架空）"],
+    ["09:59:40", "warn", "WARN", "契約DBへの接続待ちが長くなっています（架空）"],
+    ["10:01:05", "error", "ERROR", "契約DBへの接続がタイムアウトしました（架空）"],
+    ["10:02:31", "error", "ERROR", "照会処理がタイムアウトしました（架空）"],
+    ["10:03:10", "info", "INFO", "接続の再試行に成功しました（架空）"]
+  ];
+  var PERIOD_FROM = { during: "10:02:00", "5min": "09:57:00", "2h": "08:05:00" };
+  var DQL1 = 'fetch logs\n| filter loglevel == "WARN"\n| filter contains(content, "接続待ち")\n| summarize warnings = count(), by: {bin(timestamp, 1m)}';
+  var DQL2 = 'fetch logs\n| filter contains(content, "接続待ち")\n| makeTimeseries warnings = count(), interval: 1m';
+
+  /* ---------- グラフ ---------- */
+  function lineChart(o) {
+    var W = 680, H = o.bands ? 230 : 210, L = 48, R = 14, T = o.bands ? 30 : 16, B = 28, n = o.values.length;
+    var lo = o.yMin || 0, unit = o.unit || "ms";
+    var x = function (i) { return L + i * (W - L - R) / (n - 1); };
+    var y = function (v) { return T + (1 - (v - lo) / (o.yMax - lo)) * (H - T - B); };
+    var s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + o.aria + '">';
+    (o.bands || []).forEach(function (b) {
+      s += '<rect class="' + b.cls + '" x="' + x(b.from) + '" y="' + T + '" width="' + (x(b.to) - x(b.from)) + '" height="' + (H - T - B) + '"/>';
+      s += '<text class="c-band-txt" x="' + ((x(b.from) + x(b.to)) / 2) + '" y="' + (T - 8) + '" text-anchor="middle">' + b.label + "</text>";
+    });
+    o.yTicks.forEach(function (g) {
+      s += '<line class="c-grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(g) + '" y2="' + y(g) + '"/>';
+      s += '<text class="c-txt" x="' + (L - 6) + '" y="' + (y(g) + 4) + '" text-anchor="end">' + (o.fmt ? o.fmt(g) : g) + "</text>";
+    });
+    s += '<text class="c-txt" x="' + (L - 6) + '" y="' + (T - 8 < 10 ? 10 : T - 8) + '" text-anchor="end">' + unit + "</text>";
+    var pts = o.values.map(function (v, i) { return x(i).toFixed(1) + "," + y(v).toFixed(1); });
+    s += '<polygon class="c-area" points="' + x(0) + "," + y(lo) + " " + pts.join(" ") + " " + x(n - 1) + "," + y(lo) + '"/>';
+    s += '<polyline class="c-line" points="' + pts.join(" ") + '"/>';
+    o.xLabels.forEach(function (t) {
+      s += '<text class="c-txt" x="' + x(t[0]) + '" y="' + (H - 8) + '" text-anchor="' + (t[2] || "middle") + '">' + t[1] + "</text>";
+    });
+    if (o.mark) {
+      s += '<circle class="c-hit" cx="' + x(o.mark.i) + '" cy="' + y(o.values[o.mark.i]) + '" r="4.5"/>';
+      s += '<text class="c-hit-txt" x="' + (x(o.mark.i) - 8) + '" y="' + (y(o.values[o.mark.i]) - 10) + '" text-anchor="end">' + o.mark.label + "</text>";
+    }
+    return s + "</svg>";
+  }
+  function barChart(o) {
+    var W = 680, H = 200, L = 40, R = 12, T = 16, B = 28, n = o.values.length, bw = (W - L - R) / n;
+    var y = function (v) { return T + (1 - v / o.yMax) * (H - T - B); };
+    var s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + o.aria + '">';
+    o.yTicks.forEach(function (g) {
+      s += '<line class="c-grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(g) + '" y2="' + y(g) + '"/>';
+      s += '<text class="c-txt" x="' + (L - 6) + '" y="' + (y(g) + 4) + '" text-anchor="end">' + g + "</text>";
+    });
+    o.values.forEach(function (v, i) {
+      if (!v) return;
+      s += '<rect class="c-bar' + (o.hot && o.hot(i) ? " hot" : "") + '" x="' + (L + i * bw + 1).toFixed(1) + '" y="' + y(v).toFixed(1) + '" width="' + (bw - 2).toFixed(1) + '" height="' + (H - B - y(v)).toFixed(1) + '"/>';
+    });
+    o.xLabels.forEach(function (t) {
+      s += '<text class="c-txt" x="' + (L + t[0] * bw + bw / 2).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle">' + t[1] + "</text>";
+    });
+    return s + "</svg>";
+  }
+  function spark(values) {
+    var W = 120, H = 30, mx = Math.max.apply(null, values) + 10, mn = Math.min.apply(null, values) - 10;
+    var pts = values.map(function (v, i) { return (i * W / (values.length - 1)).toFixed(1) + "," + (H - (v - mn) / (mx - mn) * H).toFixed(1); });
+    return '<svg class="spark" viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts.join(" ") + '"/></svg>';
+  }
+  function minuteChart() {
+    return '<div class="surface"><div class="surface-head"><p class="dt-h3">平均応答時間（1分ごと）</p>' +
+      '<p class="chart-legend"><span><i class="sw-line"></i>平均応答時間</span><span><i class="sw-cmp"></i>比較期間</span><span><i class="sw-tgt"></i>対象期間</span></p></div>' +
+      '<div class="chart-wrap">' + lineChart({
+        values: MIN_VALUES, yMax: 1200, yTicks: [0, 400, 800, 1200],
+        bands: [{ from: 15, to: 30, cls: "c-band-cmp", label: "比較期間" }, { from: 30, to: 45, cls: "c-band-tgt", label: "対象期間" }],
+        xLabels: [[0, "09:30", "start"], [15, "09:45"], [30, "10:00"], [45, "10:15"], [60, "10:30", "end"]],
+        aria: "平均応答時間の推移（架空）。比較期間の平均420ミリ秒に対し、対象期間は平均980ミリ秒に上昇。"
+      }) + "</div></div>";
+  }
+  function hourChart() {
+    return lineChart({
+      values: HOUR_VALUES, yMax: 800, yTicks: [0, 200, 400, 600, 800],
+      xLabels: [[0, "前日 15時", "start"], [6, "21時"], [12, "3時"], [18, "9時"], [23, "14時", "end"]],
+      mark: { i: 19, label: "10時台 610 ms" },
+      aria: "平均応答時間の推移（架空）。10時台に610ミリ秒へ上昇し、その後は元の水準に戻っている。"
+    });
+  }
+
+  /* ---------- 画面の部品 ---------- */
+  function sel(id, key, opts, cur, disabled) {
+    return '<select id="' + id + '" data-id="' + key + '"' + (disabled ? " disabled" : "") + ">" + opts.map(function (o) {
+      var v = typeof o === "string" ? o : o[0], t = typeof o === "string" ? o : o[1];
+      return '<option value="' + esc(v) + '"' + (v === cur ? " selected" : "") + ">" + esc(t) + "</option>";
+    }).join("") + "</select>";
+  }
+  function qBtn(key, label) {
+    return '<button type="button" class="tt-q" data-tip="' + key + '" aria-expanded="' + (S.tip === key) + '" aria-label="' + label + '">?</button>';
+  }
+  var TIPS = {
+    rt: ["社内の指標定義（架空）", "平均応答時間は、画面の操作から結果が返るまでの時間の平均です。社内の目安は 500 ms 以下（架空）。平均だけでは、一部の遅い操作は見えません。"],
+    rt2: ["毎朝の確認の目安（架空）", "契約系サービスの平均応答時間の目安は 500 ms 以下です。超えていたら「担当サービスの状況を確認する」のガイドで詳しく見ます。"],
+    eb: ["報告の基準（社内・架空）", "エラーバジェットは、SLOを守りながら許容できる失敗の残りです。残りが 50 % 未満になったら、週次報告に記載します。"],
+    prio: ["優先度の基準（社内・架空）", "全利用者に影響 → 高／一部の利用者に影響 → 中／影響なし → 低。今回は「Webからの照会の一部」のため「中」です。"]
+  };
+  function tipHTML(key) {
+    if (S.tip !== key) return "";
+    return '<span class="tt-tip" role="tooltip"><span class="lab">テックタッチ ツールチップ（案）：' + TIPS[key][0] + "</span>" + TIPS[key][1] + "</span>";
+  }
+  function tipWrap(id, label, key, aria) {
+    return '<span class="tip-wrap" id="' + id + '">' + label + qBtn(key, aria) + tipHTML(key) + "</span>";
+  }
+  var CHATS = {
+    inquiry: { av: "業", who: "業務部門（架空）", time: "10:16", say: "10時過ぎから、契約照会の画面が遅いという声が出ています。状況を確認してもらえますか？" },
+    expert: { av: "鈴", who: "鈴木（専門家・架空）", time: "11:08", say: "共有ありがとうございます。過去事例と同じく、接続数の上限の可能性があります。接続プールの設定を確認します。" },
+    advice: { av: "鈴", who: "鈴木（専門家・架空）", time: "14:05", say: "再発に備えて、毎朝確認できるダッシュボードと、同じ問題が起きたらチームに知らせるワークフローを作っておきましょう。どちらもひな型を使ってください。" },
+    approved: { av: "鈴", who: "鈴木（専門家・架空）", time: "14:12", say: "確認しました。この設定で保存して、運用チームに共有してください。" }
+  };
+  function chatCard(key) {
+    var c = CHATS[key];
+    return '<div class="chat" role="status"><span class="av" aria-hidden="true">' + c.av + '</span><div><p class="who"><b>' + c.who + "</b>" + c.time +
+      '</p><p class="say">' + c.say + '</p><p class="src">社内チャット（架空）の通知</p></div><button type="button" class="chat-close" data-id="chat-close">閉じる</button></div>';
+  }
+  function guideList(title, text, items) {
+    return '<h3 class="ov-title">' + title + '</h3><p class="ov-text">' + text + '</p><ul class="glist">' + items.map(function (g) {
+      return g[2] ? '<li><button type="button" class="gitem" data-id="g-start" id="g-start"><span class="gname">' + g[0] + '</span><span class="gmeta">' + g[1] + "</span></button></li>"
+        : '<li><div class="gitem"><span class="gname">' + g[0] + '</span><span class="gmeta">' + g[1] + "</span></div></li>";
+    }).join("") + "</ul>";
+  }
+  function recList(rows, note) {
+    return '<div class="soft"><p><b>記録（例）</b></p><ul class="rec-list">' + rows.map(function (r) {
+      return '<li><span class="t">' + r[0] + "</span><span>" + r[1] + "</span></li>";
+    }).join("") + "</ul></div>" + '<p class="refs">' + (note || "時刻・記録はすべて架空です。") + "</p>";
+  }
+  function clickIs(id) { return function (c, ev) { return ev.kind === "click" && ev.id === id ? "done" : null; }; }
+  function pickIs(id, want, wrong) {
+    return function (c, ev) {
+      if (ev.kind !== "pick" || ev.id !== id || !ev.value) return null;
+      if (ev.value === want) return "done";
+      return { wrong: typeof wrong === "function" ? wrong(ev.value) : wrong };
+    };
+  }
+  function autoPick(id, want) { return function (c) { c.vals[id] = want; return "done"; }; }
+  function autoTip(key) { return function () { S.tip = key; note(); return "done"; }; }
+  var DOCK = '.dock [data-id="nav-';
+
+  /* ==================== 場面の定義 ==================== */
+  var ROLE_GUIDES = ["毎朝の確認（3項目）", "担当サービスの状況を確認する", "障害の一次確認（社内手順）", "推薦された調査ノートブックを使う", "再発防止の設定をひな型から作る"];
+  var CH = {};
+
+  CH[1] = {
+    time: "9:00", timeSub: "初めてのログイン", av: "田", who: "田中（架空）",
+    title: "初めてDynatraceを開いた新任者が、チームのやり方で使い始める",
+    text: "今週、運用チームに異動した田中さん（架空）が、初めてDynatraceにログインしました。製品の基本はDynatraceの入門コンテンツで学べます。テックタッチは「このチームでは、どの画面を、どの範囲で見るか」を画面の上で案内します。",
+    tags: ["場面1", "仮説1　画面・操作で迷う", "目安 2分"],
+    ask: "新任の方が一人でDynatraceを使えるようになるまで、どれくらいかかっていますか？",
+    kind: "tt", kicker: "ポップアップ・ツアー（案）", guide: "はじめての運用チーム向けツアー",
+    init: function () { return { step: 0, app: "home", view: "list", popup: true, vals: { seg: "" } }; },
+    startIds: ["role-ops"], startLabel: "「運用担当」を選ぶ",
+    onStart: function (c) { c.popup = false; note(); },
+    free: function (c, ev) {
+      if (ev.kind === "click" && (ev.id === "role-dev" || ev.id === "role-biz")) {
+        S.info = "このデモでは「運用担当」を選びます。役割ごとに、表示するツアーとガイドを分ける想定です。";
+        return true;
+      }
+      return false;
+    },
+    intro: function () {
+      return '<h3 class="ov-title">はじめての方へ</h3><p class="now-box">ポップアップで役割を選ぶと、その役割のツアーが始まります。</p>' +
+        '<p class="soft">役割（運用担当・開発担当・業務部門）ごとに、表示するツアーとガイドを分けます（案）。</p>';
+    },
+    steps: [
+      { label: "検索の場所を知る", target: DOCK + 'search"]', tip: "① 画面やサービスは「検索」で探せます", sub: "名前の一部でも探せます（Dynatraceの機能）",
+        now: "左のDockの「検索」から、アプリやサービスを名前で探せます。", why: "画面の場所を覚えていなくても、名前で探せば迷いません。",
+        handle: clickIs("nav-search") },
+      { label: "ダッシュボードを開く", target: DOCK + 'dashboards"]', tip: "② 「ダッシュボード」を開きます", sub: "運用チームが毎朝見るダッシュボードがあります",
+        now: "左のDockから「ダッシュボード」を開きます。", why: "毎朝の確認は、チームで決めたダッシュボードから始めます。", btn: "ダッシュボードを開く",
+        handle: clickIs("nav-dashboards"), after: function (c) { c.app = "dashboards"; c.view = "list"; } },
+      { label: "チームで使う1枚を確かめる", target: "#w-dash-team", tip: "③ 運用チームが使うのは、この1枚です", sub: "似た名前と間違えないよう、チームで決めています（架空）",
+        redo: "「運用チーム 毎朝の確認」を開きます",
+        now: "一覧から「運用チーム 毎朝の確認」を開きます。", why: "似た名前や古いダッシュボードがあると、人によって見るものが変わります。", btn: "このダッシュボードを開く",
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "dash-team") return "done";
+          if (ev.id === "dash-old") return { wrong: "「旧・運用ダッシュボード」は使用を終えています（チームのルール・架空）。「運用チーム 毎朝の確認」を開きます。" };
+          if (ev.id === "dash-infra") return { wrong: "「インフラの概要」は基盤チームのダッシュボードです。運用チームは「運用チーム 毎朝の確認」を使います。" };
+          return null;
+        },
+        after: function (c) { c.view = "team"; } },
+      { label: "担当範囲（セグメント）を選ぶ", target: "#f-seg", tip: "④ 担当範囲を「契約系サービス」に絞ります", sub: "他チームのサービスが混ざらなくなります",
+        redo: "「契約系サービス」を選び直します",
+        now: "セグメントで、担当範囲を「契約系サービス」にします。", why: "絞らないと、他チームの問題や数値が混ざって見えます。",
+        handle: pickIs("seg", "contract", "「基盤系」は基盤チームの担当範囲です。運用チームは「契約系サービス」を選びます（チームのルール・架空）。"),
+        auto: autoPick("seg", "contract") },
+      { label: "障害のときに開く画面を知る", target: DOCK + 'problems"]', tip: "⑤ 障害が起きたら「問題」を開きます", sub: "一次対応は、社内手順のガイドが案内します（場面4）",
+        now: "障害が起きたら、Dockの「問題」を開きます。", why: "一次対応の順番は、問題の画面でテックタッチのガイドが案内します。", btn: "ツアーを終える",
+        handle: clickIs("nav-problems") }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">ツアーが完了しました。</p><div class="soft"><p><b>運用担当のガイド（案）</b></p><ul class="sum-list plain">' +
+        ROLE_GUIDES.map(function (g) { return "<li>" + g + "</li>"; }).join("") + "</ul></div>" +
+        '<p class="refs">ガイドは、テックタッチのヘルプからいつでも呼び出せる想定です。ガイド名は架空です。</p>';
+    },
+    nextLabel: "場面2へ進む",
+    modal: function (c) {
+      if (!c.popup) return "";
+      return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
+        '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ポップアップ（案）</span></div>' +
+        '<h3 class="ov-title" id="m-title">運用チームへようこそ</h3>' +
+        "<p>あなたの役割を選んでください。役割に合わせて、最初に覚える画面とチームのやり方を案内します（目安 5分・架空）。</p>" +
+        '<div class="role-list">' +
+        '<button type="button" class="role rec" data-id="role-ops" id="m-role-ops"><b>運用担当</b><span>状況確認・障害の一次対応</span></button>' +
+        '<button type="button" class="role" data-id="role-dev"><b>開発担当</b><span>リリース後の確認・原因の調査</span></button>' +
+        '<button type="button" class="role" data-id="role-biz"><b>業務部門（閲覧）</b><span>サービスの稼働状況の確認</span></button></div>' +
+        '<p class="refs">製品の使い方は、Dynatraceの入門コンテンツを優先します。このツアーは、チームのやり方だけを案内します。</p></div></div>';
+    }
+  };
+
+  CH[2] = {
+    time: "9:15", timeSub: "毎朝の確認", av: "佐", who: "佐藤（架空）",
+    title: "毎朝の確認を、誰が見ても同じ基準で終える",
+    text: "運用担当の佐藤さん（架空。Dynatraceを使うのは月に数回）が、チームのダッシュボードで毎朝の確認をします。テックタッチのチェックリストが、見る場所と社内の判断基準（架空）を順に示します。",
+    tags: ["場面2", "仮説2　指標を読み解けない", "目安 2分"],
+    ask: "毎朝の確認で、人によって見る場所や判断が違うのはどこですか？",
+    kind: "tt", kicker: "チェックリスト型のガイド（案）", guide: "毎朝の確認（3項目）",
+    init: function () { return { step: 0, app: "dashboards", view: "team", vals: { seg: "contract" } }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("この画面のおすすめ", "毎朝の確認を始めます。見る場所と判断の基準を、順番に案内します。",
+        [["毎朝の確認（3項目）", "5ステップ・目安3分（架空）・今日はまだ未実施", true], ["担当サービスの状況を確認する", "サービスの画面で表示されます"], ["障害の一次確認（社内手順）", "問題の画面で表示されます"]]);
+    },
+    steps: [
+      { label: "未解決の問題を確認", target: "#w-tile-prob", tip: "① 未解決の問題は 0 件です", sub: "1件以上なら、社内手順の一次確認へ（架空）",
+        now: "未解決の問題が 0 件であることを確認します。", why: "1件以上のときは「障害の一次確認（社内手順）」のガイドに切り替えます（架空）。", btn: "確認した" },
+      { label: "応答時間を目安と比べる", target: "#w-tip-rt2", tip: "② 平均応答時間を社内の目安と比べます", sub: "「?」で目安（架空）を表示します",
+        now: "平均応答時間は 430 ms です。「?」で社内の目安を確認します。", why: "数値の良し悪しを、人によらず同じ基準で判断します。", btn: "目安を表示",
+        handle: function (c, ev) { return ev.kind === "tip" && ev.id === "rt2" ? "done" : null; }, auto: autoTip("rt2") },
+      { label: "SLOの詳細を開く", target: "#w-tile-slo", tip: "③ SLOのタイルから詳細を開きます", sub: "契約照会の可用性（架空）",
+        now: "SLOのタイルを押して、詳細を開きます。", why: "SLO（サービスレベル目標）は、利用者に約束した品質を守れているかを示します。", btn: "SLOを開く",
+        handle: clickIs("tile-slo"), after: function (c) { c.app = "slo"; } },
+      { label: "エラーバジェットを確認", target: "#w-tip-eb", tip: "④ エラーバジェットの残りを確認します", sub: "「?」で報告の基準（架空）を表示します",
+        now: "エラーバジェットの残りは 62 % です。「?」で報告の基準を確認します。", why: "残りが少ないときは、週次報告で共有します（社内基準・架空）。", btn: "基準を表示",
+        handle: function (c, ev) { return ev.kind === "tip" && ev.id === "eb" ? "done" : null; }, auto: autoTip("eb") },
+      { label: "確認結果を記録", target: null, now: "3項目の結果を、日報に貼る形でまとめます。", why: "記録が同じ形だと、引き継ぎや振り返りがしやすくなります。", btn: "記録する" }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">毎朝の確認が完了しました。</p>' + recList([
+        ["9:15", "未解決の問題 0 件"], ["9:16", "平均応答時間 430 ms（目安 500 ms 以下）"], ["9:17", "SLO 99.95 %、エラーバジェット残り 62 %（報告は不要）"]
+      ], "時刻・数値・基準はすべて架空です。");
+    },
+    nextLabel: "場面3へ進む"
+  };
+
+  CH[3] = {
+    time: "10:16", timeSub: "問い合わせ", av: "佐", who: "佐藤（架空）",
+    title: "問い合わせを受けて、担当サービスの状況を確認する",
+    text: "業務部門から「10時過ぎから契約照会の画面が遅い」と連絡が入りました。佐藤さんは、テックタッチのガイドで対象と時間帯をそろえて確認します。",
+    tags: ["場面3", "デモ①の発展", "仮説1　画面・操作で迷う", "目安 2分30秒"],
+    ask: "画面の探し方、絞り込み、時間帯の指定のどこで迷いますか？",
+    kind: "tt", kicker: "ガイド（案）", guide: "担当サービスの状況を確認する",
+    init: function () { return { step: 0, app: "dashboards", view: "team", chat: "inquiry", applied: false, vals: { seg: "contract", "c3-svc": "", "c3-period": "", "c3-compare": "" } }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("この画面で使えるガイド", "問い合わせのあったサービスの状況を確認します。ガイドを選ぶと、操作する場所を順番に案内します。",
+        [["担当サービスの状況を確認する", "7ステップ・目安5分（架空）・おすすめ", true], ["毎朝の確認（3項目）", "本日 9:17 に完了"], ["障害の一次確認（社内手順）", "問題の画面で表示されます"]]);
+    },
+    free: function (c, ev) { if (ev.kind === "click" && ev.id === "chat-close") { c.chat = null; return true; } return false; },
+    steps: [
+      { label: "サービスの画面を開く", target: DOCK + 'services"]', tip: "① 左のDockから「サービス」を開きます", sub: "画面の場所を覚えていなくても進められます",
+        now: "左のDockから「サービス」を開きます。", why: "担当サービスの応答時間やエラーは「サービス」の画面で確認します。", btn: "サービスを開く",
+        handle: clickIs("nav-services"), after: function (c) { c.app = "services"; c.chat = null; } },
+      { label: "対象サービスを選ぶ", target: "#f-c3-svc", tip: "② 調べるサービスを選びます", sub: "問い合わせのあった「契約照会サービス（架空）」",
+        redo: "「契約照会サービス（架空）」を選び直します",
+        now: "問い合わせのあった「契約照会サービス（架空）」を選びます。", why: "対象がずれると、別のサービスの値を見ることになります。",
+        handle: pickIs("c3-svc", SVC, "今回は問い合わせのあった「契約照会サービス（架空）」を確認します。別のサービスを選ぶと、別のサービスの値を見ることになります。"),
+        auto: autoPick("c3-svc", SVC) },
+      { label: "時間枠を選ぶ", target: "#f-c3-period", tip: "③ 事象が起きた時間帯を「時間枠」で選びます", sub: "問い合わせの「10時過ぎ」に合わせて 10:00–10:15",
+        redo: "「10:00–10:15」を選び直します",
+        now: "問い合わせの「10時過ぎ」に合わせて、10:00–10:15 を選びます。", why: "問い合わせの時間帯と、画面の時間枠をそろえます。",
+        skip: function (c) { return c.vals["c3-period"] === "10:00–10:15"; },
+        handle: pickIs("c3-period", "10:00–10:15", "問い合わせは「10時過ぎ」です。時間枠は 10:00–10:15 に合わせます。"),
+        auto: autoPick("c3-period", "10:00–10:15") },
+      { label: "比較期間を選ぶ", target: "#f-c3-compare", tip: "④ 比べる時間帯を選びます", sub: "直前の同じ長さ（15分）：09:45–10:00",
+        redo: "「09:45–10:00」を選び直します",
+        now: "直前の同じ長さ「09:45–10:00」を選びます。", why: "対象や時間帯が違うと、比較結果の解釈も変わります。",
+        skip: function (c) { return c.vals["c3-compare"] === "09:45–10:00"; },
+        handle: pickIs("c3-compare", "09:45–10:00", function (v) {
+          return v === "09:00–10:00" ? "対象期間（15分）と長さが違います。件数を比べるときは、期間の長さをそろえます。" : "前日の同じ時間帯と比べる方法もあります。今回は直前の15分（09:45–10:00）と比べます。";
+        }),
+        auto: autoPick("c3-compare", "09:45–10:00") },
+      { label: "条件を確認して適用", target: "#w-c3-apply", tip: "⑤ 条件を確認して「適用」を押します", sub: "サービス・時間枠・比較期間の3つ",
+        now: "3つの条件を見直してから「適用」を押します。", why: "条件がそろっているかを、表示の前に見直します。", btn: "条件を確認して適用",
+        handle: function (c, ev) {
+          if (ev.kind !== "click" || ev.id !== "c3-apply") return null;
+          var v = c.vals;
+          return v["c3-svc"] === SVC && v["c3-period"] === "10:00–10:15" && v["c3-compare"] === "09:45–10:00" ? "done" : { wrong: "条件がまだそろっていません。サービス・時間枠・比較期間を見直します。" };
+        },
+        auto: function (c) { c.vals["c3-svc"] = SVC; c.vals["c3-period"] = "10:00–10:15"; c.vals["c3-compare"] = "09:45–10:00"; return "done"; },
+        after: function (c) { c.applied = true; } },
+      { label: "上がっている値と定義を確認", target: "#w-tip-rt", tip: "⑥ 上がっている値を確認します", sub: "「?」で社内の指標の定義（架空）を表示します",
+        now: "平均応答時間が 420 ms から 980 ms に上がっています。「?」で社内の定義を確認します。", why: "値の意味を社内の定義でそろえてから判断します。", btn: "定義を表示",
+        handle: function (c, ev) {
+          if (ev.kind === "tip" && ev.id === "rt") return "done";
+          if (ev.kind === "click" && ev.id === "c3-problem") return { wrong: "ガイドでは、先に上がっている値と社内の定義を確認します。" };
+          return null;
+        },
+        auto: autoTip("rt") },
+      { label: "検知された問題を開く", target: "#w-c3-problem", tip: "⑦ 同じ時間帯に検知された問題を開きます", sub: "障害の一次対応（社内手順）に切り替えます",
+        now: "同じ時間帯に、問題「P-0412」が検知されています。問題を開きます。", why: "問題が検知されている場合は、社内手順の一次対応に切り替えます。", btn: "問題を開く",
+        handle: clickIs("c3-problem") }
+    ],
+    onComplete: function () { goChapter(4, true); S.c[4].fromCh3 = true; },
+    nextLabel: "場面4へ進む"
+  };
+
+  CH[4] = {
+    time: "10:18", timeSub: "問題を検知", av: "佐", who: "佐藤（架空）",
+    title: "障害の一次対応を、社内手順どおりに進めて連絡する",
+    text: "同じ時間帯に、Dynatraceが問題を検知していました。Dynatraceが示す根本原因の候補と影響範囲を、社内手順（架空）の順番で確認し、関係者に連絡します。",
+    tags: ["場面4", "デモ②の発展", "仮説4・5　実務で再現できない／学びを再利用できない", "目安 3分"],
+    ask: "一次対応で、人によって手順や判断がばらつくのはどこですか？",
+    kind: "tt", kicker: "ガイド（案）・社内手順（架空）", guide: "障害の一次確認（社内手順）",
+    init: function () { return { step: 0, app: "problems", tab: "overview", popup: true, modal: false, vals: { "c4-period": "during" } }; },
+    startIds: ["m-start"],
+    onStart: function (c) { c.popup = false; c.tab = "overview"; note(); },
+    intro: function () { return '<h3 class="ov-title">障害の一次確認（社内手順）</h3>' + stepsList(CH[4].steps, 0) + '<p class="now-box">ポップアップの「ガイドを開始」から始めます。</p>'; },
+    free: function (c, ev) {
+      if (ev.kind !== "click") return false;
+      if (ev.id.indexOf("tab-") === 0) { c.tab = ev.id.slice(4); return c.step === 0; }
+      if (ev.id === "m-close") { c.modal = false; return true; }
+      if (ev.id === "c4-contact" && c.step >= 1 && c.step < 5) { fix("社内手順では、連絡の前に影響範囲・根本原因の候補・関連ログを確認します。"); return true; }
+      return false;
+    },
+    steps: [
+      { label: "概要を確認する", target: function (c) { return c.tab === "overview" ? "#c4-kv" : "#w-tab-overview"; },
+        tip: function (c) { return c.tab === "overview" ? "ステップ1／5：問題の概要を確認します" : "ステップ1／5：「概要」タブに戻ります"; }, sub: "何が・いつから・どこで起きているか",
+        now: "何が・いつから・どこで起きているかを確認します。", why: "先にそろえると、以降の確認がぶれません。", btn: "確認した",
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "tab-overview") return "ok";
+          if (ev.id === "tab-impact") return "done";
+          if (ev.id === "tab-rc" || ev.id === "tab-logs") return { wrong: "社内手順では、次は「影響範囲」です。連絡の優先度を先に判断します。" };
+          return null;
+        },
+        auto: function (c) { c.tab = "overview"; return "done"; } },
+      { label: "影響範囲と優先度を確認する", target: function (c) { return c.tab !== "impact" ? "#w-tab-impact" : "#w-tip-prio"; },
+        tip: function (c) { return c.tab !== "impact" ? "ステップ2／5：影響範囲を確認します" : "優先度の基準を確認します"; },
+        sub: function (c) { return c.tab !== "impact" ? "「影響範囲」タブを開きます" : "「?」で社内の基準（架空）を表示します"; },
+        now: function (c) { return c.tab !== "impact" ? "「影響範囲」タブで、影響を受けたサービスと範囲を確認します。" : "影響の範囲を社内の基準（架空）に当てはめて、優先度を判断します。"; },
+        why: "影響範囲を先に確かめると、連絡の優先度を判断できます。",
+        btn: function (c) { return c.tab !== "impact" ? "影響範囲を開く" : "優先度の基準を表示"; },
+        handle: function (c, ev) {
+          if (ev.kind === "tip" && ev.id === "prio" && c.tab === "impact") return "done";
+          if (ev.kind === "click" && ev.id === "tab-impact") return "ok";
+          if (ev.kind === "click" && (ev.id === "tab-rc" || ev.id === "tab-logs")) return { wrong: "社内手順では、原因やログの前に影響範囲を確かめ、連絡の優先度を先に判断します。次は「影響範囲」です。" };
+          return null;
+        },
+        auto: function (c) { if (c.tab !== "impact") { c.tab = "impact"; return "ok"; } S.tip = "prio"; note(); return "done"; } },
+      { label: "根本原因の候補を確認する", target: function (c) { return c.tab !== "rc" ? "#w-tab-rc" : "#c4-rc"; },
+        tip: function (c) { return c.tab !== "rc" ? "ステップ3／5：根本原因の候補を確認します" : "Dynatraceが示す候補を確認します"; },
+        sub: function (c) { return c.tab !== "rc" ? "「根本原因」タブを開きます" : "この段階では断定せず、候補として記録します"; },
+        now: function (c) { return c.tab !== "rc" ? "「根本原因」タブで、Dynatraceが示す候補を確認します。" : "根本原因の候補は「契約DB（架空）」です。断定せず、候補として記録します。"; },
+        why: "原因の断定は専門家と行います。推薦された調査ガイドは、場面5で専門家と使います（社内手順・架空）。",
+        btn: function (c) { return c.tab !== "rc" ? "根本原因を開く" : "確認した"; },
+        handle: function (c, ev) {
+          if (ev.kind === "click" && ev.id === "tab-logs") return { wrong: "社内手順では、ログの前に、Dynatraceが示す根本原因の候補を確認します。" };
+          if (ev.kind === "click" && ev.id === "tab-rc") return "ok";
+          return null;
+        },
+        auto: function (c) { if (c.tab !== "rc") { c.tab = "rc"; return "ok"; } return "done"; } },
+      { label: "関連ログを確認する", target: function (c) { return c.tab !== "logs" ? "#w-tab-logs" : "#f-c4-period"; },
+        tip: function (c) { return c.tab !== "logs" ? "ステップ4／5：関連ログを確認します" : "期間を「問題の開始5分前から」にします"; },
+        sub: function (c) { return c.tab !== "logs" ? "期間は「問題の開始5分前から」に設定します" : ""; },
+        redo: "期間を「問題の開始5分前から」にします",
+        now: function (c) { return c.tab !== "logs" ? "「ログ」タブで関連ログを開きます。" : "期間を「問題の開始5分前から」に設定します。"; },
+        why: "問題の開始前後のログを見ると、いつから異常が出ていたかを確かめられます。原因はこの段階では確定しません。",
+        btn: function (c) { return c.tab !== "logs" ? "ログを開く" : "期間を設定する"; },
+        handle: function (c, ev) {
+          if (ev.kind === "click" && ev.id === "tab-logs") return "ok";
+          if (ev.kind !== "pick" || ev.id !== "c4-period" || c.tab !== "logs") return null;
+          if (ev.value === "5min") return "done";
+          return { wrong: ev.value === "during" ? "問題の発生期間だけでは、発生直前の変化を見落とすことがあります。社内手順どおり「問題の開始5分前から」にします。" : "過去 2 時間では範囲が広く、関係の薄いログが混ざります。社内手順どおり「問題の開始5分前から」にします。" };
+        },
+        auto: function (c) { if (c.tab !== "logs") { c.tab = "logs"; return "ok"; } c.vals["c4-period"] = "5min"; return "done"; } },
+      { label: "社内手順に沿って連絡する", target: function (c) { return c.modal ? null : "#w-c4-contact"; },
+        tip: "ステップ5／5：社内手順に沿って連絡します", sub: "「社内手順で連絡」から連絡内容を確認します",
+        now: function (c) { return c.modal ? "優先度・連絡先・伝える内容を確認します。" : "「社内手順で連絡」から、社内手順に沿った連絡内容を確認します。"; },
+        why: "連絡の宛先と内容を、担当者によらず同じ手順にそろえます。",
+        btn: function (c) { return c.modal ? "連絡内容を確認した" : "社内手順を開く"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "c4-contact") { c.modal = true; note(); return "ok"; }
+          if (ev.id === "m-done") return "done";
+          return null;
+        },
+        auto: function (c) { if (!c.modal) { c.modal = true; note(); return "ok"; } return "done"; },
+        after: function (c) { c.modal = false; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">一次確認の5ステップが完了しました。</p>' + recList([
+        ["10:18", "概要を確認（P-0412 応答時間の悪化・進行中）"], ["10:19", "影響範囲を確認（Webからの照会の一部 → 優先度「中」）"],
+        ["10:20", "根本原因の候補を記録（契約DB・未確定）"], ["10:21", "関連ログを確認（09:58から接続待ちの警告）"], ["10:22", "社内手順に沿って連絡（システム運用チーム・業務部門の窓口）"]
+      ]);
+    },
+    nextLabel: "場面5へ進む",
+    modal: function (c) {
+      if (c.popup && c.step === 0) {
+        return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
+          '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ポップアップ（案）</span></div>' +
+          '<h3 class="ov-title" id="m-title">障害の一次確認は、社内手順どおりに進めます</h3>' +
+          "<p>概要 → 影響範囲 → 根本原因の候補 → 関連ログ → 連絡、の5つのステップを順番に案内します。所要の目安は約10分です（架空）。</p>" +
+          '<p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。</p>' +
+          '<div class="actions"><button type="button" class="btn btn-primary" data-id="m-start" id="m-start">ガイドを開始</button></div></div></div>';
+      }
+      if (!c.modal) return "";
+      return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
+        '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ステップ5／5　社内手順（架空）</span></div>' +
+        '<h3 class="ov-title" id="m-title">障害の一次連絡</h3><ol class="proc">' +
+        "<li><b>優先度を決める</b><span>影響の範囲が「Webからの照会の一部」のため、優先度は「中」（社内基準・架空）</span></li>" +
+        "<li><b>連絡先</b><span>システム運用チーム（架空）、業務部門の窓口（架空）</span></li>" +
+        '<li><b>伝える内容（例）</b><div class="msg">【障害一次連絡】P-0412 応答時間の悪化（進行中）\n・開始：10:02\n・影響：契約照会サービス（架空）、Webからの照会の一部\n・根本原因の候補：契約DB（Dynatraceの分析・未確定）\n・関連ログ：09:58から契約DBへの接続待ちの警告\n・次の連絡：原因を確認したあと</div></li></ol>' +
+        '<p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。デモのため送信はしません。</p>' +
+        '<div class="actions"><button type="button" class="btn btn-ghost" data-id="m-close">閉じる</button>' +
+        '<button type="button" class="btn btn-primary" data-id="m-done" id="m-done">連絡内容を確認した</button></div></div></div>';
+    }
+  };
+
+  CH[5] = {
+    time: "11:00", timeSub: "原因の調査", av: "佐", who: "佐藤（架空）",
+    title: "推薦された調査ノートブックで、専門家と一緒に原因を絞り込む",
+    text: "Dynatraceが問題に合わせて推薦した調査ガイド（専門家が作成したノートブック・架空）を開き、問題の時間帯で実行します。DQLの作成と説明はDynatrace Assist、社内の過去事例はAI Hub（構想）が補います。",
+    tags: ["場面5", "仮説2・3　指標を読み解けない／作成・修正で止まる", "目安 2分30秒"],
+    ask: "原因の調査のどの段階で、専門家に依頼していますか？",
+    kind: "hub", kicker: "支援案（構想）", guide: "推薦された調査ノートブックを使う",
+    init: function () { return { step: 0, app: "problems", tab: "rc", ran: false, assist: false, added: false, shared: false, vals: { "nb-time": "", "c4-period": "5min" } }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("おすすめのガイド", "一次対応のあと、原因の調査を専門家と進めます。Dynatraceが推薦した調査ガイドを使います。",
+        [["推薦された調査ノートブックを使う", "5ステップ・目安10分（架空）", true]]);
+    },
+    free: function (c, ev) {
+      if (ev.kind === "click" && ev.id.indexOf("tab-") === 0) { c.tab = ev.id.slice(4); return true; }
+      if (ev.kind === "click" && ev.id === "chat-close") { c.chat = null; return true; }
+      return false;
+    },
+    steps: [
+      { label: "推薦された調査ガイドを開く", target: "#w-tsg-open", tip: "① Dynatraceが推薦した調査ガイドを開きます", sub: "専門家が作成したノートブック（架空）",
+        now: "「根本原因」タブにある、推薦された調査ガイドを開きます。",
+        hub: "推薦はDynatraceの機能です。どの調査ガイドを使うかは、社内手順（架空）に従って決めます。",
+        btn: "ガイドを開く", handle: clickIs("tsg-open"), after: function (c) { c.app = "notebooks"; } },
+      { label: "時間枠を問題に合わせる", target: "#f-nb-time", tip: "② 時間枠を問題の時間帯に合わせます", sub: "09:55–10:30（問題の開始前後）",
+        redo: "「問題の時間帯（09:55–10:30）」を選び直します",
+        now: "時間枠を「問題の時間帯（09:55–10:30）」にします。",
+        hub: "このノートブックは、専門家（架空）が過去の調査手順をまとめたものです。時間枠を問題に合わせると、開始前の変化も見られます。",
+        handle: pickIs("nb-time", "problem", "過去 24 時間では範囲が広く、問題と関係の薄いログが混ざります。「問題の時間帯（09:55–10:30）」にします。"),
+        auto: autoPick("nb-time", "problem") },
+      { label: "クエリを実行する", target: "#w-nb-run", tip: "③ 専門家が用意したクエリを実行します", sub: "DQL（Dynatraceのクエリ言語）",
+        now: "専門家が用意したクエリを実行して、接続待ちの警告の件数を見ます。",
+        hub: "結果の見方：警告は 09:58 から増えています。問題の検知（10:02）より前から変化が出ていました。原因は、この結果だけでは断定しません。",
+        btn: "実行する", handle: clickIs("nb-run"), after: function (c) { c.ran = true; } },
+      { label: "Dynatrace Assistで集計を足す", target: function (c) { return c.assist ? "#w-assist-add" : "#w-assist"; },
+        tip: function (c) { return c.assist ? "④ 回答のクエリをノートブックに追加します" : "④ Dynatrace Assist に、集計のしかたを聞きます"; },
+        sub: function (c) { return c.assist ? "DQLの意味は、回答の説明で確認できます" : "Dynatraceの生成AI（画面・回答は例）"; },
+        now: function (c) { return c.assist ? "回答のDQLと説明を確認し、ノートブックに追加します。" : "Dynatrace Assist に、1分ごとの件数を数えるクエリを聞きます。"; },
+        hub: "AIの役割分担：DQLの作成と説明は、Dynatrace Assist（Dynatraceの機能）を使います。AI Hub は、社内資料の側の知見だけを補います。",
+        btn: function (c) { return c.assist ? "ノートブックに追加" : "Dynatrace Assist に聞く"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "assist") { c.assist = true; return "ok"; }
+          if (ev.id === "assist-add" && c.assist) return "done";
+          return null;
+        },
+        auto: function (c) { if (!c.assist) { c.assist = true; return "ok"; } return "done"; },
+        after: function (c) { c.added = true; } },
+      { label: "過去事例を確かめ、専門家に共有", target: "#w-nb-share", tip: "⑤ 専門家の鈴木さんに共有します", sub: "結果と、社内の過去事例（AI Hub・例文）を添えます",
+        now: "ノートブックを、専門家の鈴木さん（架空）に共有します。",
+        hub: "社内の過去事例（例文・架空）：2026年5月にも、契約DBの接続待ちで照会が遅くなった記録があります。このときは接続数の上限に達していました。今回も同じかは、専門家が確かめます。",
+        btn: "専門家に共有", handle: clickIs("nb-share"), after: function (c) { c.shared = true; c.chat = "expert"; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">調査ノートブックを専門家に共有しました。</p>' + recList([
+        ["11:00", "推薦された調査ガイド（ノートブック）を開く"], ["11:02", "時間枠を問題に合わせて実行（09:58から警告が増加）"],
+        ["11:04", "Dynatrace Assist で1分ごとの集計を追加"], ["11:06", "過去事例（AI Hub・例文）を添えて専門家に共有"]
+      ]);
+    },
+    nextLabel: "場面6へ進む"
+  };
+
+  CH[6] = {
+    time: "14:05", timeSub: "専門家の助言", av: "佐", who: "佐藤（架空）",
+    title: "再発に備えて、ダッシュボードと通知のワークフローを自分で作る",
+    text: "専門家（架空）から、毎朝確認できるダッシュボードと、同じ問題が起きたらチームに知らせるワークフローを作るよう助言がありました。ひな型から自分で作り、確認を受けてから使い始めます。",
+    tags: ["場面6", "デモ③の発展", "仮説3　作成・修正で止まる", "目安 3分"],
+    ask: "ひな型選択、条件の変更、結果の検証のどこで依頼しますか？",
+    kind: "hub", kicker: "支援案3", guide: "再発防止の設定をひな型から作る",
+    init: function () {
+      return { step: 0, app: "home", view: "list", wf: "list", chat: "advice", tpl: "", preview: false, asked: false, saved: false, tested: false, enabled: false,
+        vals: { "c6-svc": "all", "c6-range": "2h", "wf-scope": "", "wf-channel": "" } };
+    },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("おすすめのガイド", "専門家の助言にあった2つの設定を、ひな型から作ります。",
+        [["再発防止の設定をひな型から作る", "6ステップ・目安15分（架空）", true]]);
+    },
+    free: function (c, ev) { if (ev.kind === "click" && ev.id === "chat-close") { c.chat = null; return true; } return false; },
+    steps: [
+      { label: "ダッシュボードをひな型から作る", target: function (c) { return c.app !== "dashboards" ? DOCK + 'dashboards"]' : "#w-c6-create"; },
+        tip: function (c) { return c.app !== "dashboards" ? "① 「ダッシュボード」を開きます" : "① 「ひな型から作成」を押します"; },
+        sub: function (c) { return c.app !== "dashboards" ? "" : "一から作らず、専門家が確認済みのひな型を使います"; },
+        now: function (c) { return c.app !== "dashboards" ? "左のDockから「ダッシュボード」を開きます。" : "「ひな型から作成」を押します。"; },
+        hub: "ひな型を使う理由：指標の定義や集計のしかたを、専門家が確認済みの設定にそろえるためです。",
+        btn: function (c) { return c.app !== "dashboards" ? "ダッシュボードを開く" : "ひな型から作成"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "nav-dashboards") { c.app = "dashboards"; c.view = "list"; c.chat = null; return "ok"; }
+          if (ev.id === "c6-create" && c.app === "dashboards") return "done";
+          return null;
+        },
+        auto: function (c) { if (c.app !== "dashboards") { c.app = "dashboards"; c.view = "list"; c.chat = null; return "ok"; } return "done"; },
+        after: function (c) { c.view = "edit"; } },
+      { label: "ひな型を選び、対象と時間枠を変える",
+        target: function (c) { return c.tpl !== "t1" ? "#c6-templates" : c.vals["c6-svc"] !== SVC ? "#f-c6-svc" : "#f-c6-range"; },
+        tip: function (c) { return c.tpl !== "t1" ? "② 助言のあったひな型を選びます" : c.vals["c6-svc"] !== SVC ? "② 対象サービスを担当サービスに変えます" : "② 時間枠を「過去 24 時間」に変えます"; },
+        sub: function (c) { return c.tpl !== "t1" ? "「サービスの状況確認（標準）」" : ""; },
+        redo: "選び直します",
+        now: function (c) { return c.tpl !== "t1" ? "助言のあった「サービスの状況確認（標準）」を選びます。" : c.vals["c6-svc"] !== SVC ? "対象サービスを「契約照会サービス（架空）」に変えます。" : "時間枠を「過去 24 時間」に変えます。"; },
+        hub: function (c) {
+          return c.tpl !== "t1" ? "ひな型の意図：「サービスの状況確認（標準）」は、担当サービスの平均応答時間とエラー率を、同じ長さの期間で比べるためのひな型です。"
+            : c.vals["c6-svc"] !== SVC ? "変える理由：ひな型の既定は、すべてのサービスの合計です。担当サービスに絞らないと、他のサービスの変化が混ざります。"
+            : "変える理由：問題が起きた10時台の前後を含めて、1日の中でいつ上がり始めたかを確認するためです。";
+        },
+        handle: function (c, ev) {
+          if (ev.kind === "click" && ev.id.indexOf("tpl-") === 0) {
+            c.tpl = ev.id.slice(4);
+            return c.tpl === "t1" ? "ok" : { wrong: "今回は助言のあった「サービスの状況確認（標準）」を使います。" };
+          }
+          if (ev.kind === "pick" && ev.id === "c6-svc") return ev.value === SVC || ev.value === "all" ? "ok" : { wrong: "今回は担当の「契約照会サービス（架空）」に絞ります。" };
+          if (ev.kind === "pick" && ev.id === "c6-range") {
+            if (ev.value === "7d") return { wrong: "今回は10時台の前後を見るため「過去 24 時間」にします。過去 7 日間は、日ごとの傾向を見るときに使います。" };
+            return ev.value === "24h" && c.tpl === "t1" && c.vals["c6-svc"] === SVC ? "done" : "ok";
+          }
+          return null;
+        },
+        auto: function (c) {
+          if (c.tpl !== "t1") { c.tpl = "t1"; return "ok"; }
+          if (c.vals["c6-svc"] !== SVC) { c.vals["c6-svc"] = SVC; return "ok"; }
+          c.vals["c6-range"] = "24h"; return "done";
+        } },
+      { label: "結果を確かめ、確認を受けて保存", target: function (c) { return !c.preview ? "#w-c6-preview" : !c.asked ? "#w-c6-ask" : "#w-c6-save"; },
+        tip: function (c) { return !c.preview ? "③ 結果をプレビューします" : !c.asked ? "③ 保存の前に、専門家に確認を依頼します" : "③ 保存して、運用チームに共有します"; },
+        sub: function (c) { return !c.preview ? "変更は2か所。指標の定義は変えていません" : !c.asked ? "変更箇所2点と結果を添えます" : "専門家の確認が済みました"; },
+        now: function (c) { return !c.preview ? "変更箇所を見直して、結果をプレビューします。" : !c.asked ? "結果を確かめ、保存の前に専門家に確認を依頼します。" : "専門家の確認が済みました。保存して、運用チーム（架空）に共有します。"; },
+        hub: function (c) {
+          return !c.preview ? "変えない項目：指標の定義（平均応答時間・エラー率）は、専門家が決めたものをそのまま使います。変えるのは対象と時間枠だけです。"
+            : "結果の見方：10時台に平均応答時間が上がっています。場面3で確認した時間帯と合っているかを確かめます。原因はこの画面だけでは特定できません。";
+        },
+        btn: function (c) { return !c.preview ? "結果をプレビュー" : !c.asked ? "専門家に確認を依頼" : "保存して共有"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "c6-preview") { c.preview = true; return "ok"; }
+          if (ev.id === "c6-ask" && c.preview) { c.asked = true; c.chat = "approved"; return "ok"; }
+          if (ev.id === "c6-save" && c.preview) return c.asked ? "done" : { wrong: "保存の前に、専門家に確認を依頼します（社内ルール・架空）。" };
+          return null;
+        },
+        auto: function (c) {
+          if (!c.preview) { c.preview = true; return "ok"; }
+          if (!c.asked) { c.asked = true; c.chat = "approved"; return "ok"; }
+          return "done";
+        },
+        after: function (c) { c.saved = true; c.view = "saved"; c.chat = null; } },
+      { label: "通知のワークフローをひな型から作る", target: function (c) { return c.app !== "workflows" ? DOCK + 'workflows"]' : "#w-wf-tpl"; },
+        tip: function (c) { return c.app !== "workflows" ? "④ 「ワークフロー」を開きます" : "④ ひな型「問題を検知したら、チャネルに通知」を選びます"; },
+        sub: function (c) { return c.app !== "workflows" ? "同じ問題が起きたら、チームに自動で知らせます" : "専門家が確認済みのひな型（架空）"; },
+        now: function (c) { return c.app !== "workflows" ? "左のDockから「ワークフロー」を開きます。" : "ひな型「問題を検知したら、チャネルに通知」を選びます。"; },
+        hub: "ワークフローの意図：問題を検知したときに、決まったチャネルへ同じ形で知らせると、気づくまでの時間が人によらなくなります。",
+        btn: function (c) { return c.app !== "workflows" ? "ワークフローを開く" : "ひな型を選ぶ"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "nav-workflows") { c.app = "workflows"; c.wf = "list"; return "ok"; }
+          if (ev.id === "wf-tpl" && c.app === "workflows") return "done";
+          return null;
+        },
+        auto: function (c) { if (c.app !== "workflows") { c.app = "workflows"; c.wf = "list"; return "ok"; } return "done"; },
+        after: function (c) { c.wf = "edit"; } },
+      { label: "通知の対象と通知先を設定する", target: function (c) { return c.vals["wf-scope"] !== "contract" ? "#f-wf-scope" : "#f-wf-channel"; },
+        tip: function (c) { return c.vals["wf-scope"] !== "contract" ? "⑤ 通知の対象を「契約系サービス」にします" : "⑤ 通知先を「運用チーム／障害連絡」にします"; },
+        sub: function (c) { return c.vals["wf-scope"] !== "contract" ? "担当範囲（セグメント）の問題だけを通知します" : "選んだ値は、テックタッチが入力チェックします（案）"; },
+        redo: "選び直します",
+        now: function (c) { return c.vals["wf-scope"] !== "contract" ? "通知する問題の対象を「契約系サービス」にします。" : "通知先を「運用チーム／障害連絡」にします。"; },
+        hub: function (c) {
+          return c.vals["wf-scope"] !== "contract" ? "条件の意図：すべての問題を通知すると、他チームの通知が混ざり、大事な通知が埋もれます。"
+            : "通知先の意図：個人宛てだと、担当者が不在のときに見落とします。チームのチャネルに送ります。";
+        },
+        handle: function (c, ev) {
+          if (ev.kind !== "pick") return null;
+          if (ev.id === "wf-scope") {
+            if (ev.value === "all") return { wrong: "すべての問題を通知すると、他チームの通知が混ざります。対象は「契約系サービス」にします（社内ルール・架空）。" };
+            return "ok";
+          }
+          if (ev.id === "wf-channel") {
+            if (ev.value === "dm") return { wrong: "【入力チェック（案）】個人宛ての通知は、担当者が不在のときに見落とします。「運用チーム／障害連絡」を選びます（社内ルール・架空）。" };
+            if (ev.value === "all") return { wrong: "【入力チェック（案）】全社向けのチャネルには、障害の第一報は送りません。「運用チーム／障害連絡」を選びます（社内ルール・架空）。" };
+            return ev.value === "ops" && c.vals["wf-scope"] === "contract" ? "done" : "ok";
+          }
+          return null;
+        },
+        auto: function (c) { if (c.vals["wf-scope"] !== "contract") { c.vals["wf-scope"] = "contract"; return "ok"; } c.vals["wf-channel"] = "ops"; return "done"; } },
+      { label: "テスト実行して有効にする", target: function (c) { return !c.tested ? "#w-wf-test" : "#w-wf-enable"; },
+        tip: function (c) { return !c.tested ? "⑥ テスト実行で、通知の内容を確かめます" : "⑥ ワークフローを有効にします"; },
+        sub: function (c) { return !c.tested ? "デモのため、実際には送信しません" : ""; },
+        now: function (c) { return !c.tested ? "テスト実行で、通知の内容を確かめます。" : "通知の内容を確かめたので、ワークフローを有効にします。"; },
+        hub: "有効にする前の確認：テスト実行で、文面・通知先・対象を確かめます。有効にしたことは、運用チームに共有します。",
+        btn: function (c) { return !c.tested ? "テスト実行" : "有効にする"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "wf-test") { c.tested = true; return "ok"; }
+          if (ev.id === "wf-enable") return c.tested ? "done" : { wrong: "有効にする前に、テスト実行で通知の内容を確かめます（社内ルール・架空）。" };
+          return null;
+        },
+        auto: function (c) { if (!c.tested) { c.tested = true; return "ok"; } return "done"; },
+        after: function (c) { c.enabled = true; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">再発防止の2つの設定ができました。</p>' + recList([
+        ["14:05", "ひな型からダッシュボードを作成（対象・時間枠の2か所を変更）"], ["14:12", "専門家が確認し、運用チームに共有"],
+        ["14:18", "通知のワークフローを作成（対象：契約系サービス、通知先：運用チーム／障害連絡）"], ["14:20", "テスト実行のうえ有効化"]
+      ], "時刻・記録はすべて架空です。デモのため実際には保存・送信していません。");
+    },
+    nextLabel: "場面7へ進む"
+  };
+
+  var AN = [
+    ["g1", "毎朝の確認（3項目）", "ダッシュボード・SLO", 52, 50, "3分"],
+    ["g2", "担当サービスの状況を確認する", "サービス", 18, 15, "6分"],
+    ["g3", "障害の一次確認（社内手順）", "問題", 7, 4, "14分"],
+    ["g4", "推薦された調査ノートブックを使う", "問題・ノートブック", 5, 4, "12分"],
+    ["g5", "再発防止の設定をひな型から作る", "ダッシュボード・ワークフロー", 3, 3, "16分"]
+  ];
+  var FUNNEL = [7, 7, 6, 4, 4];
+
+  CH[7] = {
+    time: "金曜 17:00", timeSub: "週次の振り返り", av: "高", who: "高橋（架空）",
+    title: "ガイドの利用状況から、止まっている手順を見つけて直す",
+    text: "推進担当の高橋さん（架空）が、テックタッチの管理画面で今週のガイドの利用状況を確かめます。止まっている手順に説明を足し、持ち主と次の見直し日を決めて改訂版を公開します。",
+    tags: ["場面7", "仮説5　学びを再利用できない", "目安 2分"],
+    ask: "定着したかどうかを、どの指標で判断しますか？",
+    kind: "note", kicker: "説明用の進行", guide: "今週の振り返り（推進担当）",
+    init: function () { return { step: 0, sel: "", editing: false, edited: false, published: false, vals: { "an-owner": "", "an-review": "" } }; },
+    startIds: ["g-start"], startLabel: "説明を始める",
+    intro: function () {
+      return '<h3 class="ov-title">今週の振り返り（推進担当）</h3><p class="now-box">テックタッチの管理画面で、ガイドの利用状況を確かめます。</p>' +
+        '<p class="soft">この画面はテックタッチ管理画面のイメージ（架空）です。数値は効果を示すものではありません。</p>';
+    },
+    steps: [
+      { label: "ガイドごとの利用状況を見る", target: "#an-table", tip: "① ガイドごとの開始・完了・所要時間を見ます", sub: "完了率だけでは判断しません",
+        now: "今週のガイドの利用状況（架空）を見ます。", why: "完了率だけでなく、所要時間と、社内の依頼記録（依頼件数）も合わせて見ます。" },
+      { label: "止まっている手順を見つける", target: "#w-an-g3", tip: "② 完了率の低いガイドを開きます", sub: "「障害の一次確認（社内手順）」",
+        now: "完了率の低い「障害の一次確認（社内手順）」を開きます。", why: "どのステップで止まっているかが分かると、直す場所を絞れます。", btn: "ガイドを開く",
+        handle: clickIs("an-g3"), after: function (c) { c.sel = "g3"; } },
+      { label: "止まる手順に説明を足す", target: function (c) { return c.editing ? "#w-an-save" : "#w-an-edit"; },
+        tip: function (c) { return c.editing ? "③ 改訂版を保存します" : "③ ステップ4を編集します"; },
+        sub: function (c) { return c.editing ? "" : "関連ログの期間で止まる人が多いため"; },
+        now: function (c) { return c.editing ? "追加する説明を確かめて、改訂版を保存します。" : "ステップ4（関連ログの期間）で止まる人が多いため、このステップを編集します。"; },
+        why: "期間を選ぶ理由が伝わると、迷わずに進められると考えます（仮説・架空）。",
+        btn: function (c) { return c.editing ? "改訂版を保存" : "ステップ4を編集"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "an-edit") { c.editing = true; return "ok"; }
+          if (ev.id === "an-save" && c.editing) return "done";
+          return null;
+        },
+        auto: function (c) { if (!c.editing) { c.editing = true; return "ok"; } return "done"; },
+        after: function (c) { c.edited = true; c.editing = false; } },
+      { label: "持ち主と見直し日を決めて公開", target: function (c) { return c.vals["an-owner"] !== "suzuki" ? "#f-an-owner" : c.vals["an-review"] !== "3m" ? "#f-an-review" : "#w-an-publish"; },
+        tip: function (c) { return c.vals["an-owner"] !== "suzuki" ? "④ ガイドの持ち主を決めます" : c.vals["an-review"] !== "3m" ? "④ 次の見直し日を決めます" : "④ 改訂版を公開します"; },
+        sub: function (c) { return c.vals["an-owner"] !== "suzuki" ? "手順の持ち主（専門家）にします" : c.vals["an-review"] !== "3m" ? "Dynatraceの画面更新の点検と合わせます" : ""; },
+        redo: "選び直します",
+        now: function (c) { return c.vals["an-owner"] !== "suzuki" ? "ガイドの持ち主を、手順の持ち主である鈴木さん（架空）にします。" : c.vals["an-review"] !== "3m" ? "次の見直しを「3か月後」にします。" : "改訂版を公開します。"; },
+        why: "持ち主と見直し時期を決めておくと、Dynatraceの画面更新や手順の変更に合わせてガイドを直せます。",
+        btn: function (c) { return c.vals["an-owner"] !== "suzuki" ? "持ち主を決める" : c.vals["an-review"] !== "3m" ? "見直し日を決める" : "公開する"; },
+        handle: function (c, ev) {
+          if (ev.kind === "pick" && ev.id === "an-owner") return ev.value === "takahashi" ? { wrong: "推進担当は全体の取りまとめです。手順の中身の持ち主は、専門家の鈴木さん（架空）にします。" } : "ok";
+          if (ev.kind === "pick" && ev.id === "an-review") return ev.value === "none" ? { wrong: "見直し日を決めないと、画面の更新に気づかず、ガイドが古くなります。" } : "ok";
+          if (ev.kind === "click" && ev.id === "an-publish") return c.vals["an-owner"] === "suzuki" && c.vals["an-review"] === "3m" ? "done" : { wrong: "公開の前に、持ち主と見直し日を決めます。" };
+          return null;
+        },
+        auto: function (c) {
+          if (c.vals["an-owner"] !== "suzuki") { c.vals["an-owner"] = "suzuki"; return "ok"; }
+          if (c.vals["an-review"] !== "3m") { c.vals["an-review"] = "3m"; return "ok"; }
+          return "done";
+        },
+        after: function (c) { c.published = true; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">改訂版を公開しました（デモのため実際には公開しません）。</p>' +
+        '<div class="soft"><p><b>確かめ方（案）</b></p><ul class="sum-list plain"><li>自力完了率：ガイドの完了と、依頼の有無</li><li>所要時間：作業の開始から完了まで</li><li>依頼件数：専門家への問い合わせ</li><li>再実行：次回も自力でできるか</li></ul></div>' +
+        '<p class="refs">完了率だけで自走を判断せず、作業の結果で確かめます。</p>';
+    },
+    nextLabel: "振り返りへ"
+  };
+
+  CH[8] = {
+    time: "まとめ", timeSub: "振り返り",
+    title: "立ち上がりから定着の見える化まで、一つの流れで見る",
+    text: "今日の流れと、テックタッチが手当てした場面を振り返ります。どこで迷い、どこで依頼しているかを伺い、最初に支援する作業を一つ決めます。",
+    tags: ["振り返り", "目安 1分"], ask: ""
+  };
+
+  var JOURNEY = [
+    [1, "立ち上がり", "場面1・9:00"], [2, "毎朝の確認", "場面2・9:15"], [3, "問い合わせ", "場面3・デモ①"], [4, "一次対応", "場面4・デモ②"],
+    [5, "原因の深掘り", "場面5・11:00"], [6, "再発防止", "場面6・デモ③"], [7, "定着の見える化", "場面7・金曜"], [8, "振り返り", "まとめ"]
+  ];
+
+  /* ==================== 状態と操作 ==================== */
+  var S = { ch: 1, c: {}, tip: null, warn: null, info: null, stats: { steps: 0, fixes: 0, notes: 0 } };
+  var hist = [];
+  var pendingTop = false;
+  function snap() { hist.push(JSON.stringify(S)); if (hist.length > 300) hist.shift(); }
+  function undo() { if (!hist.length) return; S = JSON.parse(hist.pop()); render(); }
+  function C() { return S.c[S.ch]; }
+  function D() { return CH[S.ch]; }
+  function cur() { var c = C(), d = D(); return d.steps && c.step >= 1 ? d.steps[c.step - 1] : null; }
+  function fix(msg) { S.warn = msg; S.stats.fixes++; }
+  function note() { S.stats.notes++; }
+
+  function goChapter(n, quiet) {
+    S.ch = n;
+    S.c[n] = CH[n].init ? CH[n].init() : { step: 0, vals: {} };
+    S.tip = null; S.warn = null; S.info = null;
+    hist = []; pendingTop = true;
+    if (!quiet) render();
+  }
+  function start() {
+    var d = D(), c = C();
+    if (d.onStart) d.onStart(c);
+    c.step = 1; c.started = true;
+  }
+  function finish() {
+    var d = D(), c = C(), st = cur();
+    if (st.after) st.after(c);
+    c.step++;
+    if (d.kind !== "note") S.stats.steps++;
+    var nx = cur();
+    while (nx && nx.skip && nx.skip(c)) {
+      c.step++;
+      if (d.kind !== "note") S.stats.steps++;
+      nx = cur();
+    }
+    if (c.step > d.steps.length && d.onComplete) d.onComplete(c);
+  }
+  function resolve(r) {
+    if (r === "done") finish();
+    else if (r && r.wrong) fix(r.wrong);
+  }
+  function emit(ev) {
+    var d = D(), c = C();
+    if (!c || !d.steps) return;
+    if (ev.kind === "pick") c.vals[ev.id] = ev.value;
+    if (ev.kind === "tip") { S.tip = S.tip === ev.id ? null : ev.id; if (!S.tip) return; note(); }
+    if (d.free && d.free(c, ev)) return;
+    if (c.step === 0) {
+      if (ev.kind === "click" && d.startIds && d.startIds.indexOf(ev.id) >= 0) start();
+      return;
+    }
+    var st = cur();
+    if (!st) return;
+    var r = st.handle ? st.handle(c, ev) : null;
+    if (r) resolve(r);
+    else if (ev.kind === "click") S.info = "このデモでは、ガイドの順に進めます。次は「" + st.label + "」です。";
+  }
+  function primary() {
+    var d = D(), c = C();
+    if (S.ch === 8) return { label: "最初の場面へ", run: function () { goChapter(1, true); } };
+    if (c.step === 0) return { label: d.startLabel || "ガイドを開始", run: start };
+    if (c.step > d.steps.length) return { label: d.nextLabel, run: function () { goChapter(S.ch + 1, true); } };
+    var st = cur();
+    return { label: val(st.btn, c) || "次へ", run: function () { resolve(st.auto ? st.auto(c) : "done"); } };
+  }
+  function act(name, arg, value) {
+    if (name === "back") { undo(); return; }
+    if (name === "chapter") { goChapter(+arg); return; }
+    snap();
+    S.warn = null; S.info = null;
+    if (name !== "tip") S.tip = null;
+    if (name === "next") primary().run();
+    else if (name === "click") emit({ kind: "click", id: arg });
+    else if (name === "pick") emit({ kind: "pick", id: arg, value: value });
+    else if (name === "tip") emit({ kind: "tip", id: arg });
+    render();
+  }
+
+  /* ==================== 画面（Dynatraceの画面イメージ・架空） ==================== */
+  var APP_LABEL = { home: "ホーム", dashboards: "ダッシュボード", services: "サービス", problems: "問題", notebooks: "ノートブック", workflows: "ワークフロー", slo: "サービスレベル目標（SLO）" };
+  var APP_ICON = { home: "home", dashboards: "dashboards", services: "services", problems: "problems", notebooks: "notebooks", workflows: "workflows", slo: "slo" };
+  function dockHTML(c) {
+    var d = D();
+    var item = function (key, label) {
+      return '<button type="button" class="dock-item' + (key === c.app ? " active" : "") + '" data-id="nav-' + key + '" data-tip-side="s" title="' + label + '">' + svg(key === "search" ? "search" : APP_ICON[key] || key) + '<span class="dl">' + label + "</span></button>";
+    };
+    return '<div class="dock-group">' + item("home", "ホーム") + item("search", "検索") + "</div>" +
+      '<div class="dock-sep"></div><p class="dock-label">アプリ</p>' +
+      '<div class="dock-group">' + item("dashboards", "ダッシュボード") + item("services", "サービス") + item("problems", "問題") +
+      item("logs", "ログ") + item("notebooks", "ノートブック") + item("workflows", "ワークフロー") + item("slo", "SLO") + "</div>" +
+      '<div class="dock-spacer"></div>' +
+      '<div class="dock-group"><span class="dock-item" title="Dockを隠す">' + svg("hide") + '<span class="dl">Dockを隠す</span></span>' +
+      '<span class="dock-item" title="サポート">' + svg("help") + '<span class="dl">サポート</span></span>' +
+      '<span class="dock-item" title="' + d.who + '"><span class="avatar">' + d.av + '</span><span class="dl">' + d.who + "</span></span></div>";
+  }
+  function appHeader(c) {
+    var navs = { home: [], dashboards: ["すべてのダッシュボード", "ひな型"], services: ["概要", "エンドポイント", "応答時間の分析"], problems: ["問題一覧"],
+      notebooks: ["すべてのノートブック"], workflows: ["すべてのワークフロー", "ひな型"], slo: ["すべてのSLO"] }[c.app] || [];
+    var activeIdx = (c.app === "dashboards" && c.view === "edit") || (c.app === "workflows" && c.wf === "edit") ? 1 : 0;
+    var nav = navs.map(function (n, i) { return "<span" + (i === activeIdx ? ' class="active"' : "") + ">" + n + "</span>"; }).join("");
+    return '<div class="appheader"><div class="ah-left"><span class="app-icon" aria-hidden="true">' + svg(APP_ICON[c.app]) + '</span><span class="app-name">' + APP_LABEL[c.app] + "</span>" +
+      (nav ? '<div class="ah-nav" aria-hidden="true">' + nav + "</div>" : "") + '</div><span class="dt-look-btn" aria-hidden="true">共有</span></div>';
+  }
+  function chatHTML(c) { return c.chat && c.chat !== "approved" ? chatCard(c.chat) : ""; }
+  function fine(t) { return '<p class="dt-fine">' + t + "</p>"; }
+
+  function pageHTML(c) {
+    switch (c.app) {
+      case "home": return pageHome();
+      case "dashboards": return S.ch === 6 ? pageDashCreate(c) : c.view === "list" ? dashList(c) : dashTeam(c);
+      case "slo": return pageSlo();
+      case "services": return pageServices(c);
+      case "problems": return pageProblem(c);
+      case "notebooks": return pageNotebook(c);
+      case "workflows": return pageWorkflows(c);
+    }
+    return "";
+  }
+  function pageHome() {
+    var tile = function (key, desc) {
+      return '<div class="app-tile"><span class="app-icon" aria-hidden="true">' + svg(APP_ICON[key]) + "</span><b>" + APP_LABEL[key] + '</b><span class="d">' + desc + "</span></div>";
+    };
+    return '<div><p class="crumbs">ホーム</p><h2 class="dt-h">ホーム</h2></div>' +
+      '<p class="section-label">アプリ</p><div class="home-grid">' +
+      tile("dashboards", "チームのダッシュボード") + tile("services", "サービスの状況確認") + tile("problems", "検知された問題") + tile("notebooks", "調査のメモ") +
+      tile("workflows", "通知・自動化") + tile("slo", "サービスの品質の目標") + "</div>" +
+      '<div class="surface"><p class="dt-h3">Dynatraceの入門コンテンツ（製品の機能）</p><p>製品の基本的な使い方は、Dynatraceが提供する入門コンテンツで学べます。</p>' +
+      fine("ホーム画面・表示は架空です。入門コンテンツの実際の名称・置き場所は実機で確認します。") + "</div>";
+  }
+  function dashList(c) {
+    var create = S.ch === 6 ? '<span class="tip-anchor" id="w-c6-create" data-tip-side="right"><button type="button" class="dt-accent" data-id="c6-create">ひな型から作成</button></span>' : "";
+    var row = function (id, name, owner, upd) {
+      var nm = id ? '<span class="tip-anchor" id="w-' + id + '"><button type="button" class="row-link" data-id="' + id + '">' + name + "</button></span>" : name;
+      return '<tr><th scope="row">' + nm + "</th><td>" + owner + "</td><td>" + upd + "</td></tr>";
+    };
+    var on = S.ch === 1;
+    return '<div class="title-row"><div><p class="crumbs">ダッシュボード</p><h2 class="dt-h">すべてのダッシュボード</h2></div>' + create + "</div>" +
+      '<div class="surface"><table class="dtable" style="min-width:0"><thead><tr><th scope="col">名前</th><th scope="col">所有者</th><th scope="col">更新</th></tr></thead><tbody>' +
+      row(on ? "dash-team" : "", "運用チーム 毎朝の確認（架空）", "運用チーム（架空）", "前日") +
+      row(on ? "dash-infra" : "", "インフラの概要", "基盤チーム（架空）", "3日前") +
+      row(on ? "dash-old" : "", "旧・運用ダッシュボード（使用停止）", "運用チーム（架空）", "半年前") +
+      row("", "代理店ポータルの状況", "代理店システム担当（架空）", "先週") +
+      "</tbody></table></div>" + fine("ダッシュボード名・所有者はすべて架空です。");
+  }
+  function dashTeam(c) {
+    var seg = c.vals.seg || "", on = seg === "contract", infra = seg === "infra";
+    var lock = !(S.ch === 1 && c.step === 4);
+    var V = on ? { prob: "0 件", probCls: "ok", probSub: "契約系サービス", rt: "430 ms", err: "0.20 %", logs: "12 件" }
+      : infra ? { prob: "1 件", probCls: "bad", probSub: "基盤系（基盤チームの担当）", rt: "280 ms", err: "0.05 %", logs: "29 件" }
+      : { prob: "1 件", probCls: "bad", probSub: "すべて（基盤系の1件を含む）", rt: "512 ms", err: "0.31 %", logs: "41 件" };
+    var sloBtn = S.ch === 2;
+    var sloInner = '<span class="t-name">SLO：契約照会の可用性（架空）</span><span class="t-val">99.95 %</span><span class="t-sub">目標 99.9 %・エラーバジェット残り 62 %</span>';
+    return '<div class="title-row"><div><p class="crumbs">ダッシュボード ＞ 運用チーム 毎朝の確認（架空）</p><h2 class="dt-h">運用チーム 毎朝の確認（架空）</h2></div><span class="share-chip">共有：運用チーム（架空）</span></div>' +
+      '<div class="toolbar"><div class="dt-field" id="f-seg"><label for="seg">' + svg("segment") + "セグメント</label>" +
+      sel("seg", "seg", [["", "すべて（未選択）"], ["contract", "契約系サービス"], ["infra", "基盤系"]], seg, lock) + "</div>" +
+      '<span class="dt-field" aria-hidden="true"><span class="pre">' + svg("clock") + '時間枠</span><span class="locked">過去 2 時間</span></span></div>' +
+      '<div class="tiles">' +
+      '<div class="tile tip-anchor" id="w-tile-prob"><span class="t-name">未解決の問題</span><span class="t-val ' + V.probCls + '">' + V.prob + '</span><span class="t-sub">' + V.probSub + "</span></div>" +
+      '<div class="tile"><span class="t-name">' + tipWrap("w-tip-rt2", "平均応答時間", "rt2", "平均応答時間の目安") + '</span><span class="t-val">' + V.rt + "</span>" + spark(SPARK) + "</div>" +
+      '<div class="tile"><span class="t-name">エラー率</span><span class="t-val">' + V.err + '</span><span class="t-sub">過去 2 時間</span></div>' +
+      (sloBtn ? '<span class="tip-anchor" id="w-tile-slo" style="display:grid"><button type="button" class="tile" data-id="tile-slo">' + sloInner + "</button></span>" : '<div class="tile" id="w-tile-slo">' + sloInner + "</div>") +
+      '<div class="tile"><span class="t-name">エラーログ（直近1時間）</span><span class="t-val">' + V.logs + '</span><span class="t-sub">' + (on ? "契約系サービス" : "セグメントで絞り込み") + "</span></div>" +
+      "</div>" + fine("ダッシュボード名・数値はすべて架空です。");
+  }
+  function pageSlo() {
+    return '<div class="title-row"><div><p class="crumbs">サービスレベル目標（SLO） ＞ 契約照会の可用性（架空）</p><h2 class="dt-h">契約照会の可用性（架空）</h2></div><span class="share-chip">達成</span></div>' +
+      '<div class="kpis"><div class="kpi"><span>現在の値（過去 28 日）</span><b>99.95 %</b></div><div class="kpi"><span>目標</span><b>99.9 %</b></div>' +
+      '<div class="kpi"><span>' + tipWrap("w-tip-eb", "エラーバジェットの残り", "eb", "エラーバジェットの報告基準") + '</span><b>62 %</b><div class="bar" aria-hidden="true"><i style="width:62%"></i></div></div></div>' +
+      '<div class="surface"><div class="surface-head"><p class="dt-h3">日ごとの可用性（過去 28 日）</p><p class="chart-legend"><span>' + SVC + "</span></p></div>" +
+      '<div class="chart-wrap">' + lineChart({
+        values: SLO_VALUES, yMin: 99.8, yMax: 100, unit: "%", yTicks: [99.8, 99.9, 100], fmt: function (g) { return g.toFixed(1); },
+        xLabels: [[0, "28日前", "start"], [14, "14日前"], [27, "今日", "end"]],
+        aria: "契約照会の可用性の推移（架空）。目標99.9パーセントを上回って推移。"
+      }) + "</div></div>" + fine("SLOの名前・数値はすべて架空です。");
+  }
+  function pageServices(c) {
+    var v = c.vals, lock = !(S.ch === 3 && c.step >= 2 && c.step <= 5);
+    var h = '<div><p class="crumbs">サービス ＞ 状況確認</p><h2 class="dt-h">サービスの状況確認</h2></div>' +
+      '<div class="toolbar">' +
+      '<span class="dt-look-btn" aria-hidden="true">' + svg("segment") + "セグメント：契約系サービス</span>" +
+      '<div class="dt-field" id="f-c3-svc"><label for="c3-svc">サービス</label>' + sel("c3-svc", "c3-svc", [["", "選択してください"], SVC, SVC2], v["c3-svc"], lock) + "</div>" +
+      '<div class="dt-field" id="f-c3-period"><label for="c3-period">' + svg("clock") + "時間枠</label>" + sel("c3-period", "c3-period", [["", "選択してください"], "09:45–10:00", "10:00–10:15", "10:15–10:30"], v["c3-period"], lock) + "</div>" +
+      '<div class="dt-field" id="f-c3-compare" data-tip-side="right"><label for="c3-compare">比較期間</label>' + sel("c3-compare", "c3-compare", [["", "選択してください"], "09:00–10:00", "09:45–10:00", "前日 10:00–10:15"], v["c3-compare"], lock) + "</div>" +
+      '<span class="tip-anchor" id="w-c3-apply" data-tip-side="right"><button type="button" class="dt-accent" data-id="c3-apply"' + (lock ? " disabled" : "") + ">適用</button></span></div>";
+    if (!c.applied) {
+      return h + '<div class="empty">' + svg("empty") + "<span>サービスと時間枠を指定して「適用」を押すと、指標が表示されます。</span></div>" + fine("数値・サービス名・時刻はすべて架空です。");
+    }
+    return h + '<div class="dt-banner"><b>この時間帯に検知された問題</b><span>P-0412　応答時間の悪化（10:02〜・進行中）</span>' +
+      '<span class="tip-anchor" id="w-c3-problem" data-tip-side="right"><button type="button" class="row-link" data-id="c3-problem">問題を開く</button></span></div>' +
+      '<div class="surface"><p class="dt-h3">期間の比較</p><table class="dtable num" style="min-width:0"><thead><tr><th scope="col">指標</th>' +
+      '<th scope="col">比較期間<br>09:45–10:00</th><th scope="col">対象期間<br>10:00–10:15</th></tr></thead><tbody>' +
+      '<tr><th scope="row">' + tipWrap("w-tip-rt", "平均応答時間", "rt", "平均応答時間の定義") + "</th>" +
+      '<td class="big">420 ms</td><td class="big up">980 ms</td></tr>' +
+      '<tr><th scope="row">リクエスト数</th><td>6,000件</td><td>6,200件</td></tr>' +
+      '<tr><th scope="row">エラー数 / エラー率</th><td>12件 / 0.2%</td><td>48件 / 約0.8%</td></tr></tbody></table></div>' +
+      minuteChart() + fine("数値・サービス名・時刻はすべて架空です。");
+  }
+  var TAB_LABEL = { overview: "概要", impact: "影響範囲", rc: "根本原因", logs: "ログ", events: "イベント" };
+  function pageProblem(c) {
+    var tabs = ["overview", "impact", "rc", "logs", "events"].map(function (t) {
+      return '<span class="tip-anchor" id="w-tab-' + t + '"><button type="button" role="tab" data-id="tab-' + t + '" aria-selected="' + (c.tab === t) + '"' +
+        (c.tab === t ? ' class="active"' : "") + ">" + TAB_LABEL[t] + "</button></span>";
+    }).join("");
+    var contact = S.ch === 4 ? '<span class="tip-anchor" id="w-c4-contact" data-tip-side="right"><button type="button" class="tt-chip" data-id="c4-contact">社内手順で連絡</button></span>' : "";
+    return '<div><p class="crumbs">問題 ＞ P-0412</p><h2 class="dt-h">問題の詳細（架空）</h2></div>' +
+      '<div class="tb-row"><span class="dt-h3">P-0412　応答時間の悪化</span><span class="status active">進行中</span><span class="dt-fine">開始 10:02</span>' + contact + "</div>" +
+      '<div class="dt-tabs" role="tablist" aria-label="問題の詳細">' + tabs + "</div>" + problemTab(c) +
+      fine("画面の構成・問題番号・サービス名・数値はすべて架空です。");
+  }
+  function problemTab(c) {
+    if (c.tab === "overview") {
+      return '<div class="surface" id="c4-kv"><dl class="kv">' +
+        "<dt>影響を受けたサービス</dt><dd>" + SVC + "</dd>" +
+        "<dt>影響の範囲</dt><dd>Webからの照会の一部（架空）</dd>" +
+        "<dt>根本原因の候補</dt><dd>契約DB（架空）：接続待ちの増加（Dynatraceの分析）</dd>" +
+        "<dt>開始</dt><dd>10:02（検知）</dd></dl></div>";
+    }
+    if (c.tab === "impact") {
+      return '<div style="display:grid;gap:14px">' +
+        '<div class="surface"><p class="dt-h3">影響を受けたサービス</p><table class="dtable num" style="min-width:0"><thead><tr><th scope="col">サービス</th><th scope="col">平均応答時間</th><th scope="col">エラー率</th></tr></thead>' +
+        '<tbody><tr><th scope="row">' + SVC + '</th><td class="up">980 ms（平常時 420 ms）</td><td>約0.8%（平常時 0.2%）</td></tr></tbody></table></div>' +
+        '<div class="surface"><p class="dt-h3">' + tipWrap("w-tip-prio", "影響の範囲", "prio", "優先度の基準") + "</p>" +
+        '<table class="dtable" style="min-width:0"><thead><tr><th scope="col">照会の入口</th><th scope="col">影響</th></tr></thead>' +
+        '<tbody><tr><th scope="row">Webからの照会</th><td class="up">一部で遅延（架空）</td></tr><tr><th scope="row">代理店ポータルからの照会</th><td>影響なし（架空）</td></tr></tbody></table></div></div>';
+    }
+    if (c.tab === "rc") {
+      return '<div class="rc-grid"><div class="surface" id="c4-rc"><p class="dt-h3">根本原因の候補（Dynatraceの分析）</p><dl class="kv">' +
+        "<dt>候補</dt><dd>契約DB（架空）</dd><dt>事象</dt><dd>接続待ちの増加（09:58〜）</dd>" +
+        '<dt>影響の伝わり方</dt><dd><span class="flowline"><span class="n root">契約DB</span><span class="a">→</span><span class="n">契約照会サービス</span><span class="a">→</span><span class="n">Webからの照会</span></span></dd></dl>' +
+        fine("根本原因の分析はDynatraceの機能です。表示は架空です。") + "</div>" +
+        '<div class="surface"><p class="dt-h3">推薦されたトラブルシューティングガイド</p><p>契約DB 接続待ちの調査（ノートブック・専門家作成・架空）</p>' +
+        '<span class="tip-anchor" id="w-tsg-open"><button type="button" class="dt-emph" data-id="tsg-open">' + svg("notebooks") + " ノートブックを開く</button></span>" +
+        fine("似た問題に使われた調査ガイドを、Dynatraceが推薦します（機能の名称・利用条件は実機で確認）。") + "</div></div>" +
+        '<p class="tt-note"><span class="lab">テックタッチ（案）</span>社内手順：根本原因は、この段階では断定しません。推薦された調査ガイドは、専門家と一緒に使います。</p>';
+    }
+    if (c.tab === "logs") {
+      var p = c.vals["c4-period"] || "during", from = PERIOD_FROM[p];
+      var rows = LOGS.filter(function (l) { return l[0] >= from; }).map(function (l) {
+        return "<tr><td>" + l[0] + '</td><td><span class="lv ' + l[1] + '">' + l[2] + "</span></td><td>" + l[3] + "</td></tr>";
+      }).join("");
+      return '<div style="display:grid;gap:12px"><div class="toolbar">' +
+        '<div class="dt-field" id="f-c4-period"><label for="c4-period">' + svg("clock") + "期間</label>" +
+        sel("c4-period", "c4-period", [["during", "問題の発生期間（10:02〜）"], ["5min", "問題の開始5分前から（09:57〜）"], ["2h", "過去 2 時間"]], p, !(S.ch === 4 && c.step === 4)) + "</div>" +
+        '<span class="dt-field" aria-hidden="true"><span class="pre">サービス</span><span class="locked">' + SVC + "</span></span></div>" +
+        '<div class="surface"><div class="table-wrap"><table class="dtable num logs"><thead><tr><th scope="col">時刻</th><th scope="col">状態</th><th scope="col">内容</th></tr></thead><tbody>' +
+        rows + "</tbody></table></div>" +
+        (p === "5min" ? '<p class="dt-callout">10:02の開始より前（09:58）から、接続待ちの警告が出ています（架空）。原因はこの段階では確定しません。</p>' : "") + "</div></div>";
+    }
+    return '<div class="surface"><div class="table-wrap"><table class="dtable num"><thead><tr><th scope="col">時刻</th><th scope="col">イベント</th></tr></thead><tbody>' +
+      "<tr><td>10:02</td><td>問題を検知しました（応答時間の悪化）</td></tr>" +
+      "<tr><td>10:04</td><td>影響範囲が更新されました（架空）</td></tr>" +
+      "<tr><td>10:06</td><td>関連するイベントが追加されました（架空）</td></tr></tbody></table></div></div>";
+  }
+  function pageNotebook(c) {
+    var t = c.vals["nb-time"], lock = !(S.ch === 5 && c.step >= 2);
+    var h = '<div class="title-row"><div><p class="crumbs">ノートブック ＞ 契約DB 接続待ちの調査（架空）</p><h2 class="dt-h">契約DB 接続待ちの調査（架空）</h2></div>' +
+      '<div class="row-actions"><span class="share-chip">トラブルシューティングガイド</span>' +
+      '<span class="tip-anchor" id="w-assist" data-tip-side="right"><button type="button" class="dt-emph" data-id="assist"' + (c.ran ? "" : " disabled") + ">" + svg("spark") + " Dynatrace Assist</button></span>" +
+      '<span class="tip-anchor" id="w-nb-share" data-tip-side="right"><button type="button" class="dt-accent" data-id="nb-share"' + (c.added && !c.shared ? "" : " disabled") + ">" + svg("share") + (c.shared ? " 共有済み" : " 共有") + "</button></span></div></div>" +
+      '<div class="toolbar"><div class="dt-field" id="f-nb-time"><label for="nb-time">' + svg("clock") + "時間枠</label>" +
+      sel("nb-time", "nb-time", [["", "選択してください"], ["problem", "問題の時間帯（09:55–10:30）"], ["24h", "過去 24 時間"]], t, lock) + "</div>" +
+      '<span class="dt-fine">作成：鈴木（専門家・架空）</span></div>';
+    h += '<div class="nb-sec"><div class="nb-sec-head"><span class="nb-kind">メモ</span></div><p><b>使い方（専門家のメモ・架空）</b>　1. 時間枠を問題に合わせる　2. クエリを実行する　3. 結果を共有する</p></div>';
+    h += '<div class="nb-sec"><div class="nb-sec-head"><span class="nb-kind">DQL</span><span class="tip-anchor" id="w-nb-run" data-tip-side="right"><button type="button" class="dt-accent" data-id="nb-run"' +
+      (t === "problem" && !c.ran ? "" : " disabled") + ">" + svg("play") + " 実行</button></span></div>" +
+      '<pre class="code">' + esc(DQL1) + "</pre>" +
+      (c.ran ? '<p class="dt-h3">「接続待ち」の警告の件数（1分ごと）</p><div class="chart-wrap">' + barChart({
+        values: NB_COUNTS, yMax: 15, yTicks: [0, 5, 10, 15], hot: function (i) { return i >= 3 && i <= 6; },
+        xLabels: [[0, "09:55"], [5, "10:00"], [10, "10:05"], [15, "10:10"], [20, "10:15"], [25, "10:20"], [30, "10:25"], [35, "10:30"]],
+        aria: "接続待ちの警告の件数（架空）。09:58から増え、10:02に13件で最多。"
+      }) + "</div>" : "") + "</div>";
+    if (c.assist && !c.added) {
+      h += '<div class="assist"><p class="assist-head">' + svg("spark") + "Dynatrace Assist</p>" +
+        '<p class="bubble">契約DBの接続待ちの警告を、1分ごとに数えてグラフにして</p>' +
+        "<p>次のDQLで集計できます（回答の例）。</p>" + '<pre class="code">' + esc(DQL2) + "</pre>" +
+        "<ul><li>fetch logs：ログを読み込みます</li><li>filter：「接続待ち」を含む行に絞ります</li><li>makeTimeseries：1分ごとの件数を時系列にします</li></ul>" +
+        '<div class="row-actions"><span class="tip-anchor" id="w-assist-add"><button type="button" class="dt-accent" data-id="assist-add">ノートブックに追加</button></span></div>' +
+        '<p class="ai-label">Dynatrace Assist（Dynatraceの生成AI）の画面・回答は例です。実機の表示とは異なります。</p></div>';
+    }
+    if (c.added) {
+      h += '<div class="nb-sec"><div class="nb-sec-head"><span class="nb-kind">DQL</span><span class="ai-label">Dynatrace Assist で作成（例）</span></div>' +
+        '<pre class="code">' + esc(DQL2) + "</pre></div>";
+    }
+    return h + fine("ノートブック名・クエリ・結果はすべて例（架空）です。DQLは実機で動作を確認します。");
+  }
+  function pageDashCreate(c) {
+    if (c.view === "list") return dashList(c);
+    if (c.view === "saved") {
+      return '<div class="title-row"><div><p class="crumbs">ダッシュボード ＞ 契約照会サービスの状況（架空）</p><h2 class="dt-h">契約照会サービスの状況（架空）</h2></div>' +
+        '<span class="share-chip">共有：運用チーム（架空）</span></div>' +
+        '<div class="kpis"><div class="kpi"><span>平均応答時間（14時台）</span><b>425 ms</b></div>' +
+        '<div class="kpi"><span>最大（過去 24 時間）</span><b>610 ms</b></div>' +
+        '<div class="kpi"><span>エラー率（14時台）</span><b>0.2%</b></div></div>' +
+        '<div class="surface"><div class="surface-head"><p class="dt-h3">平均応答時間（1時間ごと）</p><p class="chart-legend"><span>' + SVC + "</span><span>過去 24 時間</span></p></div>" +
+        '<div class="chart-wrap">' + hourChart() + "</div></div>" +
+        fine("ひな型「サービスの状況確認（標準）」から作成。数値はすべて架空です。デモのため実際には保存していません。");
+    }
+    var ok = c.tpl === "t1", svcChanged = c.vals["c6-svc"] === SVC, rngChanged = c.vals["c6-range"] === "24h";
+    var tpl = function (v, name, desc) {
+      return '<button type="button" class="tpl" data-id="tpl-' + v + '" aria-pressed="' + (c.tpl === v) + '"><span class="tpl-name">' + name +
+        '</span><span class="tpl-desc">' + desc + '</span><span class="badge">専門家が確認済み</span></button>';
+    };
+    var st = function (on) { return '<span class="st' + (on ? " on" : "") + '">' + (on ? "変更" : "未変更") + "</span>"; };
+    var h = '<div><p class="crumbs">ダッシュボード ＞ ひな型から作成</p><h2 class="dt-h">ひな型の編集</h2></div>' +
+      '<p class="section-label">ひな型を選ぶ</p><div class="tpl-list" id="c6-templates" role="group" aria-label="ひな型">' +
+      tpl("t1", "サービスの状況確認（標準）", "平均応答時間とエラー率を期間で比べる") +
+      tpl("t2", "エラーの内訳（標準）", "エラーの種類と発生箇所を一覧する") +
+      tpl("t3", "利用の多い時間帯（標準）", "リクエスト数の推移を見る") + "</div>" +
+      '<p class="section-label">設定を変更する</p><div class="edit-grid">' +
+      '<div class="dt-field block" id="f-c6-svc"><label for="c6-svc">対象サービス</label>' +
+      sel("c6-svc", "c6-svc", [["all", "すべてのサービス（既定）"], SVC, SVC2, "代理店ポータル（架空）"], c.vals["c6-svc"], !ok || c.preview) + "</div>" +
+      '<div class="dt-field block" id="f-c6-range"><label for="c6-range">' + svg("clock") + "時間枠</label>" +
+      sel("c6-range", "c6-range", [["2h", "過去 2 時間（既定）"], ["24h", "過去 24 時間"], ["7d", "過去 7 日間"]], c.vals["c6-range"], !ok || !svcChanged || c.preview) + "</div>" +
+      '<div class="dt-field block"><span class="pre">指標（変更しない）</span><span class="locked">平均応答時間・エラー率</span></div></div>' +
+      '<div class="surface changes" id="c6-changes"><div class="surface-head"><p class="section-label">変更箇所</p>' +
+      '<span class="tip-anchor" id="w-c6-preview" data-tip-side="right"><button type="button" class="dt-emph" data-id="c6-preview"' + (ok && svcChanged && rngChanged && !c.preview ? "" : " disabled") + ">結果をプレビュー</button></span></div><ul>" +
+      '<li><span class="k">対象サービス</span><span>すべてのサービス → ' + (svcChanged ? SVC : "（未変更）") + "</span>" + st(svcChanged) + "</li>" +
+      '<li><span class="k">時間枠</span><span>過去 2 時間 → ' + (rngChanged ? "過去 24 時間" : "（未変更）") + "</span>" + st(rngChanged) + "</li>" +
+      '<li><span class="k">指標</span><span>平均応答時間・エラー率</span><span class="st">変更しない</span></li></ul></div>';
+    if (c.preview) {
+      h += '<div class="surface" id="c6-result"><div class="surface-head"><p class="dt-h3">平均応答時間（1時間ごと）</p><p class="chart-legend"><span>' + SVC + "</span><span>過去 24 時間</span></p></div>" +
+        '<div class="chart-wrap">' + hourChart() + "</div>" +
+        '<ul class="checks"><li>対象サービスが担当サービスになっている</li><li>時間枠が過去 24 時間になっている</li><li>10時台の上昇が、場面3で確認した時間帯と合っている</li></ul>' +
+        '<div class="row-actions"><span class="tip-anchor" id="w-c6-ask"><button type="button" class="dt-emph" data-id="c6-ask"' + (c.asked ? " disabled" : "") + ">専門家に確認を依頼</button></span>" +
+        '<span class="tip-anchor" id="w-c6-save"><button type="button" class="dt-accent" data-id="c6-save">保存して共有</button></span></div>' +
+        (c.asked ? '<p class="done-msg" role="status">依頼しました：変更箇所2点と結果の画面を添えて、専門家（架空）に確認を依頼しました。デモのため送信はしません。</p>' : "") +
+        (c.chat === "approved" ? chatCard("approved") : "") + fine("数値はすべて架空です。") + "</div>";
+    }
+    return h + '<div class="dql"><strong>DQLの作成・説明が必要な場合</strong><span>利用条件を満たすDynatrace Assistの活用を含めて確認します。</span></div>';
+  }
+  function pageWorkflows(c) {
+    if (c.wf === "list") {
+      return '<div><p class="crumbs">ワークフロー</p><h2 class="dt-h">すべてのワークフロー</h2></div>' +
+        '<div class="surface"><table class="dtable" style="min-width:0"><thead><tr><th scope="col">名前</th><th scope="col">きっかけ</th><th scope="col">状態</th></tr></thead><tbody>' +
+        '<tr><th scope="row">夜間バッチの完了通知（架空）</th><td>毎日 6:00</td><td>有効</td></tr>' +
+        '<tr><th scope="row">基盤系の障害通知（架空）</th><td>問題を検知したとき</td><td>有効</td></tr></tbody></table></div>' +
+        '<p class="section-label">ひな型（専門家が確認済み・架空）</p><div class="tpl-list">' +
+        '<span class="tip-anchor" id="w-wf-tpl"><button type="button" class="tpl" data-id="wf-tpl"><span class="tpl-name">問題を検知したら、チャネルに通知</span><span class="tpl-desc">対象と通知先を選ぶだけで使えます</span><span class="badge">専門家が確認済み</span></button></span>' +
+        '<div class="tpl"><span class="tpl-name">毎朝の状況をレポート</span><span class="tpl-desc">決まった時刻に要約を送る</span><span class="badge">専門家が確認済み</span></div>' +
+        '<div class="tpl"><span class="tpl-name">チケットを起票</span><span class="tpl-desc">問題から連携先にチケットを作る</span><span class="badge">専門家が確認済み</span></div></div>' +
+        fine("ワークフロー名・ひな型名はすべて架空です。");
+    }
+    var v = c.vals, scope = v["wf-scope"], ch = v["wf-channel"], scopeOk = scope === "contract", ready = scopeOk && ch === "ops";
+    var CHN = { ops: "運用チーム／障害連絡（チャネル）", dm: "佐藤（個人宛て）", all: "全社お知らせ（チャネル）" };
+    var node = function (k, b, sub, unset) {
+      return '<div class="wf-node' + (unset ? " unset" : "") + '"><span class="k">' + k + "</span><b>" + b + "</b>" + (sub ? '<span class="v">' + sub + "</span>" : "") + "</div>";
+    };
+    var flow = '<div class="wf-flow" aria-label="ワークフローの流れ">' +
+      node("きっかけ", "問題を検知したとき", "Dynatraceが問題を検知・更新したとき") + '<span class="wf-arrow" aria-hidden="true"></span>' +
+      node("条件", scopeOk ? "対象：契約系サービス" : scope === "all" ? "対象：すべての問題" : "対象：（未設定）", "セグメントで絞り込み", !scope) + '<span class="wf-arrow" aria-hidden="true"></span>' +
+      node("アクション", "チャネルに通知", "通知先：" + (CHN[ch] || "（未設定）"), !ch) + "</div>";
+    var form = '<div class="surface wf-form"><p class="dt-h3">設定</p>' +
+      '<div class="dt-field block" id="f-wf-scope"><label for="wf-scope">通知する問題の対象</label>' +
+      sel("wf-scope", "wf-scope", [["", "選択してください"], ["all", "すべての問題"], ["contract", "契約系サービス（セグメント）"]], scope, c.enabled) + "</div>" +
+      '<div class="dt-field block" id="f-wf-channel"><label for="wf-channel">通知先</label>' +
+      sel("wf-channel", "wf-channel", [["", "選択してください"], ["ops", CHN.ops], ["dm", CHN.dm], ["all", CHN.all]], ch, !scopeOk || c.enabled) + "</div>" +
+      '<div class="dt-field block"><span class="pre">通知の文面（ひな型・変更しない）</span><span class="locked">【障害】{問題名}　開始 {開始時刻}　影響 {影響範囲}　詳細 {問題へのリンク}</span></div>' +
+      '<div class="row-actions"><span class="tip-anchor" id="w-wf-test"><button type="button" class="dt-emph" data-id="wf-test"' + (ready && !c.tested ? "" : " disabled") + ">テスト実行</button></span>" +
+      '<span class="tip-anchor" id="w-wf-enable"><button type="button" class="dt-accent" data-id="wf-enable"' + (ready && !c.enabled ? "" : " disabled") + ">有効にする</button></span></div>" +
+      (c.tested ? '<p class="done-msg" role="status">テスト実行：通知の内容を確かめました（デモのため送信はしません）。</p>' : "") +
+      (c.enabled ? '<p class="done-msg" role="status">有効にしました。契約系サービスで問題を検知すると、運用チーム／障害連絡に通知します（デモのため実際には動きません）。</p>' : "") + "</div>";
+    return '<div class="title-row"><div><p class="crumbs">ワークフロー ＞ ひな型から作成</p><h2 class="dt-h">契約系サービスの障害通知（架空）</h2></div>' +
+      '<span class="share-chip">' + (c.enabled ? "有効" : "下書き") + "</span></div>" +
+      '<div class="wf">' + flow + form + "</div>" +
+      fine("ワークフローの画面・ひな型名・通知先はすべて架空です。通知できる連携先（Microsoft Teams など）は実機で確認します。");
+  }
+
+  /* ---------- 場面7：テックタッチ管理画面（イメージ・架空） ---------- */
+  function adminWindow(c) {
+    var nav = [["home", "ホーム"], ["guide", "ガイド"], ["chart", "分析"], ["cog", "設定"]].map(function (n, i) {
+      return '<span class="dock-item' + (i === 2 ? " active" : "") + '">' + svg(n[0]) + '<span class="dl">' + n[1] + "</span></span>";
+    }).join("");
+    return '<div class="window"><div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>テックタッチ 管理画面（イメージ・架空）　実際の画面とは異なります</span></div>' +
+      '<div class="dt has-overlay tt-admin"><nav class="dock" aria-label="管理画面のメニュー（架空）"><div class="dock-group">' + nav + "</div>" +
+      '<div class="dock-spacer"></div><div class="dock-group"><span class="dock-item"><span class="avatar">' + CH[7].av + '</span><span class="dl">' + CH[7].who + "</span></span></div></nav>" +
+      '<div class="dt-app"><div class="appheader"><div class="ah-left"><span class="app-icon tt" aria-hidden="true">' + svg("chart") + '</span><span class="app-name">分析</span>' +
+      '<div class="ah-nav" aria-hidden="true"><span class="active">ガイドの利用状況</span></div></div><span class="dt-look-btn" aria-hidden="true">期間：今週</span></div>' +
+      '<div class="dt-page">' + adminPage(c) + "</div></div>" +
+      '<aside class="overlay note" aria-label="説明用の進行">' + panelHTML() + "</aside></div></div>";
+  }
+  function adminPage(c) {
+    var rows = AN.map(function (r) {
+      var rate = Math.round(r[4] / r[3] * 100);
+      var name = r[0] === "g3" ? '<span class="tip-anchor" id="w-an-g3"><button type="button" class="row-link" data-id="an-g3">' + r[1] + "</button></span>" : r[1];
+      return '<tr><th scope="row">' + name + "</th><td>" + r[2] + "</td><td>" + r[3] + "</td><td>" + r[4] + '</td><td class="' + (rate < 70 ? "rate-low" : "") + '">' + rate + " %</td><td>" + r[5] + "</td></tr>";
+    }).join("");
+    var h = '<div><p class="crumbs">分析 ＞ ガイドの利用状況</p><h2 class="dt-h">ガイドの利用状況（今週・架空）</h2></div>' +
+      '<div class="kpis"><div class="kpi"><span>ガイドを使った人</span><b>12 人</b></div><div class="kpi"><span>ガイドの開始</span><b>85 回</b></div><div class="kpi"><span>完了</span><b>76 回</b></div></div>' +
+      '<div class="surface" id="an-table"><div class="table-wrap"><table class="dtable num"><thead><tr><th scope="col">ガイド</th><th scope="col">対象の画面（Dynatrace）</th><th scope="col">開始</th><th scope="col">完了</th><th scope="col">完了率</th><th scope="col">平均所要時間</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div></div>";
+    if (c.sel === "g3") {
+      var labels = CH[4].steps.map(function (s) { return s.label; });
+      h += '<div class="surface"><div class="surface-head"><p class="dt-h3">障害の一次確認（社内手順）：ステップごとの完了人数</p>' +
+        (c.edited ? '<span class="share-chip">改訂版 v2 を保存済み</span>' : '<span class="tip-anchor" id="w-an-edit" data-tip-side="right"><button type="button" class="dt-emph" data-id="an-edit"' + (c.editing ? " disabled" : "") + ">ステップ4を編集</button></span>") +
+        '</div><div class="funnel">' + FUNNEL.map(function (n, i) {
+          return '<div class="fn-row' + (i === 3 ? " hot" : "") + '"><span>' + (i + 1) + ". " + labels[i] + (i === 3 ? "（2人が止まる）" : "") + '</span><span class="fn-bar"><i style="width:' + (n / FUNNEL[0] * 100).toFixed(0) + '%"></i></span><span class="cnt">' + n + " 人</span></div>";
+        }).join("") + "</div></div>";
+    }
+    if (c.editing) {
+      h += '<div class="surface edit-card"><p class="dt-h3">ステップ4：関連ログを確認する（編集中）</p>' +
+        '<div class="edit-field"><span class="k">吹き出しの文（いまの内容）</span><span class="v">期間は「問題の開始5分前から」に設定します</span></div>' +
+        '<div class="edit-field new"><span class="k">追加する説明（ツールチップ）</span><span class="v">発生直前の変化を見るため、開始の5分前からにします。発生期間だけでは、09:58からの警告を見落とします（社内手順・架空）。</span></div>' +
+        '<div class="row-actions"><span class="tip-anchor" id="w-an-save"><button type="button" class="dt-accent" data-id="an-save">改訂版を保存</button></span></div></div>';
+    }
+    if (c.edited) {
+      var v = c.vals;
+      h += '<div class="surface"><p class="dt-h3">改訂版 v2 の公開</p><div class="edit-grid">' +
+        '<div class="dt-field block" id="f-an-owner"><label for="an-owner">ガイドの持ち主</label>' +
+        sel("an-owner", "an-owner", [["", "選択してください"], ["suzuki", "鈴木（専門家・手順の持ち主）"], ["takahashi", "高橋（推進担当）"]], v["an-owner"], c.published) + "</div>" +
+        '<div class="dt-field block" id="f-an-review"><label for="an-review">次の見直し</label>' +
+        sel("an-review", "an-review", [["", "選択してください"], ["3m", "3か月後（Dynatraceの画面更新の点検と合わせる）"], ["none", "決めない"]], v["an-review"], c.published) + "</div>" +
+        '<div style="display:flex;align-items:end"><span class="tip-anchor" id="w-an-publish"><button type="button" class="dt-accent" data-id="an-publish"' + (c.published ? " disabled" : "") + ">公開する</button></span></div></div>" +
+        (c.published ? '<p class="done-msg" role="status">改訂版 v2 を公開しました（持ち主：鈴木、次の見直し：3か月後）。デモのため実際には公開しません。</p>' : "") + "</div>";
+    }
+    return h + fine("管理画面・数値はすべて架空のイメージです。効果を示すものではありません。実際に見られる指標は、テックタッチの分析機能で確認します。");
+  }
+
+  /* ---------- テックタッチのパネル ---------- */
+  var PILL = { tt: "テックタッチ", hub: "テックタッチ＋AI Hub", note: "説明用" };
+  function stepsList(steps, now) {
+    return '<ol class="steps compact">' + steps.map(function (g, i) {
+      var n = i + 1;
+      return '<li class="' + (n < now ? "done" : n === now ? "now" : "") + '">' + g.label + "</li>";
+    }).join("") + "</ol>";
+  }
+  function msgs() {
+    return (S.warn ? '<p class="alert" role="alert">' + S.warn + "</p>" : "") + (S.info ? '<p class="info" role="status">' + S.info + "</p>" : "");
+  }
+  function actions() {
+    return '<div class="actions"><button type="button" class="btn btn-ghost" data-act="back"' + (hist.length ? "" : " disabled") + ">戻る</button>" +
+      '<button type="button" class="btn btn-primary" data-act="next" id="panel-next">' + primary().label + "</button></div>";
+  }
+  function panelHTML() {
+    var d = D(), c = C(), kind = d.kind || "tt";
+    var head = '<div class="ov-head"><span class="ov-pill">' + PILL[kind] + '</span><span class="ov-kicker">' + d.kicker + "</span></div>";
+    if (c.step === 0) return head + d.intro(c) + msgs() + actions();
+    if (c.step > d.steps.length) return head + '<h3 class="ov-title">' + d.guide + "</h3>" + stepsList(d.steps, c.step) + d.doneHTML(c) + actions();
+    var st = cur(), h = head + '<h3 class="ov-title">' + d.guide + "</h3>" + stepsList(d.steps, c.step);
+    if (kind === "hub") {
+      h += '<div class="part tt"><p class="part-head"><span>テックタッチ 操作ガイド</span><span class="num">' + c.step + " / " + d.steps.length + "</span></p><p>" + val(st.now, c) + "</p></div>" + msgs();
+      var hub = val(st.hub, c);
+      if (hub) h += '<div class="part hub"><p class="part-head"><span>AI Hub（例文）</span></p><p>' + hub + "</p></div>";
+      return h + '<p class="refs">実環境の項目名やデータ構造に合わせた説明・検証が必要です。</p>' + actions();
+    }
+    return h + '<p class="now-box">' + val(st.now, c) + "</p>" + msgs() + (st.why ? '<p class="soft">' + val(st.why, c) + "</p>" : "") + actions();
+  }
+
+  /* ---------- 振り返り ---------- */
+  function summaryHTML() {
+    var any = S.stats.steps > 0;
+    var stat = function (v, label) { return '<div class="stat"><b>' + (any ? v : "—") + "</b><span>" + label + "</span></div>"; };
+    var tl = function (t, title, desc) { return '<li><span class="t">' + t + '</span><span class="rail" aria-hidden="true"></span><div class="body"><b>' + title + "</b><span>" + desc + "</span></div></li>"; };
+    return '<div class="summary">' +
+      '<section class="sum-card"><h2>今日の業務の流れ（架空）</h2><ol class="tl">' +
+      tl("9:00", "場面1　新任者の立ち上がり", "役割を選んでツアー5ステップ。チームのダッシュボードと担当範囲を覚える") +
+      tl("9:15", "場面2　毎朝の確認", "3項目を社内の基準（架空）で確認し、同じ形で記録") +
+      tl("10:16", "場面3　問い合わせ対応", "対象と時間帯をそろえ、平均応答時間 420 ms → 980 ms を確認") +
+      tl("10:18", "場面4　障害の一次対応", "影響範囲・根本原因の候補・関連ログを社内手順の順番で確認し、連絡") +
+      tl("11:00", "場面5　原因の深掘り", "推薦された調査ノートブック、Dynatrace Assist、AI Hub（構想）で専門家と協働") +
+      tl("14:05", "場面6　再発防止", "ひな型からダッシュボードと通知のワークフローを作り、確認を受けて使い始める") +
+      tl("金曜", "場面7　定着の見える化", "止まる手順を見つけて説明を足し、持ち主と見直し日を決めて改訂") +
+      "</ol></section>" +
+      '<section class="sum-card"><h2>このデモで、テックタッチが手当てした場面</h2><div class="stats">' +
+      stat(S.stats.steps, "ガイドで進めたステップ") + stat(S.stats.fixes, "選び直し・順番・入力の案内") + stat(S.stats.notes, "定義・基準・社内手順の表示") + "</div>" +
+      '<p class="sum-note">' + (any ? "このデモを操作した回数です。効果の数値ではありません。" : "場面を順に進めると、操作した回数を数えます。効果の数値ではありません。") + "</p>" +
+      '<h2>確かめ方（案）</h2><ul class="sum-list"><li>自力完了率：依頼せずに作業を終えられた割合</li><li>所要時間：作業の開始から完了まで</li><li>依頼件数：専門家への問い合わせの件数</li><li>再実行：同じ作業を、次回も自力でできるか</li></ul>' +
+      '<p class="sum-note">数値の目標は、現状を伺ってから設定します。ガイドの完了率だけでは判断せず、作業の結果で確かめます。</p></section>' +
+      '<section class="sum-card wide"><h2>本日伺いたいこと</h2><ul class="sum-list">' +
+      [1, 2, 3, 4, 5, 6, 7].map(function (n) { return "<li>" + CH[n].ask + "</li>"; }).join("") + "</ul></section>" +
+      '<section class="sum-card wide"><h2>最初の一歩</h2><p class="flow3"><span>対象を一つ決める</span><span class="arrow">→</span><span>実画面で確かめる</span><span class="arrow">→</span><span>変化を測る</span></p>' +
+      '<p class="sum-note">画面・サービス名・手順・数値は架空です。御社環境での実画面の確認は、導入時の通常手順として実施します。</p></section></div>';
+  }
+
+  /* ---------- 吹き出し ---------- */
+  function point(target, text, warn, sub) {
+    var noteKind = D().kind === "note";
+    target.classList.add("is-target");
+    if (noteKind) target.classList.add("note-target");
+    var side = target.getAttribute("data-tip-side");
+    var b = document.createElement("div");
+    b.className = "balloon" + (warn ? " warn" : "") + (noteKind && !warn ? " note" : "") + (side === "right" ? " r" : side === "s" ? " s" : "");
+    b.textContent = text;
+    if (sub) { var sm = document.createElement("small"); sm.textContent = sub; b.appendChild(sm); }
+    target.appendChild(b);
+    keepInside(b, side === "right" ? "r" : side === "s" ? "s" : "l");
+  }
+  // 吹き出し・ツールチップが、画面の端やテックタッチのパネルに重ならないよう内側にずらす
+  function rightLimit(el) {
+    var lim = document.documentElement.clientWidth - 8, pg = el.closest(".dt-page");
+    if (pg) { var pr = pg.getBoundingClientRect(); lim = Math.min(lim, pr.right - parseFloat(getComputedStyle(pg).paddingRight) + 8); }
+    return lim;
+  }
+  function keepInside(el, mode) {
+    var vw = document.documentElement.clientWidth, pad = 8, r = el.getBoundingClientRect(), lim = rightLimit(el);
+    if (mode === "s") {
+      if (r.right > lim) { el.classList.remove("s"); keepInside(el, "l"); }
+      return;
+    }
+    if (mode === "l" && r.right > lim) {
+      var shift = Math.min(r.right - lim, Math.max(0, r.left - pad));
+      el.style.left = (parseFloat(getComputedStyle(el).left) - shift) + "px";
+      el.style.setProperty("--ax", Math.min(20 + shift, r.width - 24) + "px");
+    } else if (mode === "r" && r.left < pad) {
+      var back = Math.min(pad - r.left, Math.max(0, vw - pad - r.right));
+      el.style.right = (parseFloat(getComputedStyle(el).right) - back) + "px";
+      el.style.setProperty("--axr", Math.min(20 + back, r.width - 24) + "px");
+    }
+  }
+  function guideTarget() {
+    var st = cur(), c = C();
+    if (S.ch === 8 || !st) return null;
+    var s = val(st.target, c);
+    if (!s) return null;
+    var warn = !!S.warn;
+    return { sel: s, tip: warn && st.redo ? val(st.redo, c) : val(st.tip, c), sub: warn ? "" : val(st.sub, c), warn: warn };
+  }
+
+  /* ---------- 描画 ---------- */
+  function renderJourney() {
+    $("#journey").innerHTML = JOURNEY.map(function (j) {
+      var st = j[0] < S.ch ? "done" : j[0] === S.ch ? "now" : "todo";
+      return '<button type="button" class="jn ' + st + '" data-act="chapter" data-arg="' + j[0] + '"' + (st === "now" ? ' aria-current="step"' : "") + ">" +
+        '<span class="no">' + (st === "done" ? "✓" : j[0]) + '</span><span class="jl">' + j[1] + '</span><span class="jt">' + j[2] + "</span></button>";
+    }).join("");
+  }
+  function renderStory() {
+    var d = D();
+    $("#story").innerHTML = '<p class="story-time">' + d.time + "<small>" + d.timeSub + "</small></p><h1>" + d.title + '</h1><p class="story-text">' + d.text + "</p>" +
+      '<p class="story-tags">' + d.tags.map(function (t) { return "<span>" + t + "</span>"; }).join("") + "</p>";
+  }
+  function renderStage() {
+    var st = $("#stage"), d = D(), c = C();
+    if (S.ch === 8) { st.innerHTML = summaryHTML(); return; }
+    if (S.ch === 7) { st.innerHTML = adminWindow(c); return; }
+    st.innerHTML = '<div class="window"><div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>監視画面（架空）　Dynatraceの画面イメージを踏襲</span></div>' +
+      '<div class="dt has-overlay"><nav class="dock" aria-label="Dock（架空）">' + dockHTML(c) + "</nav>" +
+      '<div class="dt-app">' + appHeader(c) + '<div class="dt-page">' + chatHTML(c) + pageHTML(c) + "</div></div>" +
+      '<aside class="overlay' + (d.kind === "hub" ? " hub" : "") + '" aria-label="テックタッチのガイド">' + panelHTML() + "</aside>" +
+      (d.modal ? d.modal(c) : "") + "</div></div>";
+  }
+  function render() {
+    var active = document.activeElement, focusId = active && active.id;
+    renderJourney();
+    renderStory();
+    renderStage();
+    $("#ask").hidden = S.ch === 8;
+    $("#ask-text").textContent = D().ask;
+    $$("#notes [data-for]").forEach(function (ul) { ul.hidden = ul.getAttribute("data-for") !== String(S.ch); });
+    var t = guideTarget(), el = t && $(t.sel);
+    if (el) point(el, t.tip, t.warn, t.sub);
+    $$(".tt-tip").forEach(function (tt) { keepInside(tt, "l"); });
+    if (focusId) { var f = document.getElementById(focusId); if (f && f !== document.activeElement) { try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); } } }
+    if (pendingTop) { window.scrollTo(0, 0); pendingTop = false; }
+    try { history.replaceState(null, "", "#s" + S.ch); } catch (e) { /* 表示には影響なし */ }
+  }
+
+  /* ---------- 入力 ---------- */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("[data-act]");
+    if (a) { if (!a.disabled) act(a.getAttribute("data-act"), a.getAttribute("data-arg")); return; }
+    var q = e.target.closest("[data-tip]");
+    if (q) { act("tip", q.getAttribute("data-tip")); return; }
+    var el = e.target.closest("[data-id]");
+    if (!el || el.disabled || el.tagName === "SELECT") return;
+    act("click", el.getAttribute("data-id"));
+  });
+  document.addEventListener("change", function (e) {
+    var el = e.target.closest("select[data-id]");
+    if (!el) return;
+    act("pick", el.getAttribute("data-id"), el.value);
+  });
+  function toggleNotes() {
+    var n = $("#notes"), btn = $("#notes-btn");
+    n.hidden = !n.hidden;
+    btn.setAttribute("aria-pressed", String(!n.hidden));
+  }
+  $("#notes-btn").addEventListener("click", toggleNotes);
+  $("#reset-btn").addEventListener("click", function () { goChapter(S.ch); });
+
+  var THEME_KEY = "dt-tt-full-demo-theme";
+  var themes = ["", "light", "dark"], labels = { "": "自動", light: "ライト", dark: "ダーク" };
+  var theme = "";
+  function applyTheme(t, persist) {
+    theme = t;
+    if (t) document.documentElement.setAttribute("data-theme", t);
+    else if (persist) document.documentElement.removeAttribute("data-theme");
+    $("#theme-btn").textContent = "表示：" + labels[t];
+    if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* 保存できなくても表示は切り替わる */ } }
+  }
+  try { var saved = localStorage.getItem(THEME_KEY); if (saved === "light" || saved === "dark") applyTheme(saved, false); } catch (e) { /* 既定のまま */ }
+  $("#theme-btn").addEventListener("click", function () { applyTheme(themes[(themes.indexOf(theme) + 1) % themes.length], true); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var tag = (e.target && e.target.tagName || "").toLowerCase();
+    if (tag === "select" || tag === "input" || tag === "textarea") return;
+    if (e.key === "ArrowRight") { act("next"); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { act("back"); e.preventDefault(); }
+    else if (e.key >= "1" && e.key <= "8") goChapter(+e.key);
+    else if (e.key === "n" || e.key === "N") toggleNotes();
+    else if (e.key === "r" || e.key === "R") goChapter(S.ch);
+  });
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 150); });
+
+  var m = /^#s([1-8])$/.exec(location.hash || "");
+  goChapter(m ? +m[1] : 1);
+})();
+</script>
+<!-- fragment:body:end -->
+</body>
+</html>
