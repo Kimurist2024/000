@@ -7,6 +7,7 @@ Splunk Cloud Platform＋Splunk Security Essentials（SSE）でSIEM（SOC）を�
 - `data/demo_auth_events.csv`：架空の認証ログ72件（ケースA〜D）
 - `spl/`：Q0〜Q5と、教材用の「不十分な例」
 - `aihub/SOC_KNOWLEDGE_FOR_AIHUB.md`：AI Hubに登録する架空のナレッジKB01〜KB05と、プロンプトP1〜P4
+- `mock/SOC_demo_clickthrough.html`：9場面の対話型モック（GPT版を修正）
 - `verify/simulate_spl.py`：CSVに対してQ0〜Q4と「不十分な例」の判定をPythonで再現し、期待値と一致するかを確かめるスクリプト
 
 ## 使う順番
@@ -31,7 +32,7 @@ Q0〜Q4と「不十分な例」の期待値が、CSVと一致することを確�
 
 ## 画面モック
 
-画面の流れを示すHTMLのイメージデモは、このフォルダにはまだ含まれていません（`dynatrace-techtouch-full-demo` と同じ作りで作る予定）。
+`mock/SOC_demo_clickthrough.html` は、ローカルのブラウザで開ける9場面の対話型モックです（GPT版1.0をシナリオ1.1に合わせて修正）。実際のSplunk・AI Hub・テックタッチとは通信していません。画面のデザインはSplunk Webを踏襲していません。Splunk Webの画面イメージを踏襲したイメージデモ（`dynatrace-techtouch-full-demo` と同じ作り）は、別途作ります。
 
 ## セキュリティ
 
@@ -42,4 +43,4 @@ Q0〜Q4と「不十分な例」の期待値が、CSVと一致することを確�
 ## 版
 
 - 1.0（2026-10-08）：GPTで作成した初版。
-- 1.1（2026-10-08）：出典を一つずつ確認し、確認できなかったものを差し替え。CSV・SPL・ナレッジを再作成し、期待値を検算。先に確かめること、想定問答、AI機能の役割分担、20分版を追加。変更点は `scenario.md` の付録A。
+- 1.1（2026-10-08）：出典を一つずつ確認し、確認できなかったものを差し替え。CSV・SPL・ナレッジを再作成し、期待値を検算。先に確かめること、想定問答、AI機能の役割分担、20分版を追加。GPT版のモックとナレッジを取り込み、MFAの値（approved／failed／not_applicable）をそろえた。変更点は `scenario.md` の付録A。
