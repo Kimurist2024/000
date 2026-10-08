@@ -852,6 +852,19 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
   .tt-modal { padding-top: 40px; }
 }
 .tt-modal-card > .actions { position: sticky; bottom: -18px; margin: 0 -20px -18px; padding: 10px 20px 14px; background: var(--dt-surface); border-radius: 0 0 12px 12px; }
+/* 場面4・5：問題へのコメント（Dynatraceの機能・イメージ） */
+#c4-comments { display: grid; gap: 10px; }
+.cm-box { border: 1px solid var(--dt-border, rgba(127,127,127,.35)); border-radius: 9px; padding: 10px 12px; display: grid; gap: 4px; background: var(--dt-surface); }
+.cm-box.empty { color: var(--dt-text-sub); font-size: 14px; min-height: 44px; }
+.cm-l { margin: 0; font-size: 14px; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 0 10px; align-items: baseline; }
+.cm-l .k { flex: 0 0 auto; min-width: 5.5em; color: var(--dt-text-sub); font-size: 13px; }
+.cm-fields { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: 10px; margin-top: 6px; }
+.cm-fields select { min-width: 0; max-width: 100%; }
+.cm-item { display: grid; gap: 4px; border-left: 3px solid var(--dt-primary); padding: 2px 0 2px 12px; }
+.cm-who { margin: 0 0 4px; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.cm-who .avatar { width: 24px; height: 24px; font-size: 12px; }
+#c4-explain p { margin: 0; font-size: 14px; }
+@media (max-width: 700px) { .cm-fields { grid-template-columns: minmax(0, 1fr); } }
 </style>
 <!-- fragment:head:end -->
 </head>
@@ -911,14 +924,15 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
           <li>問いかけ：「どこで迷いますか」</li>
         </ul>
         <ul data-for="4" hidden>
-          <li>【運用者】目安3分。10/1のデモ②に「根本原因の候補」と「SREへの引き継ぎ」を加えた5ステップです。</li>
-          <li>話すこと：根本原因の分析はDynatraceの機能です。テックタッチは、社内手順の順番・判断の基準・連絡と引き継ぎの形をそろえ、原因は断定しません。</li>
+          <li>【運用者】目安3分。10/1のデモ②に「Explain」「根本原因」「コメントでの引き継ぎ」を加えた5ステップです。</li>
+          <li>話すこと：要約（Explain）・根本原因の分析・通知のワークフロー・コメントはDynatraceの機能です。テックタッチは、社内手順の順番と、社内優先度・連絡の判断・引き継ぎの書き方という会社固有のルールだけを案内します。</li>
+          <li>見せ場：ステップ5の入力チェック。優先度に「高」、連絡に「運用チームにも手動でもう一度通知」を選ぶと、ガイドが止めます（ワークフローが10:03に通知済みのため重複しない。社内ルール・架空）。間違いを入力の時点で止める場面です。</li>
           <li>影響範囲の前に「ログ」や「根本原因」を開くと、社内手順の順番を案内します（構想の表現）。</li>
           <li>15分（SRE中心）では、ステップ5の引き継ぎだけを見せます（1分30秒）。</li>
           <li>問いかけ：「人によって手順や判断がばらつくのはどこですか」</li>
         </ul>
         <ul data-for="5" hidden>
-          <li>【SRE】目安2分30秒。運用者の引き継ぎを受けて、SREが深掘りします。記録がそろっているので聞き直しません。</li>
+          <li>【SRE】目安2分30秒。運用者がDynatraceの問題に残した引き継ぎのコメントを読んで、SREが深掘りします。記録がそろっているので聞き直しません。</li>
           <li>AIの分担を言い分けます：根本原因の分析・調査ガイドの推薦・DQLの作成と説明（Dynatrace Assist）はDynatraceの機能。AI Hub（構想）は社内の過去事例など、社内資料の側だけを補います。</li>
           <li>見せ場：最後に着眼点をノートブックに書き、「全員（閲覧のみ）」に共有。似た問題のとき、運用者の画面にも推薦される想定です（条件は実機で確認）。</li>
           <li>Dynatrace Assistの回答は事前に確かめた例で見せます（実機）。</li>
@@ -938,7 +952,8 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
         </ul>
         <ul data-for="8" hidden>
           <li>【SRE】目安2分。テックタッチの管理画面（イメージ・架空）で、SREがガイドの効き目を確かめて直します。</li>
-          <li>見せ場：止まっているステップ4に、場面5の着眼点を足す → 持ち主と見直し日を決めて公開 → フローティングバナーで改訂を知らせる。</li>
+          <li>見せ場：止まっているステップ5（連絡の判断）に社内ルールの説明を足す → 持ち主と見直し日を決めて公開 → フローティングバナーで改訂を知らせる。</li>
+          <li>話すこと：技術の着眼点（ログは開始5分前から見る、など）は、場面5でDynatraceの調査ガイドに残しています。テックタッチには会社のルールだけを書き、二重に管理しません。</li>
           <li>話すこと：完了率だけで自走を判断しません。Dynatraceの画面更新に合わせて点検します。動かなくなったガイドを見つける機能（AIリカバリー）は提供状況を確認中のため、聞かれたら「確認してご案内します」と答えます。</li>
           <li>数値はすべて架空で、効果を示すものではありません。推進担当を別に置く場合は、この場面を推進担当の場面にできます。</li>
           <li>問いかけ：「定着したかどうかを、どの指標で判断しますか。ガイドを直す役割は、どなたが担う想定ですか」</li>
@@ -951,7 +966,7 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
         <ul>
           <li>冒頭で「イメージデモです。画面・人物・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません」とお伝えする。</li>
           <li>20分版：全場面を通す（約18分45秒）。15分（運用者中心）：場面5・7・8を口頭0:30ずつ（約13分45秒）。15分（SRE中心）：場面1・3・6を口頭0:30ずつ、場面2は省略、場面4は引き継ぎだけ（約11分15秒＋質疑）。</li>
-          <li>Dynatrace＝観測、テックタッチ＝介入。Dynatrace内で完結する支援（根本原因の分析、調査ガイドの推薦、Dynatrace Assist、通知）は、Dynatraceの機能として先に見せます。</li>
+          <li>Dynatraceでできることは二重化しない。Dynatrace内で完結する支援（Explain、根本原因の分析、調査ガイドの推薦、Dynatrace Assist、通知のワークフロー、コメント）は、Dynatraceの機能として先に見せます。技術の手順はDynatraceの調査ガイドに、会社固有のルール（社内優先度・連絡の判断・書き方）はテックタッチに置きます。</li>
           <li>削減率などの数値はお約束しない。確かめ方は自力完了率・所要時間・依頼件数・再実行。</li>
         </ul>
       </div>
@@ -1335,57 +1350,62 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
     nextLabel: "場面4へ進む"
   };
 
+  var ESC_OPT = { notified: "通知済み（ワークフロー）。業務部門の窓口にだけ連絡する", resend: "運用チームにも手動でもう一度通知する", none: "連絡しない" };
   CH[4] = {
     role: "ops", time: "10:18", timeSub: "問題を検知", av: "佐", who: "佐藤（架空）",
     title: "障害の一次対応を社内手順どおりに進め、SREに引き継ぐ",
-    text: "同じ時間帯に、Dynatraceが問題を検知していました。Dynatraceが示す影響範囲と根本原因の候補を、社内手順（架空）の順番で確認し、関係者に連絡します。SREには、一次確認の記録を添えて引き継ぎます。",
+    text: "同じ時間帯に、Dynatraceが問題を検知していました。まずDynatraceのExplain（要約）と分析を確認します。テックタッチは、社内手順の順番と、社内優先度・連絡の判断・引き継ぎの書き方といった会社固有のルールだけを案内します。引き継ぎは、Dynatraceの問題へのコメントに残します。",
     tags: ["場面4", "運用者の視点", "デモ②の発展", "仮説4・5　実務で再現できない／学びを再利用できない", "目安 3分"],
     ask: "一次対応で、人によって手順や判断がばらつくのはどこですか？",
     kind: "tt", kicker: "ガイド（案）・社内手順（架空）", guide: "障害の一次確認と引き継ぎ（社内手順）",
-    init: function () { return { step: 0, app: "problems", tab: "overview", popup: true, modal: false, vals: { "c4-period": "during" } }; },
+    init: function () { return { step: 0, app: "problems", tab: "overview", popup: true, explained: false, tpl: false, posted: false, vals: { "c4-period": "during", "c4-prio": "", "c4-esc": "" } }; },
     startIds: ["m-start"],
     onStart: function (c) { c.popup = false; c.tab = "overview"; note(); },
     intro: function () { return '<h3 class="ov-title">障害の一次確認と引き継ぎ（社内手順）</h3>' + stepsList(CH[4].steps, 0) + '<p class="now-box">ポップアップの「ガイドを開始」から始めます。</p>'; },
     free: function (c, ev) {
       if (ev.kind !== "click") return false;
       if (ev.id.indexOf("tab-") === 0) { c.tab = ev.id.slice(4); return c.step === 0; }
-      if (ev.id === "m-close") { c.modal = false; return true; }
-      if (ev.id === "c4-contact" && c.step >= 1 && c.step < 5) { fix("社内手順では、連絡と引き継ぎの前に、影響範囲・根本原因の候補・関連ログを確認します。"); return true; }
+      if ((ev.id === "c4-tpl" || ev.id === "c4-post") && c.step >= 1 && c.step < 5) { fix("社内手順では、引き継ぎを書く前に、影響範囲・根本原因・関連ログを確認します。"); return true; }
       return false;
     },
     steps: [
-      { label: "概要を確認する", target: function (c) { return c.tab === "overview" ? "#c4-kv" : "#w-tab-overview"; },
-        tip: function (c) { return c.tab === "overview" ? "ステップ1／5：問題の概要を確認します" : "ステップ1／5：「概要」タブに戻ります"; }, sub: "何が・いつから・どこで起きているか",
-        now: "何が・いつから・どこで起きているかを確認します。", why: "先にそろえると、以降の確認がぶれません。", btn: "確認した",
+      { label: "Explainと概要を確認する", target: function (c) { return !c.explained ? "#w-explain" : c.tab === "overview" ? "#c4-kv" : "#w-tab-overview"; },
+        tip: function (c) { return !c.explained ? "ステップ1／5：まずDynatraceのExplainで要約を見ます" : "ステップ1／5：問題の概要を確認します"; },
+        sub: function (c) { return !c.explained ? "何が起きたか・なぜか・修正の手順（Dynatraceの機能）" : "何が・いつから・どこで。通知のワークフローの実行状況も"; },
+        now: function (c) { return !c.explained ? "Dynatraceの「Explain」で、問題の要約を見ます。" : "概要で、影響・根本原因・通知のワークフローの実行状況を確認します。"; },
+        why: "要約と分析はDynatraceの機能です。テックタッチは、この後の社内の判断だけを案内します。",
+        btn: function (c) { return !c.explained ? "Explainを開く" : "確認した"; },
         handle: function (c, ev) {
           if (ev.kind !== "click") return null;
+          if (ev.id === "explain") { c.explained = true; c.tab = "overview"; return "ok"; }
+          if (!c.explained && ev.id.indexOf("tab-") === 0) { c.tab = "overview"; return { wrong: "社内手順では、まずDynatraceのExplainで要約を確認します。" }; }
           if (ev.id === "tab-overview") return "ok";
           if (ev.id === "tab-impact") return "done";
-          if (ev.id === "tab-rc" || ev.id === "tab-logs") return { wrong: "社内手順では、次は「影響範囲」です。連絡の優先度を先に判断します。" };
+          if (ev.id === "tab-rc" || ev.id === "tab-logs") return { wrong: "社内手順では、次は「影響範囲」です。社内優先度を先に判断します。" };
           return null;
         },
-        auto: function (c) { c.tab = "overview"; return "done"; } },
-      { label: "影響範囲と優先度を確認する", target: function (c) { return c.tab !== "impact" ? "#w-tab-impact" : "#w-tip-prio"; },
-        tip: function (c) { return c.tab !== "impact" ? "ステップ2／5：影響範囲を確認します" : "優先度の基準を確認します"; },
+        auto: function (c) { if (!c.explained) { c.explained = true; c.tab = "overview"; return "ok"; } c.tab = "overview"; return "done"; } },
+      { label: "影響範囲と社内優先度を確認する", target: function (c) { return c.tab !== "impact" ? "#w-tab-impact" : "#w-tip-prio"; },
+        tip: function (c) { return c.tab !== "impact" ? "ステップ2／5：影響範囲を確認します" : "社内優先度の基準を確認します"; },
         sub: function (c) { return c.tab !== "impact" ? "「影響範囲」タブを開きます" : "「?」で社内の基準（架空）を表示します"; },
-        now: function (c) { return c.tab !== "impact" ? "「影響範囲」タブで、影響を受けたサービスと範囲を確認します。" : "影響の範囲を社内の基準（架空）に当てはめて、優先度を判断します。"; },
-        why: "影響範囲を先に確かめると、連絡の優先度を判断できます。",
-        btn: function (c) { return c.tab !== "impact" ? "影響範囲を開く" : "優先度の基準を表示"; },
+        now: function (c) { return c.tab !== "impact" ? "「影響範囲」タブで、影響を受けたサービスと範囲を確認します。" : "影響の範囲を社内の基準（架空）に当てはめて、社内優先度を判断します。"; },
+        why: "Dynatraceの重大度とは別に、社内優先度は会社のルールで決めます（社内基準・架空）。",
+        btn: function (c) { return c.tab !== "impact" ? "影響範囲を開く" : "社内優先度の基準を表示"; },
         handle: function (c, ev) {
           if (ev.kind === "tip" && ev.id === "prio" && c.tab === "impact") return "done";
           if (ev.kind === "click" && ev.id === "tab-impact") return "ok";
-          if (ev.kind === "click" && (ev.id === "tab-rc" || ev.id === "tab-logs")) return { wrong: "社内手順では、原因やログの前に影響範囲を確かめ、連絡の優先度を先に判断します。次は「影響範囲」です。" };
+          if (ev.kind === "click" && (ev.id === "tab-rc" || ev.id === "tab-logs")) return { wrong: "社内手順では、原因やログの前に影響範囲を確かめ、社内優先度を先に判断します。次は「影響範囲」です。" };
           return null;
         },
         auto: function (c) { if (c.tab !== "impact") { c.tab = "impact"; return "ok"; } S.tip = "prio"; note(); return "done"; } },
-      { label: "根本原因の候補を確認する", target: function (c) { return c.tab !== "rc" ? "#w-tab-rc" : "#c4-rc"; },
-        tip: function (c) { return c.tab !== "rc" ? "ステップ3／5：根本原因の候補を確認します" : "Dynatraceが示す候補を確認します"; },
-        sub: function (c) { return c.tab !== "rc" ? "「根本原因」タブを開きます" : "この段階では断定せず、候補として記録します"; },
-        now: function (c) { return c.tab !== "rc" ? "「根本原因」タブで、Dynatraceが示す候補を確認します。" : "根本原因の候補は「契約DB（架空）」です。断定せず、候補として記録します。"; },
-        why: "原因の断定はSREが行います。候補として記録しておくと、引き継ぎを受けたSREが聞き直さずに深掘りできます（社内手順・架空）。",
+      { label: "根本原因を確認する", target: function (c) { return c.tab !== "rc" ? "#w-tab-rc" : "#c4-rc"; },
+        tip: function (c) { return c.tab !== "rc" ? "ステップ3／5：根本原因を確認します" : "Dynatraceが示す根本原因を確認します"; },
+        sub: function (c) { return c.tab !== "rc" ? "「根本原因」タブを開きます" : "社内での確定はSREが行います（社内手順・架空）"; },
+        now: function (c) { return c.tab !== "rc" ? "「根本原因」タブで、Dynatraceの分析を確認します。" : "根本原因は「契約DB（架空）」です。社内での確定はSREに任せます。"; },
+        why: "根本原因の分析はDynatraceの機能です。社内手順では、確定と対策の判断をSREが行います（架空）。",
         btn: function (c) { return c.tab !== "rc" ? "根本原因を開く" : "確認した"; },
         handle: function (c, ev) {
-          if (ev.kind === "click" && ev.id === "tab-logs") return { wrong: "社内手順では、ログの前に、Dynatraceが示す根本原因の候補を確認します。" };
+          if (ev.kind === "click" && ev.id === "tab-logs") return { wrong: "社内手順では、ログの前に、Dynatraceが示す根本原因を確認します。" };
           if (ev.kind === "click" && ev.id === "tab-rc") return "ok";
           return null;
         },
@@ -1395,7 +1415,7 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
         sub: function (c) { return c.tab !== "logs" ? "期間は「問題の開始5分前から」に設定します" : ""; },
         redo: "期間を「問題の開始5分前から」にします",
         now: function (c) { return c.tab !== "logs" ? "「ログ」タブで関連ログを開きます。" : "期間を「問題の開始5分前から」に設定します。"; },
-        why: "問題の開始前後のログを見ると、いつから異常が出ていたかを確かめられます。原因はこの段階では確定しません。",
+        why: "問題の開始前後のログを見ると、いつから異常が出ていたかを確かめられます。実機では、この調べ方はDynatraceの調査ガイドにも書いておきます。",
         btn: function (c) { return c.tab !== "logs" ? "ログを開く" : "期間を設定する"; },
         handle: function (c, ev) {
           if (ev.kind === "click" && ev.id === "tab-logs") return "ok";
@@ -1404,79 +1424,85 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
           return { wrong: ev.value === "during" ? "問題の発生期間だけでは、発生直前の変化を見落とすことがあります。社内手順どおり「問題の開始5分前から」にします。" : "過去 2 時間では範囲が広く、関係の薄いログが混ざります。社内手順どおり「問題の開始5分前から」にします。" };
         },
         auto: function (c) { if (c.tab !== "logs") { c.tab = "logs"; return "ok"; } c.vals["c4-period"] = "5min"; return "done"; } },
-      { label: "連絡し、SREに引き継ぐ", target: function (c) { return c.modal ? null : "#w-c4-contact"; },
-        tip: "ステップ5／5：連絡し、SREに引き継ぎます", sub: "「社内手順で連絡・引き継ぎ」から内容を確認します",
-        now: function (c) { return c.modal ? "優先度・連絡先・伝える内容と、SREへの引き継ぎを確認します。" : "「社内手順で連絡・引き継ぎ」から、社内手順に沿った連絡と引き継ぎの内容を確認します。"; },
-        why: "連絡と引き継ぎの宛先・内容を、担当者によらず同じ形にそろえます。そろった記録が、SREの深掘りを助けます（場面5）。",
-        btn: function (c) { return c.modal ? "内容を確認した" : "社内手順を開く"; },
+      { label: "引き継ぎをコメントに書く",
+        target: function (c) { return !c.tpl ? "#w-c4-tpl" : c.vals["c4-prio"] !== "mid" ? "#f-c4-prio" : c.vals["c4-esc"] !== "notified" ? "#f-c4-esc" : "#w-c4-post"; },
+        tip: function (c) { return !c.tpl ? "ステップ5／5：引き継ぎのテンプレートを入れます" : c.vals["c4-prio"] !== "mid" ? "社内優先度を選びます" : c.vals["c4-esc"] !== "notified" ? "連絡の判断を選びます" : "コメントを投稿します"; },
+        sub: function (c) { return !c.tpl ? "引き継ぎはDynatraceの問題へのコメントに残します" : c.vals["c4-prio"] !== "mid" ? "影響範囲で確認した社内の基準で" : c.vals["c4-esc"] !== "notified" ? "通知のワークフローの実行状況を見て" : "SREの鈴木さん（架空）が、このコメントから深掘りを始めます"; },
+        redo: "選び直します",
+        now: function (c) { return !c.tpl ? "コメント欄に、社内の引き継ぎテンプレートを入れます。" : c.vals["c4-prio"] !== "mid" ? "社内優先度を選びます。" : c.vals["c4-esc"] !== "notified" ? "連絡の判断を選びます。" : "引き継ぎをコメントとして投稿します。"; },
+        why: "Dynatraceの事実（影響・根本原因・通知の状況）に、社内の判断（社内優先度・連絡）を同じ形で足します。空欄や重複通知は、入力の時点で止めます。",
+        btn: function (c) { return !c.tpl ? "テンプレートを入れる" : c.vals["c4-prio"] !== "mid" ? "社内優先度を選ぶ" : c.vals["c4-esc"] !== "notified" ? "連絡の判断を選ぶ" : "コメントを投稿"; },
         handle: function (c, ev) {
-          if (ev.kind !== "click") return null;
-          if (ev.id === "c4-contact") { c.modal = true; note(); return "ok"; }
-          if (ev.id === "m-done") return "done";
+          if (ev.kind === "click" && ev.id === "c4-tpl") { c.tpl = true; note(); return "ok"; }
+          if (ev.kind === "pick" && ev.id === "c4-prio") {
+            if (ev.value === "mid") return "ok";
+            return { wrong: "【入力チェック（案）】影響は「Webからの照会の一部」です。社内の基準では「中」になります（社内基準・架空）。" };
+          }
+          if (ev.kind === "pick" && ev.id === "c4-esc") {
+            if (ev.value === "notified") return "ok";
+            if (ev.value === "resend") return { wrong: "【入力チェック（案）】運用チーム／障害連絡には、Dynatraceのワークフローが10:03に通知済みです。重複して通知しません（社内ルール・架空）。" };
+            return { wrong: "【入力チェック（案）】業務に影響があるため、業務部門の窓口への連絡は人が判断して行います。自動通知の対象外です（社内ルール・架空）。" };
+          }
+          if (ev.kind === "click" && ev.id === "c4-post") {
+            if (c.vals["c4-prio"] === "mid" && c.vals["c4-esc"] === "notified") return "done";
+            return { wrong: "【入力チェック（案）】社内優先度と連絡の判断が空です。選んでから投稿します。" };
+          }
           return null;
         },
-        auto: function (c) { if (!c.modal) { c.modal = true; note(); return "ok"; } return "done"; },
-        after: function (c) { c.modal = false; } }
+        auto: function (c) {
+          if (!c.tpl) { c.tpl = true; note(); return "ok"; }
+          if (c.vals["c4-prio"] !== "mid") { c.vals["c4-prio"] = "mid"; return "ok"; }
+          if (c.vals["c4-esc"] !== "notified") { c.vals["c4-esc"] = "notified"; return "ok"; }
+          return "done";
+        },
+        after: function (c) { c.posted = true; } }
     ],
     doneHTML: function () {
-      return '<p class="now-box">一次確認の5ステップが完了しました。</p>' + recList([
-        ["10:18", "概要を確認（P-0412 応答時間の悪化・進行中）"], ["10:19", "影響範囲を確認（Webからの照会の一部 → 優先度「中」）"],
-        ["10:20", "根本原因の候補を記録（契約DB・未確定）"], ["10:21", "関連ログを確認（09:58から接続待ちの警告）"], ["10:22", "社内手順に沿って連絡（システム運用チーム・業務部門の窓口）"],
-        ["10:22", "SREの鈴木さん（架空）に、一次確認の記録を添えて引き継ぎ"]
+      return '<p class="now-box">一次確認と引き継ぎが完了しました。</p>' + recList([
+        ["10:18", "Explainで要約を確認、概要で通知のワークフローの実行（10:03 成功）を確認"], ["10:19", "影響範囲を確認（Webからの照会の一部 → 社内優先度「中」）"],
+        ["10:20", "根本原因を確認（契約DB。社内での確定はSRE）"], ["10:21", "関連ログを確認（09:58から接続待ちの警告）"],
+        ["10:22", "引き継ぎをDynatraceのコメントに投稿（社内優先度「中」、運用チームへは通知済み、業務部門の窓口に連絡）"]
       ]);
     },
     nextLabel: "場面5へ進む（SRE）",
     modal: function (c) {
-      if (c.popup && c.step === 0) {
-        return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
-          '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ポップアップ（案）</span></div>' +
-          '<h3 class="ov-title" id="m-title">障害の一次確認は、社内手順どおりに進めます</h3>' +
-          "<p>概要 → 影響範囲 → 根本原因の候補 → 関連ログ → 連絡と引き継ぎ、の5つのステップを順番に案内します。所要の目安は約10分です（架空）。</p>" +
-          '<p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。</p>' +
-          '<div class="actions"><button type="button" class="btn btn-primary" data-id="m-start" id="m-start">ガイドを開始</button></div></div></div>';
-      }
-      if (!c.modal) return "";
+      if (!(c.popup && c.step === 0)) return "";
       return '<div class="tt-modal" role="dialog" aria-labelledby="m-title"><div class="tt-modal-card">' +
-        '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ステップ5／5　社内手順（架空）</span></div>' +
-        '<h3 class="ov-title" id="m-title">障害の一次連絡とSREへの引き継ぎ</h3><ol class="proc">' +
-        "<li><b>優先度</b><span>「中」：影響の範囲が「Webからの照会の一部」のため（社内基準・架空）</span></li>" +
-        "<li><b>連絡先</b><span>システム運用チーム、業務部門の窓口（架空）</span></li>" +
-        "<li><b>SREへの引き継ぎ</b><span>鈴木（SRE・架空）に、ステップ1〜4の記録を添える。原因の判断はSREが行う</span></li>" +
-        '<li><b>伝える内容（例）</b><div class="msg">【障害一次連絡】P-0412 応答時間の悪化（10:02〜・進行中）\n・影響：契約照会サービス（架空）、Webからの照会の一部\n・根本原因の候補：契約DB（Dynatraceの分析・未確定）\n・関連ログ：09:58から接続待ちの警告\n・次の連絡：SREが原因を確認したあと</div></li></ol>' +
-        '<p class="refs">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。デモのため送信はしません。</p>' +
-        '<div class="actions"><button type="button" class="btn btn-ghost" data-id="m-close">閉じる</button>' +
-        '<button type="button" class="btn btn-primary" data-id="m-done" id="m-done">内容を確認した</button></div></div></div>';
+        '<div class="ov-head"><span class="ov-pill">テックタッチ</span><span class="ov-kicker">ポップアップ（案）</span></div>' +
+        '<h3 class="ov-title" id="m-title">障害の一次確認は、社内手順どおりに進めます</h3>' +
+        "<p>Explainと概要 → 影響範囲と社内優先度 → 根本原因 → 関連ログ → 引き継ぎ（コメント）、の5つのステップを順番に案内します。所要の目安は約10分です（架空）。</p>" +
+        '<p class="refs">要約・分析・通知はDynatraceの機能です。テックタッチは社内の判断と書き方だけを案内します。社内手順・連絡先は架空です。</p>' +
+        '<div class="actions"><button type="button" class="btn btn-primary" data-id="m-start" id="m-start">ガイドを開始</button></div></div></div>';
     }
   };
 
   CH[5] = {
     role: "sre", time: "10:25", timeSub: "引き継ぎを受ける", av: "鈴", who: "鈴木（架空）",
     title: "運用者からの引き継ぎを受けて、SREが原因を深掘りする",
-    text: "SREの鈴木さん（架空）が、佐藤さんからの引き継ぎを受けます。一次確認の記録がそろっているので、聞き直さずに深掘りに入れます。調査はDynatraceの機能（根本原因の分析、推薦された調査ガイド、DQL、Dynatrace Assist）で進め、社内の過去事例はAI Hub（構想）が補います。最後に、今回の着眼点を調査ガイドに残して全員に共有します。",
+    text: "SREの鈴木さん（架空）が、佐藤さんがDynatraceの問題に残した引き継ぎのコメントを読みます。一次確認の記録が同じ形でそろっているので、聞き直さずに深掘りに入れます。調査はDynatraceの機能（根本原因の分析、推薦された調査ガイド、DQL、Dynatrace Assist）で進め、社内の過去事例はAI Hub（構想）が補います。最後に、今回の着眼点を調査ガイドに残して全員に共有します。",
     tags: ["場面5", "SREの視点", "仮説5　学びを再利用できない", "目安 2分30秒"],
     ask: "障害の深掘りの前に、運用者に聞き直していることは何ですか？",
     kind: "hub", kicker: "SREの深掘り（Dynatraceの機能が中心）", guide: "着眼点を調査ガイドに残して共有する",
-    init: function () { return { step: 0, app: "problems", tab: "overview", chat: "handoff", ran: false, assist: false, added: false, hub: false, memo: false, shared: false, vals: { "nb-time": "", "nb-scope": "", "c4-period": "5min" } }; },
+    init: function () { return { step: 0, app: "problems", tab: "overview", chat: null, ran: false, assist: false, added: false, hub: false, memo: false, shared: false, vals: { "nb-time": "", "nb-scope": "", "c4-period": "5min" } }; },
     startIds: ["g-start"],
     intro: function () {
-      return guideList("SRE向けのガイド", "引き継ぎの記録を確かめてから、Dynatraceの分析と調査ガイドで深掘りします。最後に、今回の着眼点を全員に共有します。",
+      return guideList("SRE向けのガイド", "引き継ぎのコメントを確かめてから、Dynatraceの分析と調査ガイドで深掘りします。最後に、今回の着眼点を全員に共有します。",
         [["着眼点を調査ガイドに残して共有する", "6ステップ・目安10分（架空）", true]]);
     },
     free: function (c, ev) {
       if (ev.kind === "click" && ev.id.indexOf("tab-") === 0) { c.tab = ev.id.slice(4); return c.step === 0; }
-      if (ev.kind === "click" && ev.id === "chat-close" && c.step !== 1) { c.chat = null; return true; }
       return false;
     },
     steps: [
-      { label: "引き継ぎの記録を確かめる", target: function (c) { return c.chat ? "#chat-card" : null; },
-        tip: "① 運用者からの引き継ぎを確かめます", sub: "優先度・根本原因の候補・関連ログがそろっています",
-        now: "佐藤さんからの引き継ぎ（社内チャット・架空）を確かめます。",
-        hub: "場面4で、運用者の一次確認の記録が同じ形にそろっています。SREは聞き直さずに深掘りを始められます。",
-        btn: "記録を確かめた", handle: clickIs("chat-close"), after: function (c) { c.chat = null; } },
-      { label: "根本原因の候補を見る", target: function (c) { return c.tab !== "rc" ? "#w-tab-rc" : "#c4-rc"; },
-        tip: function (c) { return c.tab !== "rc" ? "② 「根本原因」タブを開きます" : "② Dynatraceが示す候補と、影響の伝わり方を見ます"; },
+      { label: "引き継ぎのコメントを確かめる", target: "#c4-comments",
+        tip: "① 運用者の引き継ぎのコメントを確かめます", sub: "Dynatraceの問題へのコメント（10:22）",
+        now: "佐藤さんがDynatraceの問題に残した引き継ぎのコメントを確かめます。",
+        hub: "場面4で、運用者が社内のテンプレートどおりにコメントを残しています。社内優先度・根本原因・関連ログ・通知の状況がそろっているので、SREは聞き直さずに深掘りを始められます。",
+        btn: "コメントを確かめた", handle: function () { return null; } },
+      { label: "根本原因を見る", target: function (c) { return c.tab !== "rc" ? "#w-tab-rc" : "#c4-rc"; },
+        tip: function (c) { return c.tab !== "rc" ? "② 「根本原因」タブを開きます" : "② Dynatraceが示す根本原因と、影響の伝わり方を見ます"; },
         sub: function (c) { return c.tab !== "rc" ? "" : "分析はDynatraceの機能。判断はSREが行います"; },
-        now: function (c) { return c.tab !== "rc" ? "「根本原因」タブで、Dynatraceの分析を見ます。" : "候補は契約DB（架空）。接続待ちの増加が、契約照会サービスに伝わっています。"; },
+        now: function (c) { return c.tab !== "rc" ? "「根本原因」タブで、Dynatraceの分析を見ます。" : "根本原因は契約DB（架空）。接続待ちの増加が、契約照会サービスに伝わっています。"; },
         hub: "根本原因の分析はDynatrace（Dynatrace Intelligence）の機能です。テックタッチとAI Hubは、分析そのものには関わりません。",
         btn: function (c) { return c.tab !== "rc" ? "根本原因を開く" : "確認した"; },
         handle: function (c, ev) { return ev.kind === "click" && ev.id === "tab-rc" ? "ok" : null; },
@@ -1572,7 +1598,7 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
     ],
     doneHTML: function () {
       return '<p class="now-box">着眼点を調査ガイドに残し、全員に共有しました。</p>' + recList([
-        ["10:25", "引き継ぎの記録を確認（聞き直しなし）"], ["10:27", "根本原因の候補（契約DB）を確認"],
+        ["10:25", "引き継ぎのコメントを確認（聞き直しなし）"], ["10:27", "根本原因（契約DB）を確認"],
         ["10:30", "推薦された調査ガイドを実行（09:58から警告が増加）"], ["10:34", "Dynatrace Assist で1分ごとの集計を追加"],
         ["10:38", "過去事例（AI Hub・例文）と見立て：接続数の上限"], ["10:40", "着眼点を追記し、全員（閲覧のみ）に共有"]
       ]);
@@ -1770,12 +1796,12 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
     ["g5", "ダッシュボードをひな型から作る", "ダッシュボード", 3, 3, "9分"],
     ["g6", "通知ワークフローを社内基準で作る（全チーム）", "ワークフロー", 4, 4, "8分"]
   ];
-  var FUNNEL = [7, 7, 6, 4, 4];
+  var FUNNEL = [7, 7, 7, 6, 4];
 
   CH[8] = {
     role: "sre", time: "金曜 17:00", timeSub: "週次の振り返り", av: "鈴", who: "鈴木（架空）",
-    title: "着眼点をガイドにして配り、効き目を確かめて直す",
-    text: "SREの鈴木さん（架空）が、テックタッチの管理画面で今週のガイドの使われ方を確かめます。場面1〜4で運用者が使ったガイドは、SREがここで作り、直しているものです。止まっているステップに場面5の着眼点を足し、持ち主と見直し日を決めて公開し、改訂を運用者に知らせます。",
+    title: "社内ルールのガイドを、使われ方を見て直す",
+    text: "SREの鈴木さん（架空）が、テックタッチの管理画面で今週のガイドの使われ方を確かめます。止まっていたのは、引き継ぎの「連絡の判断」でした。社内ルールの説明を足し、持ち主と見直し日を決めて公開し、改訂を運用者に知らせます。技術の着眼点（ログは開始5分前から見る、など）は、場面5でDynatraceの調査ガイドに残してあり、テックタッチには重ねて書きません。",
     tags: ["場面8", "SREの視点", "仮説5　学びを再利用できない", "目安 2分"],
     ask: "定着したかどうかを、どの指標で判断しますか？ガイドを直す役割は、どなたが担う想定ですか？",
     kind: "note", kicker: "説明用の進行", guide: "今週の振り返り（SRE）",
@@ -1790,12 +1816,12 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
         now: "ガイドごとの開始・完了・所要時間（架空）を見て、完了率の低い「障害の一次確認と引き継ぎ」を開きます。",
         why: "完了率だけでなく、所要時間と、社内の依頼記録（依頼件数）も合わせて見ます。", btn: "ガイドを開く",
         handle: clickIs("an-g4"), after: function (c) { c.sel = "g4"; } },
-      { label: "止まるステップに着眼点を足す", target: function (c) { return c.editing ? "#w-an-save" : "#w-an-edit"; },
-        tip: function (c) { return c.editing ? "② 改訂版を保存します" : "② ステップ4を編集します"; },
-        sub: function (c) { return c.editing ? "" : "関連ログの期間で止まる人が多いため"; },
-        now: function (c) { return c.editing ? "場面5で残した着眼点を説明に足して、改訂版を保存します。" : "ステップ4（関連ログの期間）で止まる人が多いため、このステップを編集します。"; },
-        why: "SREの着眼点が、運用者の画面の説明になります。画面の上の説明は、ノーコードでSREが自分で直せます。",
-        btn: function (c) { return c.editing ? "改訂版を保存" : "ステップ4を編集"; },
+      { label: "止まるステップに社内ルールを足す", target: function (c) { return c.editing ? "#w-an-save" : "#w-an-edit"; },
+        tip: function (c) { return c.editing ? "② 改訂版を保存します" : "② ステップ5を編集します"; },
+        sub: function (c) { return c.editing ? "" : "連絡の判断で止まる人が多いため"; },
+        now: function (c) { return c.editing ? "社内ルール（通知済みなら再通知しない、業務部門の窓口は人が判断）を説明に足して、改訂版を保存します。" : "ステップ5（引き継ぎ・連絡の判断）で止まる人が多いため、このステップを編集します。"; },
+        why: "テックタッチに書くのは会社のルールだけです。技術の着眼点はDynatraceの調査ガイド（場面5）に残し、二重に管理しません。画面の上の説明は、ノーコードで直せます。",
+        btn: function (c) { return c.editing ? "改訂版を保存" : "ステップ5を編集"; },
         handle: function (c, ev) {
           if (ev.kind !== "click") return null;
           if (ev.id === "an-edit") { c.editing = true; return "ok"; }
@@ -2052,19 +2078,62 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
       return '<span class="tip-anchor" id="w-tab-' + t + '"><button type="button" role="tab" data-id="tab-' + t + '" aria-selected="' + (c.tab === t) + '"' +
         (c.tab === t ? ' class="active"' : "") + ">" + TAB_LABEL[t] + "</button></span>";
     }).join("");
-    var contact = S.ch === 4 ? '<span class="tip-anchor" id="w-c4-contact" data-tip-side="right"><button type="button" class="tt-chip" data-id="c4-contact">社内手順で連絡・引き継ぎ</button></span>' : "";
+    var exBtn = '<span class="tip-anchor" id="w-explain" data-tip-side="right"><button type="button" class="dt-emph" data-id="explain"' + (c.explained || S.ch !== 4 ? " disabled" : "") + ">" + svg("spark") + " Explain</button></span>";
     return '<div><p class="crumbs">問題 ＞ P-0412</p><h2 class="dt-h">問題の詳細（架空）</h2></div>' +
-      '<div class="tb-row"><span class="dt-h3">P-0412　応答時間の悪化</span><span class="status active">進行中</span><span class="dt-fine">開始 10:02</span>' + contact + "</div>" +
-      '<div class="dt-tabs" role="tablist" aria-label="問題の詳細">' + tabs + "</div>" + problemTab(c) +
+      '<div class="tb-row"><span class="dt-h3">P-0412　応答時間の悪化</span><span class="status active">進行中</span><span class="dt-fine">開始 10:02</span>' + exBtn + "</div>" +
+      (c.explained ? explainCard() : "") +
+      '<div class="dt-tabs" role="tablist" aria-label="問題の詳細">' + tabs + "</div>" + problemTab(c) + commentsHTML(c) +
       fine("画面の構成・タブ・問題番号・サービス名・数値はすべて架空です。実機のタブと項目は構築時に確かめます。");
+  }
+  function explainCard() {
+    return '<div class="assist" id="c4-explain"><p class="assist-head">' + svg("spark") + "Explain（Dynatrace Assistによる問題の要約・例）</p>" +
+      "<p><b>何が起きたか</b>　契約照会サービスの応答時間が、10:02から平常時の約2倍に悪化しています。</p>" +
+      "<p><b>なぜ起きたか</b>　契約DBで接続待ちが増え、契約照会サービスに伝わっています（根本原因の分析）。</p>" +
+      "<p><b>修正の手順</b>　接続数と接続プールの設定を確認します。</p>" +
+      '<p class="ai-label">Explainの画面・回答は例です（架空）。実機の表示とは異なります。</p></div>';
+  }
+  var CM_LINES = [
+    ["問題", "P-0412 応答時間の悪化（10:02〜）"],
+    ["影響", "Webからの照会の一部（Dynatraceの影響範囲）"],
+    ["根本原因", "契約DBの接続待ちの増加（Dynatraceの分析。社内での確定はSRE）"],
+    ["関連ログ", "09:58から契約DBへの接続待ちの警告（開始5分前から確認）"],
+    ["通知", "障害通知ワークフロー：10:03 成功（運用チーム／障害連絡）"]
+  ];
+  function cmLines() {
+    return CM_LINES.map(function (l) { return '<p class="cm-l"><span class="k">' + l[0] + "</span>" + l[1] + "</p>"; }).join("");
+  }
+  function commentsHTML(c) {
+    var head = '<div class="surface-head"><p class="dt-h3">コメント</p><span class="dt-fine">Dynatraceの機能</span></div>';
+    if (S.ch !== 4 || c.posted) {
+      return '<div class="surface" id="c4-comments">' + head + '<div class="cm-item"><p class="cm-who"><span class="avatar">佐</span><b>佐藤（運用者・架空）</b><span class="dt-fine">10:22</span></p>' +
+        '<p class="cm-l"><b>【SREへの引き継ぎ】</b><span class="ai-label">社内テンプレート（テックタッチで入力・案）</span></p>' + cmLines() +
+        '<p class="cm-l"><span class="k">社内優先度</span>中（社内基準・架空）</p><p class="cm-l"><span class="k">連絡</span>' + ESC_OPT.notified + "（10:22 連絡済み）</p>" +
+        '<p class="cm-l"><span class="k">SREへ</span>根本原因の確定と対策をお願いします</p></div>' +
+        fine("コメントはDynatraceの問題へのコメントです。内容・人物は架空です。") + "</div>";
+    }
+    var v = c.vals, dis = !(c.step === 5 && c.tpl);
+    var h = '<div class="surface" id="c4-comments">' + head;
+    if (!c.tpl) {
+      h += '<p class="tb-row"><span class="tip-anchor" id="w-c4-tpl" data-tip-side="right"><button type="button" class="tt-chip" data-id="c4-tpl">引き継ぎのテンプレートを入れる</button></span></p>' +
+        '<div class="cm-box empty">コメントを入力…</div>';
+    } else {
+      h += '<div class="cm-box"><p class="cm-l"><b>【SREへの引き継ぎ】</b><span class="ai-label">社内テンプレート（テックタッチ・案）</span></p>' + cmLines() +
+        '<div class="cm-fields"><div class="dt-field block" id="f-c4-prio"><label for="c4-prio">社内優先度</label>' +
+        sel("c4-prio", "c4-prio", [["", "選択してください"], ["high", "高"], ["mid", "中"], ["low", "低"]], v["c4-prio"], dis) + "</div>" +
+        '<div class="dt-field block" id="f-c4-esc"><label for="c4-esc">連絡の判断</label>' +
+        sel("c4-esc", "c4-esc", [["", "選択してください"], ["notified", ESC_OPT.notified], ["resend", ESC_OPT.resend], ["none", ESC_OPT.none]], v["c4-esc"], dis) + "</div></div></div>";
+    }
+    return h + '<div class="row-actions"><span class="tip-anchor" id="w-c4-post"><button type="button" class="dt-accent" data-id="c4-post">投稿</button></span></div>' +
+      fine("コメントはDynatraceの機能です。テンプレートと入力チェックはテックタッチ（案）です。コメント欄の位置・表記は実機で確かめます。") + "</div>";
   }
   function problemTab(c) {
     if (c.tab === "overview") {
       return '<div class="surface" id="c4-kv"><dl class="kv">' +
         "<dt>影響を受けたサービス</dt><dd>" + SVC + "</dd>" +
         "<dt>影響の範囲</dt><dd>Webからの照会の一部（架空）</dd>" +
-        "<dt>根本原因の候補</dt><dd>契約DB（架空）：接続待ちの増加（Dynatraceの分析）</dd>" +
-        "<dt>開始</dt><dd>10:02（検知）</dd></dl></div>";
+        "<dt>根本原因</dt><dd>契約DB（架空）：接続待ちの増加（Dynatraceの分析）</dd>" +
+        "<dt>開始</dt><dd>10:02（検知）</dd>" +
+        "<dt>ワークフローの実行</dt><dd>障害通知（運用チーム／障害連絡）：成功 10:03（架空）</dd></dl></div>";
     }
     if (c.tab === "impact") {
       return '<div style="display:grid;gap:14px">' +
@@ -2075,15 +2144,15 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
         '<tbody><tr><th scope="row">Webからの照会</th><td class="up">一部で遅延（架空）</td></tr><tr><th scope="row">代理店ポータルからの照会</th><td>影響なし（架空）</td></tr></tbody></table></div></div>';
     }
     if (c.tab === "rc") {
-      return '<div class="rc-grid"><div class="surface" id="c4-rc"><p class="dt-h3">根本原因の候補（Dynatraceの分析）</p><dl class="kv">' +
-        "<dt>候補</dt><dd>契約DB（架空）</dd><dt>事象</dt><dd>接続待ちの増加（09:58〜）</dd>" +
+      return '<div class="rc-grid"><div class="surface" id="c4-rc"><p class="dt-h3">根本原因（Dynatraceの分析）</p><dl class="kv">' +
+        "<dt>根本原因</dt><dd>契約DB（架空）</dd><dt>事象</dt><dd>接続待ちの増加（09:58〜）</dd>" +
         '<dt>影響の伝わり方</dt><dd><span class="flowline"><span class="n root">契約DB</span><span class="a">→</span><span class="n">契約照会サービス</span><span class="a">→</span><span class="n">Webからの照会</span></span></dd></dl>' +
         fine("根本原因の分析はDynatraceの機能です。表示は架空です。") + "</div>" +
         '<div class="surface"><p class="dt-h3">関連するイベント</p><div class="table-wrap"><table class="dtable num"><thead><tr><th scope="col">時刻</th><th scope="col">イベント</th></tr></thead><tbody>' +
         "<tr><td>09:58</td><td>契約DBの接続待ちが増加（架空）</td></tr>" +
         "<tr><td>10:02</td><td>問題を検知しました（応答時間の悪化）</td></tr>" +
         "<tr><td>10:04</td><td>影響範囲が更新されました（架空）</td></tr></tbody></table></div></div></div>" +
-        (S.ch === 4 ? '<p class="tt-note"><span class="lab">テックタッチ（案）</span>社内手順：根本原因は、この段階では断定しません。候補として記録し、判断はSREが行います。</p>' : "");
+        (S.ch === 4 ? '<p class="tt-note"><span class="lab">テックタッチ（案）</span>社内手順：根本原因の社内での確定と、対策の判断はSREが行います（社内手順・架空）。</p>' : "");
     }
     if (c.tab === "logs") {
       var p = c.vals["c4-period"] || "during", from = PERIOD_FROM[p];
@@ -2268,15 +2337,16 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
     if (c.sel === "g4") {
       var labels = CH[4].steps.map(function (s) { return s.label; });
       h += '<div class="surface"><div class="surface-head"><p class="dt-h3">障害の一次確認と引き継ぎ：ステップごとの到達人数（ファネル）</p>' +
-        (c.edited ? '<span class="share-chip">改訂版 v2 を保存済み</span>' : '<span class="tip-anchor" id="w-an-edit" data-tip-side="right"><button type="button" class="dt-emph" data-id="an-edit"' + (c.editing ? " disabled" : "") + ">ステップ4を編集</button></span>") +
+        (c.edited ? '<span class="share-chip">改訂版 v2 を保存済み</span>' : '<span class="tip-anchor" id="w-an-edit" data-tip-side="right"><button type="button" class="dt-emph" data-id="an-edit"' + (c.editing ? " disabled" : "") + ">ステップ5を編集</button></span>") +
         '</div><div class="funnel">' + FUNNEL.map(function (n, i) {
-          return '<div class="fn-row' + (i === 3 ? " hot" : "") + '"><span>' + (i + 1) + ". " + labels[i] + (i === 3 ? "（2人が止まる）" : "") + '</span><span class="fn-bar"><i style="width:' + (n / FUNNEL[0] * 100).toFixed(0) + '%"></i></span><span class="cnt">' + n + " 人</span></div>";
+          return '<div class="fn-row' + (i === 4 ? " hot" : "") + '"><span>' + (i + 1) + ". " + labels[i] + (i === 4 ? "（2人が止まる）" : "") + '</span><span class="fn-bar"><i style="width:' + (n / FUNNEL[0] * 100).toFixed(0) + '%"></i></span><span class="cnt">' + n + " 人</span></div>";
         }).join("") + "</div></div>";
     }
     if (c.editing) {
-      h += '<div class="surface edit-card"><p class="dt-h3">ステップ4：関連ログを確認する（編集中・ノーコード）</p>' +
-        '<div class="edit-field"><span class="k">吹き出しの文（いまの内容）</span><span class="v">期間は「問題の開始5分前から」に設定します</span></div>' +
-        '<div class="edit-field new"><span class="k">追加する説明（ツールチップ）：場面5のSREの着眼点</span><span class="v">接続待ちの警告は、問題の検知より前（09:58）から出ていました。開始の5分前から見ると、前ぶれを見落としません（SREの着眼点・架空）。</span></div>' +
+      h += '<div class="surface edit-card"><p class="dt-h3">ステップ5：引き継ぎをコメントに書く（編集中・ノーコード）</p>' +
+        '<div class="edit-field"><span class="k">吹き出しの文（いまの内容）</span><span class="v">連絡の判断を選びます</span></div>' +
+        '<div class="edit-field new"><span class="k">追加する説明（ツールチップ）：社内ルール</span><span class="v">運用チーム／障害連絡には、Dynatraceのワークフローが自動で通知します。通知済みなら再通知はしません。業務部門の窓口への連絡は、人が判断して行います（社内ルール・架空）。</span></div>' +
+        '<p class="soft">技術の着眼点（ログは開始5分前から見る、など）は、Dynatraceの調査ガイド（場面5）に書いてあります。テックタッチには重ねて書きません。</p>' +
         '<div class="row-actions"><span class="tip-anchor" id="w-an-save"><button type="button" class="dt-accent" data-id="an-save">改訂版を保存</button></span></div></div>';
     }
     if (c.edited) {
@@ -2292,7 +2362,7 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
     if (c.published) {
       h += '<div class="surface"><div class="surface-head"><p class="dt-h3">改訂のお知らせ（フローティングバナー）</p>' +
         (c.banner ? '<span class="share-chip">公開済み</span>' : '<span class="tip-anchor" id="w-an-banner" data-tip-side="right"><button type="button" class="dt-accent" data-id="an-banner">バナーを公開</button></span>') + "</div>" +
-        '<div class="banner-preview"><span class="lab">表示する画面：Dynatraceの「問題」の画面（案）</span><p>【お知らせ】障害の一次確認と引き継ぎのガイドを改訂しました。ステップ4に、ログの期間を選ぶ理由を追加しています。</p></div>' +
+        '<div class="banner-preview"><span class="lab">表示する画面：Dynatraceの「問題」の画面（案）</span><p>【お知らせ】障害の一次確認と引き継ぎのガイドを改訂しました。ステップ5に、連絡の判断の社内ルールを追加しています。</p></div>' +
         (c.banner ? '<p class="done-msg" role="status">バナーを公開しました。次に問題の画面を開いた運用者に表示されます（デモのため実際には公開しません）。</p>' : "") + "</div>";
     }
     return h + fine("管理画面・数値はすべて架空のイメージです。効果を示すものではありません。実際に見られる指標（ファネル分析など）は、テックタッチ アナリティクスで確認します。");
@@ -2340,12 +2410,12 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
       tl("9:00", "場面1　新任者の立ち上がり", "役割を選んでツアー。チームのダッシュボードと担当範囲を覚える") +
       tl("9:15", "場面2　毎朝の確認", "SREが決めた基準（架空）で3項目を確認し、同じ形で記録") +
       tl("10:16", "場面3　問い合わせ対応", "対象と時間帯をそろえ、平均応答時間 420 ms → 980 ms を確認") +
-      tl("10:18", "場面4　一次対応と引き継ぎ", "社内手順の順番で確認し、記録を添えてSREに引き継ぐ") +
+      tl("10:18", "場面4　一次対応と引き継ぎ", "Explainと分析を確認し、社内の判断を添えてDynatraceのコメントで引き継ぐ") +
       tl("14:05", "場面6　ダッシュボード作成", "SREのひな型を複製し、対象と時間枠だけを変えて作る") +
       '</ol></div><div class="lane"><h3><span class="rc sre">SRE</span>仕組みを作る側（鈴木）</h3><ol class="tl">' +
-      tl("10:25", "場面5　原因の深掘り", "聞き直さずに深掘り。着眼点を調査ガイドに残して全員に共有") +
+      tl("10:25", "場面5　原因の深掘り", "コメントを読んで聞き直さずに深掘り。着眼点を調査ガイドに残して全員に共有") +
       tl("15:00", "場面7　再発防止の仕組み化", "通知のワークフローを、通知先と命名規則の入力チェック付きで作る") +
-      tl("金曜", "場面8　定着の見える化", "止まるステップに着眼点を足し、持ち主・見直し日を決めて改訂を知らせる") +
+      tl("金曜", "場面8　定着の見える化", "止まるステップに社内ルールを足し、持ち主・見直し日を決めて改訂を知らせる") +
       '</ol><p class="sum-note">つながり：引き継ぎ（場面4→5）、助言とひな型（場面5→6）、改訂したガイド（場面8→場面1〜4）。</p></div></div></section>' +
       '<section class="sum-card"><h2>このデモで、テックタッチが手当てした場面</h2><div class="stats">' +
       stat(S.stats.steps, "ガイドで進めたステップ") + stat(S.stats.fixes, "選び直し・順番・入力の案内") + stat(S.stats.notes, "定義・基準・社内手順の表示") + "</div>" +
