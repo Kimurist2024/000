@@ -1,0 +1,9 @@
+| inputlookup demo_auth_events.csv
+| eval epoch=strptime(event_time,"%Y-%m-%d %H:%M:%S")
+| where epoch>=strptime("2026-10-08 09:00:00","%Y-%m-%d %H:%M:%S") AND epoch<strptime("2026-10-08 09:15:00","%Y-%m-%d %H:%M:%S")
+| eval fail_mark=if(action="failure",1,0), failed_user=if(action="failure",user,null())
+| eventstats sum(fail_mark) AS src_fail_count dc(failed_user) AS src_failed_users BY src
+| sort 0 src user epoch
+| streamstats sum(fail_mark) AS prior_user_failures BY src user
+| where action="success" AND privileged="true" AND prior_user_failures>=1 AND src_fail_count>=10 AND src_failed_users>=5
+| table src user event_time src_fail_count src_failed_users mfa

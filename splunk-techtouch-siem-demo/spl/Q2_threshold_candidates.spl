@@ -1,0 +1,7 @@
+| inputlookup demo_auth_events.csv
+| eval epoch=strptime(event_time,"%Y-%m-%d %H:%M:%S")
+| where epoch>=strptime("2026-10-08 09:00:00","%Y-%m-%d %H:%M:%S") AND epoch<strptime("2026-10-08 09:15:00","%Y-%m-%d %H:%M:%S")
+| where action="failure"
+| stats count AS fail_count dc(user) AS failed_users BY src
+| where fail_count>=10 AND failed_users>=5
+| sort - fail_count

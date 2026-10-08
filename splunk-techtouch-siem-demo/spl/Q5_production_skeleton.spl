@@ -1,0 +1,6 @@
+`comment("Q5 は本番検知に置き換えるための設計骨格です。<...> を環境の値に置き換えるまで実行しないでください。")`
+index=<認証ログのインデックス> sourcetype=<認証ログのsourcetype> earliest=-15m latest=now
+| eval src=<正規化した接続元IP>, user=<正規化したユーザーID>, action=<success または failure への正規化>
+| where action="failure"
+| stats count AS fail_count dc(user) AS failed_users BY src
+| where fail_count>=10 AND failed_users>=5

@@ -1,0 +1,4 @@
+| inputlookup demo_auth_events.csv
+| where action="failure"
+| stats count AS fail_count dc(user) AS failed_users BY src
+| sort - fail_count

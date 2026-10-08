@@ -1,0 +1,4 @@
+`comment("教材用。条件を意図的に省いた検索です。Splunk AI Assistant の実際の出力ではありません。")`
+| inputlookup demo_auth_events.csv
+| stats count(eval(action="failure")) AS failures count(eval(action="success" AND privileged="true")) AS admin_successes BY src
+| where failures >= 10 AND admin_successes >= 1
