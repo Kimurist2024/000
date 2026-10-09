@@ -1,0 +1,6 @@
+| inputlookup demo_hr_audit.csv
+| where action="signin"
+| lookup demo_hr_baseline.csv user OUTPUT usual_geo usual_asn
+| where geo!=usual_geo OR asn!=usual_asn
+| table event_time user src geo asn mfa
+| sort event_time

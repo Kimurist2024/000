@@ -1,0 +1,3 @@
+| inputlookup demo_cust_audit.csv
+| where user="hr_ops03" OR src="198.51.100.77"
+| table event_time user src system action record_count

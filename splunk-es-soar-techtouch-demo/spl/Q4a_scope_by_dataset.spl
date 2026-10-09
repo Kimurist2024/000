@@ -1,0 +1,4 @@
+| inputlookup demo_hr_audit.csv
+| where user="hr_ops03" AND src="198.51.100.77" AND action="export"
+| stats sum(record_count) AS records values(fields) AS fields min(event_time) AS first_export max(event_time) AS last_export BY dataset
+| addcoltotals labelfield=dataset label="合計" records

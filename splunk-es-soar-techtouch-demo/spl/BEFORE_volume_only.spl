@@ -1,0 +1,5 @@
+| inputlookup demo_hr_audit.csv
+| where action IN ("view","export")
+| stats sum(record_count) AS records BY user
+| where records>=1000
+| sort - records

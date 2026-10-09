@@ -1,0 +1,2 @@
+| inputlookup demo_hr_audit.csv
+| stats count AS total_events dc(user) AS distinct_users dc(src) AS distinct_srcs

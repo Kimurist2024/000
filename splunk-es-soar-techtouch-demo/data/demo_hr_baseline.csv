@@ -1,0 +1,8 @@
+user,usual_geo,usual_asn,role,dept
+hr_ops03,国内,AS64496,一般（参照・エクスポート）,人事部
+hr_ops05,国内,AS64496,一般（参照）,人事部
+hr_ops08,国内,AS64496,一般（参照）,人事部
+hr_ops11,国内,AS64496,一般（参照）,人事部
+hr_admin01,国内,AS64496,管理者,人事部
+payroll02,国内,AS64496,一般（参照）,給与
+vendor_mnt02,国内,AS64496,委託先保守,委託先

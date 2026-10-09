@@ -1,0 +1,9 @@
+| inputlookup demo_hr_audit.csv
+| eval epoch=strptime(event_time,"%Y-%m-%d %H:%M:%S"), request_id=if(request_id="",null(),request_id)
+| lookup demo_hr_baseline.csv user OUTPUT usual_geo usual_asn
+| sort 0 user epoch
+| eval odd_signin=if(action="signin" AND (geo!=usual_geo OR asn!=usual_asn), epoch, null())
+| streamstats latest(odd_signin) AS last_odd BY user
+| where action IN ("view","export") AND isnotnull(last_odd) AND epoch-last_odd<=3600
+| stats sum(record_count) AS records sum(eval(if(scope="retired",record_count,0))) AS retired_records values(request_id) AS request_id min(event_time) AS first_access max(event_time) AS last_access BY user src
+| sort - records

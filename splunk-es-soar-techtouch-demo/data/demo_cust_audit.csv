@@ -1,0 +1,5 @@
+event_time,user,src,system,action,record_count
+2026-10-06 01:40:00,cs_agent01,192.0.2.61,customer_portal,view,3
+2026-10-06 02:20:00,cs_agent07,192.0.2.62,customer_portal,view,1
+2026-10-06 08:55:00,cs_agent01,192.0.2.61,customer_portal,view,8
+2026-10-06 09:30:00,cs_batch,192.0.2.70,customer_portal,export,15000

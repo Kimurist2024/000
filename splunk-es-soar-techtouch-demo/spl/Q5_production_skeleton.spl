@@ -1,0 +1,12 @@
+（本番用の骨格。実行しない。人事システムの監査ログをインデックス化してから使う）
+index=<人事システム監査ログのインデックス> sourcetype=<人事システムのsourcetype> earliest=-24h
+| eval user=<アカウントのフィールド>, src=<接続元IPのフィールド>, geo=<国のフィールド>, asn=<ASNのフィールド>
+| lookup <利用者平常値のルックアップ> user OUTPUT usual_geo usual_asn
+| sort 0 user _time
+| eval odd_signin=if(action="signin" AND (geo!=usual_geo OR asn!=usual_asn), _time, null())
+| streamstats latest(odd_signin) AS last_odd BY user
+| where action IN ("view","export") AND isnotnull(last_odd) AND _time-last_odd<=3600
+| stats sum(record_count) AS records sum(eval(if(scope="retired",record_count,0))) AS retired_records values(request_id) AS request_id BY user src
+| where records>=1000 AND retired_records>0 AND isnull(request_id)
+（注：本番では「平常値」をUEBAの異常スコアやRBAのリスクイベントで置き換える設計も検討する。
+　60分の窓は、後続の平常なサインインで打ち切る処理を足す。ESの相関検索として保存し、ノータブルとリスクを付ける）
