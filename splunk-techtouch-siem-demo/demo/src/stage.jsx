@@ -301,7 +301,7 @@ function DashboardsPage({ c }) {
         <Breadcrumbs><Breadcrumbs.Item label="ダッシュボード" onClick={click("nav-dashboards")} /><Breadcrumbs.Item label="VPN認証_失敗数（委託先作成）" isCurrent /></Breadcrumbs>
         <div className="sp-head"><Heading level={2}>VPN認証_失敗数（委託先作成・架空）</Heading><span className="dt-fine">過去15分　最終更新 09:15</span></div>
         <div className="canvas">
-          <Panel id="d-old-panel" title="認証失敗数（件）" sub="接続元IP別・異なるアカウント数・失敗と成功の順序は表示していない"><Viz kind="single70" h={120} /></Panel>
+          <Panel id="d-old-panel" title="認証失敗数（件）" sub="接続元IP別・異なるアカウント数・失敗と成功の順序は表示していない"><Viz kind="single70" h={250} /></Panel>
           <Panel title="認証失敗数の推移（5分）"><Viz kind="line" h={200} /></Panel>
         </div>
       </div>
@@ -342,8 +342,8 @@ function Studio({ c }) {
       </div>
       <div className="studio">
         <div className="canvas">
-          <Panel title="認証失敗（過去15分）" sub="単一値・Q0"><Viz kind="single70" h={120} /></Panel>
-          <Panel title="接続元IP（過去15分）" sub="単一値・Q0"><Viz kind="single4" h={120} /></Panel>
+          <Panel title="認証失敗（過去15分）" sub="単一値・Q0"><Viz kind="single70" h={250} /></Panel>
+          <Panel title="接続元IP（過去15分）" sub="単一値・Q0"><Viz kind="single4" h={250} /></Panel>
           {panels}
           {!c.panels.length && <div className="sp-panel wide empty-panel">右の「可視化を追加」で、Q1〜Q4のパネルを置きます。</div>}
         </div>
