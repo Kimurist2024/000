@@ -44,7 +44,7 @@ Q0〜Q4と「不十分な例」の期待値が、CSVと一致することを確�
 
 ## 動画版
 
-`demo/video/splunk-techtouch-siem-demo.mp4`（1920×1080、H.264、音声なし）。PowerPointに埋め込んで再生できます。長さは下の「版」を参照。
+`demo/video/splunk-techtouch-siem-demo.mp4`（8分10秒、1920×1080、H.264、音声なし、約38MB）。PowerPointに埋め込んで再生できます。
 
 - 構成：表紙 → デモの流れ（全体像）→ S0〜S8（各場面の最後に「伺いたいこと」）→ 振り返り → クロージング・最初の一歩。
 - 画面下の字幕に、操作の説明と「イメージデモ｜画面・人物・企業名・手順・数値は架空で…」の注記を常に表示します。
@@ -69,3 +69,4 @@ NODE_PATH="$(npm root -g)" FFMPEG=/path/to/ffmpeg node record.js
 - 1.0（2026-10-08）：GPTで作成した初版。
 - 1.1（2026-10-08）：出典を一つずつ確認し、確認できなかったものを差し替え。CSV・SPL・ナレッジを再作成し、期待値を検算。先に確かめること、想定問答、AI機能の役割分担、20分版を追加。GPT版のモックとナレッジを取り込み、MFAの値（approved／failed／not_applicable）をそろえた。変更点は `scenario.md` の付録A。
 - 1.1＋デモ（2026-10-08）：Splunk Webの画面イメージを踏襲したイメージデモ `demo/index.html` を追加（シナリオの内容は変更なし）。
+- 1.1＋動画（2026-10-09）：イメージデモの動画版 `demo/video/splunk-techtouch-siem-demo.mp4`（8分10秒）を追加。
