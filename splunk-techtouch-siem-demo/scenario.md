@@ -368,6 +368,7 @@ GPT版1.0が前提にした課題「Splunkの運用が難しく、十分に使�
 | SSE | 認証関連の検知コンテンツと適用条件の画面 | 対象環境へ導入し、内容を確認（3.8.0以降） |
 | 検証 | 正解のテストケースA/B/C/D | CSVと `verify/simulate_spl.py` で提供 |
 | 画面モック | 9場面の流れを示す対話型モック | `mock/SOC_demo_clickthrough.html`（GPT版を1.1に合わせて修正。Splunk Webのデザインは踏襲していない） |
+| イメージデモ | Splunk Webの画面イメージを踏襲した架空画面の上で、9場面＋振り返りをガイド付きで進めるHTML | `demo/index.html`（`demo/src/build.py` で作り直す。画面・回答はすべて架空・例文） |
 
 ### 4.2 場面別の合格判定
 

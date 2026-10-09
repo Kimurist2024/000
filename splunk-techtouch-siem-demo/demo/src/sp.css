@@ -1,0 +1,177 @@
+
+/* ==================== Splunk版で追加・上書きした部品 ==================== */
+/* Dock は使わない（Splunk Web は上部バー＋アプリバー）。色は Splunk Web の画面イメージに寄せた架空の配色 */
+:root {
+  --dock-w: 0px;
+  --sp-top: #1f2326;
+  --sp-green: #53a051;
+  --dt-primary: #006d9c;
+  --dt-primary-accent: #006d9c;
+  --dt-primary-cont: #eaf3f8;
+  --dt-primary-cont-emph: #dbeaf2;
+  --dt-chart-1: #006d9c;
+}
+:root[data-theme="dark"] { --dt-primary: #6cc1ea; --dt-primary-accent: #3a8fb7; --dt-primary-cont: #1c2b36; --dt-primary-cont-emph: #22384a; --dt-chart-1: #4aa8d8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --dt-primary: #6cc1ea; --dt-primary-accent: #3a8fb7; --dt-primary-cont: #1c2b36; --dt-primary-cont-emph: #22384a; --dt-chart-1: #4aa8d8; } }
+@media (max-width: 1240px) { :root { --dock-w: 0px; } }
+.dt { min-height: 640px; }
+.dt-app { border-radius: 0 0 12px 12px; }
+.overlay { margin-top: 56px; }
+
+/* 上部バー（黒）とアプリバー */
+.sp-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap;
+  min-height: 40px; padding: 4px 16px; background: var(--sp-top); color: #f2f2f2; font-size: 13px;
+}
+.sp-top .logo { font-weight: 700; letter-spacing: 0.01em; }
+.sp-top .menus { display: flex; flex-wrap: wrap; gap: 2px 14px; opacity: 0.9; }
+.sp-top .menus .user { font-weight: 600; opacity: 1; }
+.sp-top.intra { background: #34404d; }
+.ah-nav button { border: 0; background: transparent; font: inherit; color: var(--dt-text-sub); font-weight: 500; padding: 13px 10px; position: relative; cursor: pointer; border-radius: 6px 6px 0 0; }
+.ah-nav button.active { color: var(--dt-primary); }
+.ah-nav button.active::after { content: ""; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: 20px; height: 2px; border-radius: 12px; background: currentColor; }
+.ah-nav button:hover { background: var(--dt-container); }
+.ah-nav .balloon { font-family: var(--font-demo); }
+
+/* 視点の印（SOC担当者／SOC責任者） */
+.rc.soc { border: 1px solid var(--dt-text-sub); color: var(--dt-text); background: var(--dt-surface); }
+.rc.lead { border: 1px solid var(--dt-text); background: var(--dt-text); color: var(--dt-base); }
+
+/* 画面の区別（凡例） */
+.sc { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; margin-right: 6px; white-space: nowrap; }
+.sc-splunk, .l-sp { background: var(--dt-primary-cont-emph); color: var(--dt-primary); }
+.sc-tt { background: var(--tt-soft); color: var(--tt-ink); }
+.sc-hub { background: var(--hub-soft); color: var(--hub-ink); }
+.sc-intra, .l-in { background: var(--dt-container-emph); color: var(--dt-text-sub); }
+.legend .l-sp { border: 1px solid var(--dt-primary); }
+.legend .l-in { border: 1px solid var(--dt-text-sub); }
+
+.tt-chip svg, .hub-chip svg { width: 15px; height: 15px; flex: none; }
+.tt-chip { position: relative; cursor: pointer; }
+
+/* 検索画面 */
+.sp-search { display: grid; gap: 12px; min-width: 0; }
+.sp-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; border: 1px solid var(--dt-border); border-radius: 4px; overflow: hidden; background: var(--dt-surface); }
+.spl-box { margin: 0; padding: 10px 12px; min-height: 64px; font-family: "SFMono-Regular", Consolas, Menlo, "BIZ UDGothic", monospace; font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-all; color: var(--dt-text); }
+.spl-box.ph { color: var(--dt-text-sub); }
+.sp-time { display: flex; align-items: center; padding: 0 12px; border-left: 1px solid var(--dt-border); white-space: nowrap; color: var(--dt-text-sub); font-size: 13px; }
+.sp-go { position: relative; border: 0; background: var(--sp-green); color: #fff; width: 48px; display: grid; place-items: center; cursor: pointer; }
+.sp-go svg { width: 20px; height: 20px; }
+.sp-go .balloon { left: auto; right: 0; }
+.sp-go .balloon::before { left: auto; right: var(--axr, 16px); }
+.sp-summary { font-size: 14px; }
+.sp-summary .ok { color: var(--dt-success); font-weight: 700; }
+.sp-res .idx { color: var(--dt-text-sub); width: 2em; }
+.sp-res tr.hit td { background: var(--dt-warning-cont-emph); }
+.sp-res td { font-variant-numeric: tabular-nums; position: relative; }
+.sw-ok { background: var(--dt-success); }
+.c-bar { fill: var(--dt-chart-1); }
+.c-bar.hot { fill: var(--dt-warning); }
+.c-line.ok { stroke: var(--dt-success); }
+.c-dot { fill: var(--dt-chart-1); }
+.c-dot.ok { fill: var(--dt-success); }
+.sp-menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; display: grid; min-width: 200px; background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 6px; box-shadow: var(--dt-shadow-float); padding: 4px 0; }
+.sp-menu button { position: relative; border: 0; background: transparent; text-align: left; padding: 8px 14px; font: inherit; color: var(--dt-text); cursor: pointer; }
+.sp-menu button:hover { background: var(--dt-container); }
+.sp-menu .balloon { left: 100%; top: 0; margin-left: 12px; }
+.sp-menu .balloon::before { display: none; }
+.tip-anchor.block { display: block; }
+
+/* Splunk AI Assistant（画面イメージ・架空） */
+.sp-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 340px); gap: 14px; align-items: start; }
+.assist { min-width: 0; }
+.assist .bubble { font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+.as-ans { display: grid; gap: 6px; }
+.as-ans .code { font-size: 12px; }
+.as-in { position: relative; display: grid; gap: 8px; }
+.as-in textarea, .hub-win textarea { width: 100%; border: 1px solid var(--dt-border); border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 13px; line-height: 1.55; background: var(--dt-container); color: var(--dt-text); resize: vertical; }
+.as-in textarea:focus, .hub-win textarea:focus { outline: 2px solid var(--dt-primary); outline-offset: 1px; }
+
+/* AI Hub（構想・架空画面） */
+.hub-win { border: 2px dashed var(--hub); background: var(--hub-soft); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; font-family: var(--font-demo); font-size: 14px; line-height: 1.6; min-width: 0; }
+.hub-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.hub-head b { font-size: 15px; color: var(--hub-ink); }
+.hubpill { background: var(--hub); }
+.kb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--dt-text-sub); }
+.kb { border: 1px solid var(--hub); color: var(--hub-ink); background: var(--dt-surface); border-radius: 999px; padding: 0 10px; font-size: 12px; font-weight: 700; }
+.hub-ans { display: grid; gap: 6px; }
+.hub-win .lab { font-size: 12px; font-weight: 700; color: var(--hub-ink); }
+.hub-win .kv { background: var(--dt-surface); border-radius: 8px; padding: 2px 12px; }
+.hub-win .kv > * { padding: 6px 4px; font-size: 13.5px; }
+.hub-win .kv dt { font-weight: 700; color: var(--hub-ink); }
+.hub-win .code.req { background: var(--dt-surface); font-family: var(--font-demo); font-size: 13px; white-space: pre-wrap; }
+.hub-win .dtable { background: var(--dt-surface); border-radius: 8px; font-size: 13px; }
+.hub-win .dtable th, .hub-win .dtable td { padding: 7px 10px; }
+.hub-btn { background: var(--hub); color: var(--on-accent); }
+.hub-chip { position: relative; }
+.st.ng { background: var(--ov-warn-soft); color: var(--ov-warn); border: 1px solid var(--ov-warn); }
+.st.on { background: var(--dt-success); color: var(--on-accent); }
+
+/* Dashboard Studio（画面イメージ・架空） */
+.studio { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: start; }
+.canvas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.panel { background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 6px; padding: 10px 12px; display: grid; gap: 6px; min-width: 0; align-content: start; position: relative; }
+.panel.wide { grid-column: 1 / -1; }
+.panel-title { font-size: 13px; font-weight: 600; }
+.panel .dtable { min-width: 0; font-size: 13px; }
+.panel .chart { min-width: 0; }
+.single { font-size: 30px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.single.bad { color: var(--dt-warning); }
+.empty-panel { color: var(--dt-text-sub); border-style: dashed; text-align: center; padding: 28px 12px; }
+.add-form { display: grid; gap: 8px; background: var(--dt-container); border-radius: 8px; padding: 12px; align-content: start; }
+.dt-field.block select { width: 100%; }
+
+/* ダイアログ（Splunk風・架空） */
+.sp-modal { padding-top: 48px; align-items: flex-start; }
+.sp-dialog-card { border-top: 0; max-width: 620px; gap: 8px; }
+.dlg-head { font-weight: 600; font-size: 16px; border-bottom: 1px solid var(--dt-border); padding-bottom: 8px; }
+.dlg-row { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 8px; align-items: center; font-size: 14px; }
+.dlg-row .k { color: var(--dt-text-sub); font-size: 13px; }
+.dlg-row .dt-field { display: flex; }
+.dlg-row .dt-field select, .dlg-row .dt-field input { flex: 1; }
+.sp-btn { background: var(--sp-green); color: #fff; }
+.overlay.note .btn-primary { background: var(--dt-text); color: var(--dt-base); }
+
+/* SSE（画面イメージ・架空） */
+.sse-list { display: grid; gap: 8px; }
+.sse-row { position: relative; display: grid; gap: 2px; text-align: left; font: inherit; color: var(--dt-text); background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 8px; padding: 10px 14px; cursor: pointer; }
+.sse-row b { font-size: 15px; }
+.sse-row span { font-size: 13px; color: var(--dt-text-sub); }
+.sse-row.dim { opacity: 0.6; }
+.sse-sec { background: var(--dt-surface); border-radius: 10px; box-shadow: var(--dt-shadow-raised); padding: 10px 14px; display: grid; gap: 4px; }
+.sec-btn { display: grid; gap: 4px; width: 100%; text-align: left; border: 0; background: transparent; font: inherit; color: inherit; padding: 0; cursor: pointer; }
+
+/* 一次調査のチェックリスト・記録 */
+.ck-grid { display: grid; gap: 6px; }
+.ck-row { display: grid; grid-template-columns: minmax(0, 1fr) 170px; gap: 8px; align-items: center; font-size: 14px; }
+.ck-row .dt-field { display: flex; }
+.ck-row select { width: 100%; }
+
+/* 社内ポータル（架空） */
+.i-card { background: var(--dt-surface); border: 1px solid var(--dt-border); border-left: 5px solid var(--dt-text-sub); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; font-family: var(--font-demo); font-size: 14.5px; line-height: 1.65; position: relative; }
+.i-card .lab { font-size: 12px; font-weight: 700; color: var(--dt-text-sub); }
+.i-quote { margin: 0; padding: 8px 14px; border-left: 3px solid var(--dt-primary); background: var(--dt-container); font-size: 15px; }
+.i-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; }
+.i-chain .n { background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 8px; padding: 6px 12px; font-size: 14px; }
+.i-chain .n.wait { border-color: var(--ov-warn); color: var(--ov-warn); font-weight: 700; background: var(--ov-warn-soft); }
+.i-chain .a { color: var(--dt-text-sub); }
+.i-goals { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; }
+.dt.intra .dt-page { background: var(--dt-container); border-radius: 0 0 0 12px; }
+.chat { position: relative; }
+
+@media (max-width: 1080px) {
+  /* ダイアログが本文の高さに収まるように（パネルは下に並ぶ） */
+  .dt-app { min-height: 620px; }
+}
+@media (max-width: 1240px) {
+  .sp-split { grid-template-columns: minmax(0, 1fr); }
+  .studio { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .canvas { grid-template-columns: minmax(0, 1fr); }
+  .dlg-row, .ck-row { grid-template-columns: minmax(0, 1fr); }
+  .sp-bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .sp-time { display: none; }
+  .sp-top { padding: 6px 12px; }
+  .ah-nav button { padding: 10px 6px; }
+}

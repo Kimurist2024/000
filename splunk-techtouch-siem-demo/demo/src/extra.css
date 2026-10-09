@@ -1,0 +1,196 @@
+
+/* ==================== 本格デモで追加した部品 ==================== */
+.status { border-radius: 999px; padding: 1px 10px; }
+.done-msg { background: var(--dt-container); border-radius: 6px; padding: 8px 12px; font-size: 14px; }
+.dt-accent:disabled, .dt-emph:disabled { opacity: 0.45; cursor: not-allowed; }
+.info { background: var(--dt-container); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; color: var(--dt-text-sub); }
+.jn { flex: 1 1 140px; }
+
+/* 視点（運用者／SRE）の印。色ではなく塗りの有無で見分ける */
+.rc {
+  display: inline-block; vertical-align: 1px; margin-right: 6px; border-radius: 4px; padding: 0 6px;
+  font-size: 11px; font-weight: 700; line-height: 1.6; letter-spacing: 0.02em; white-space: nowrap;
+}
+.rc.ops { border: 1px solid var(--dt-text-sub); color: var(--dt-text); background: var(--dt-surface); }
+.rc.sre { border: 1px solid var(--dt-text); background: var(--dt-text); color: var(--dt-base); }
+.story h1 .rc { font-size: 13px; vertical-align: 4px; }
+.jn .jt { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 0; }
+.jn { padding: 8px 10px; column-gap: 8px; }
+.jn .jl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13.5px; }
+
+/* 文字の入力欄（ワークフローの名前） */
+.dt-field input[type="text"] {
+  border: 0; background: transparent; color: var(--dt-text); font-size: 14px; font-weight: 500;
+  padding: 2px 0 4px; min-width: 0; width: 100%; border-radius: 4px;
+}
+.dt-field input[type="text"]:focus { outline: none; }
+.dt-field input[type="text"]:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* AI Hub が画面に添える要素（構想） */
+.hub-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px dashed var(--hub); color: var(--hub-ink); background: var(--hub-soft);
+  border-radius: 6px; padding: 4px 12px; font-size: 13px; font-weight: 700; font-family: var(--font-demo); cursor: pointer;
+}
+.hub-card {
+  border: 1px dashed var(--hub); background: var(--hub-soft); border-radius: 12px; padding: 12px 14px;
+  display: grid; gap: 6px; font-family: var(--font-demo); font-size: 14px; line-height: 1.6;
+}
+.hub-card .lab { font-size: 12px; font-weight: 700; color: var(--hub-ink); }
+
+/* フローティングバナーのプレビュー（案） */
+.banner-preview {
+  border: 1px dashed var(--tt); background: var(--tt-soft); border-radius: 10px; padding: 10px 14px;
+  display: grid; gap: 2px; font-family: var(--font-demo); font-size: 14px;
+}
+.banner-preview .lab { font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* 振り返り：運用者とSREの2列 */
+.lanes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
+.lane { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.lane h3 { font-size: 15px; line-height: 1.5; }
+.sum-list.plain { padding-left: 1.1em; font-size: 14px; }
+
+/* 説明用の進行（場面8：テックタッチ管理画面の上） */
+.overlay.note { border-top-color: var(--dt-text-sub); box-shadow: var(--dt-shadow-float); }
+.overlay.note .ov-pill { background: var(--dt-text-sub); }
+.overlay.note .steps li.now { background: var(--dt-container); color: var(--dt-text); }
+.overlay.note .steps li.now::before { background: var(--dt-text-sub); border-color: var(--dt-text-sub); }
+.overlay.note .btn-primary { background: var(--dt-text); color: var(--dt-base); }
+.overlay.note .soft { background: var(--dt-container); }
+.balloon.note { background: var(--dt-text); color: var(--dt-base); }
+.balloon.note::before { border-bottom-color: var(--dt-text); }
+.is-target.note-target { outline-color: var(--dt-text-sub); animation: none; }
+
+/* ポップアップ：役割を選ぶ */
+.role-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.role {
+  display: grid; gap: 2px; text-align: left; font: inherit; font-family: var(--font-demo);
+  border: 1px solid var(--dt-border); border-radius: 9px; background: var(--dt-surface); padding: 10px 12px; color: var(--dt-text); cursor: pointer;
+}
+.role b { font-size: 15px; }
+.role span { font-size: 12.5px; color: var(--dt-text-sub); line-height: 1.5; }
+.role.rec { border-color: var(--tt); background: var(--tt-soft); }
+
+/* ダッシュボードのタイル */
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile {
+  position: relative; display: grid; gap: 4px; align-content: start; min-width: 0;
+  text-align: left; font: inherit; color: var(--dt-text);
+  background: var(--dt-surface); border: 0; border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px;
+}
+button.tile { cursor: pointer; }
+button.tile:hover { box-shadow: var(--dt-shadow-float); }
+.t-name { font-size: 13px; color: var(--dt-text-sub); font-weight: 500; }
+.t-val { font-size: 24px; font-weight: 600; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.t-val.ok { color: var(--dt-success); }
+.t-val.bad { color: var(--dt-warning); }
+.t-sub { font-size: 12px; color: var(--dt-text-sub); }
+.spark { width: 100%; height: 30px; display: block; }
+.spark polyline { fill: none; stroke: var(--dt-chart-1); stroke-width: 1.6; }
+.bar { height: 8px; border-radius: 999px; background: var(--dt-container-emph); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 999px; background: var(--dt-success); }
+
+/* 根本原因・推薦 */
+.rc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.flowline { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.flowline .n { border-radius: 6px; padding: 2px 8px; background: var(--dt-container); font-size: 13px; }
+.flowline .n.root { background: var(--dt-warning-cont-emph); color: var(--dt-warning); font-weight: 600; }
+.flowline .a { color: var(--dt-text-sub); }
+
+/* ノートブック・Dynatrace Assist */
+.nb-sec { background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.nb-sec-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.nb-kind { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; background: var(--dt-container); color: var(--dt-text-sub); }
+.code {
+  margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--dt-container); color: var(--dt-text);
+  font-family: "SFMono-Regular", Consolas, Menlo, "BIZ UDGothic", "Yu Gothic", monospace; font-size: 13px; line-height: 1.6;
+  white-space: pre-wrap; overflow-x: auto;
+}
+.assist { border: 1px solid var(--dt-primary); border-radius: 12px; background: var(--dt-surface); padding: 12px 14px; display: grid; gap: 8px; box-shadow: var(--dt-shadow-raised); }
+.assist-head { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--dt-primary); }
+.assist-head svg, .dt-emph svg, .dt-accent svg { width: 15px; height: 15px; vertical-align: -2px; }
+.bubble { justify-self: end; max-width: 85%; background: var(--dt-primary-cont-emph); border-radius: 12px 12px 4px 12px; padding: 8px 12px; }
+.assist ul { margin: 0; padding-left: 1.2em; font-size: 13.5px; color: var(--dt-text-sub); }
+.ai-label { font-size: 11.5px; color: var(--dt-text-sub); }
+.c-bar { fill: var(--dt-chart-1); }
+.c-bar.hot { fill: var(--dt-warning); }
+
+/* ワークフロー */
+.wf { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 14px; align-items: start; }
+.wf-flow { display: grid; justify-items: stretch; }
+.wf-node { background: var(--dt-surface); border-radius: 10px; box-shadow: var(--dt-shadow-raised); padding: 10px 12px; display: grid; gap: 2px; }
+.wf-node .k { font-size: 11px; font-weight: 700; color: var(--dt-text-sub); }
+.wf-node b { font-weight: 600; }
+.wf-node .v { font-size: 13px; color: var(--dt-text-sub); }
+.wf-node.unset b { color: var(--dt-text-sub); font-weight: 500; }
+.wf-arrow { justify-self: center; width: 2px; height: 20px; background: var(--dt-border); position: relative; }
+.wf-arrow::after { content: ""; position: absolute; bottom: -2px; left: -4px; border: 5px solid transparent; border-bottom: 0; border-top-color: var(--dt-border); }
+.wf-form { align-content: start; }
+button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%; }
+.tpl[aria-pressed="true"] { border-color: var(--dt-primary); background: var(--dt-primary-cont); }
+.tpl-list > .tip-anchor { display: grid; }
+
+/* テックタッチが画面に添える注記（案） */
+.tt-note {
+  border: 1px dashed var(--tt); background: var(--tt-soft); border-radius: 9px; padding: 9px 14px;
+  font-family: var(--font-demo); font-size: 14px; line-height: 1.6; color: var(--dt-text); display: grid; gap: 2px;
+}
+.tt-note .lab { font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* テックタッチ管理画面（イメージ・架空） */
+.tt-admin .dock { background: var(--dt-surface); }
+.tt-admin .dock-item.active { background: var(--tt-soft); color: var(--tt-ink); font-weight: 700; }
+.app-icon.tt { background: var(--tt-soft); color: var(--tt-ink); }
+.rate-low { color: var(--dt-warning); font-weight: 700; }
+.funnel { display: grid; gap: 6px; }
+.fn-row { display: grid; grid-template-columns: minmax(9em, 15em) minmax(0, 1fr) 3.2em; gap: 10px; align-items: center; font-size: 13.5px; }
+.fn-bar { height: 18px; border-radius: 4px; background: var(--dt-container); overflow: hidden; }
+.fn-bar i { display: block; height: 100%; background: var(--tt); }
+.fn-row.hot { font-weight: 700; }
+.fn-row.hot .fn-bar i { background: var(--ov-warn); }
+.fn-row .cnt { text-align: right; font-variant-numeric: tabular-nums; }
+.edit-card { display: grid; gap: 8px; }
+.edit-field { display: grid; gap: 2px; }
+.edit-field .k { font-size: 12px; color: var(--dt-text-sub); font-weight: 600; }
+.edit-field .v { border-radius: 8px; padding: 8px 10px; background: var(--dt-container); font-size: 14px; }
+.edit-field.new .v { background: var(--tt-soft); border: 1px dashed var(--tt); }
+.measure { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.measure th, .measure td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--dt-border-sub); vertical-align: top; }
+.measure thead th { color: var(--dt-text-sub); font-weight: 600; font-size: 12.5px; }
+
+@media (max-width: 1240px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wf { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 1080px) {
+  .rc-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .tiles, .role-list, .lanes { grid-template-columns: minmax(0, 1fr); }
+  .fn-row { grid-template-columns: minmax(0, 1fr) 3em; }
+  .fn-row .fn-bar { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* 管理画面の表：数値の列は折り返さない */
+#an-table thead th, #an-table td { white-space: nowrap; }
+
+/* 内容の多いポップアップ（場面4の連絡と引き継ぎ）が枠からはみ出さないように */
+.tt-modal-card { max-height: 100%; overflow-y: auto; }
+@media (min-width: 1081px) {
+  .tt-modal { padding-top: 40px; }
+}
+.tt-modal-card > .actions { position: sticky; bottom: -18px; margin: 0 -20px -18px; padding: 10px 20px 14px; background: var(--dt-surface); border-radius: 0 0 12px 12px; }
+/* 場面4・5：問題へのコメント（Dynatraceの機能・イメージ） */
+#c4-comments { display: grid; gap: 10px; }
+.cm-box { border: 1px solid var(--dt-border, rgba(127,127,127,.35)); border-radius: 9px; padding: 10px 12px; display: grid; gap: 4px; background: var(--dt-surface); }
+.cm-box.empty { color: var(--dt-text-sub); font-size: 14px; min-height: 44px; }
+.cm-l { margin: 0; font-size: 14px; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 0 10px; align-items: baseline; }
+.cm-l .k { flex: 0 0 auto; min-width: 5.5em; color: var(--dt-text-sub); font-size: 13px; }
+.cm-fields { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: 10px; margin-top: 6px; }
+.cm-fields select { min-width: 0; max-width: 100%; }
+.cm-item { display: grid; gap: 4px; border-left: 3px solid var(--dt-primary); padding: 2px 0 2px 12px; }
+.cm-who { margin: 0 0 4px; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.cm-who .avatar { width: 24px; height: 24px; font-size: 12px; }
+#c4-explain p { margin: 0; font-size: 14px; }
+@media (max-width: 700px) { .cm-fields { grid-template-columns: minmax(0, 1fr); } }
