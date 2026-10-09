@@ -12,7 +12,8 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 const { chromium } = require("playwright");
 
-const HTML = "file://" + path.resolve(__dirname, "..", "index.html");
+// 撮影対象は旧版（v1）。Splunk公式UI部品版（../index.html）は画面の要素が違うため、台本の調整が要る
+const HTML = "file://" + path.resolve(__dirname, "..", "v1", "index.html");
 const OUT = process.env.OUT || path.join(__dirname, "splunk-techtouch-siem-demo.mp4");
 const FRAMES = process.env.FRAMES_DIR || fs.mkdtempSync(path.join(os.tmpdir(), "sptt-frames-"));
 const FFMPEG = process.env.FFMPEG || "ffmpeg";

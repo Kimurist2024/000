@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Splunk Cloud×テックタッチ SIEM/SOC活用デモ（イメージ）</title>
+<style>
+/*
+  Splunk Cloud × テックタッチ SIEM/SOC活用デモ（イメージ）。レイアウト：デモの流れ（9場面＋振り返り）→ 場面説明 → ブラウザ枠の中に
+  「Splunk Webの画面イメージを踏襲した架空画面」（上部バー・アプリバー・本文）→ 重なるテックタッチ（青）／AI Hub（紫）のオーバーレイ → 伺いたいこと。
+  基本の部品は Dynatrace 版デモ（dynatrace-techtouch-full-demo）から流用。--dt-* の変数名はその名残で、色は Splunk Web 風の架空の配色に上書きしている。
+*/
+:root {
+  --dt-base: #f9f9fa;
+  --dt-surface: #ffffff;
+  --dt-container: #f2f2f5;
+  --dt-container-emph: #ebecf0;
+  --dt-field: #e4e5eb;
+  --dt-field-hover: #dadbe4;
+  --dt-text: #2f2f4f;
+  --dt-text-sub: #595a7d;
+  --dt-border: #dadbe4;
+  --dt-border-sub: #e4e5eb;
+  --dt-primary: #464cce;
+  --dt-primary-accent: #474fcf;
+  --dt-primary-cont: #f1f2f9;
+  --dt-primary-cont-emph: #e9ecf8;
+  --dt-on-accent: #f4f4fb;
+  --dt-warning: #855400;
+  --dt-warning-cont-emph: #f9f3ec;
+  --dt-critical: #bb0731;
+  --dt-critical-cont: #f9f1f2;
+  --dt-success: #2d6761;
+  --dt-chart-1: #0057bf;
+  --dt-shadow-raised: 0 0 0 1px #2d2e4e08, 0 1px 2px #2d2e4e0d, 0 4px 8px -2px #2d2e4e12;
+  --dt-shadow-float: 0 0 0 1px #2d2e4e08, 0 1px 2px #2d2e4e0d, 0 5px 11px -2px #2d2e4e29;
+  --dt-shadow-field: inset 0 0 0 1px #2f2f4f1f, inset 0 -1px 0 #2f2f4f14, 0 1px 1px -1px #2d2e4e1f;
+
+  --tt: #0B7FB5;
+  --tt-soft: #E7F3FA;
+  --tt-ink: #075E86;
+  --tt-ring: rgba(11, 127, 181, 0.35);
+  --hub: #6A4C9C;
+  --hub-soft: #F3EFF9;
+  --hub-ink: #553C80;
+  --ov-warn: #B4531A;
+  --ov-warn-soft: #FCF0E6;
+  --on-accent: #FFFFFF;
+  --scrim: rgba(17, 17, 34, 0.32);
+
+  --font: Roboto, Helvetica, "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Yu Gothic", "游ゴシック", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  --font-demo: "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Yu Gothic", "游ゴシック", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  --dock-w: 184px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --dt-base: #19192c; --dt-surface: #111122; --dt-container: #212135; --dt-container-emph: #292a3e;
+    --dt-field: #323248; --dt-field-hover: #3b3b52; --dt-text: #ebecff; --dt-text-sub: #b1b2d2;
+    --dt-border: #3b3b52; --dt-border-sub: #323248; --dt-primary: #adb0ff; --dt-primary-accent: #999bed;
+    --dt-primary-cont: #212138; --dt-primary-cont-emph: #292944; --dt-on-accent: #1f2037;
+    --dt-warning: #eea83f; --dt-warning-cont-emph: #332c34; --dt-critical: #ff999c; --dt-critical-cont: #251c2e; --dt-success: #6fc3ba; --dt-chart-1: #0072f5;
+    --dt-shadow-raised: 0 0 0 1px #f0f0f514, 0 1px 2px #111122, 0 4px 8px #111122cc;
+    --dt-shadow-float: 0 0 0 1px #f0f0f514, 0 1px 2px #111122, 0 7px 8px #111122cc;
+    --dt-shadow-field: inset 0 0 0 1px #ebecff1f, inset 0 1px 0 #ebecff14, 0 1px 1px -1px #11112280;
+    --tt: #45AEE0; --tt-soft: #12324A; --tt-ink: #8FD0EF; --tt-ring: rgba(69, 174, 224, 0.4);
+    --hub: #A88DD8; --hub-soft: #28213D; --hub-ink: #CDBDEB;
+    --ov-warn: #F2A465; --ov-warn-soft: #3A2616; --on-accent: #0B1420; --scrim: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --dt-base: #19192c; --dt-surface: #111122; --dt-container: #212135; --dt-container-emph: #292a3e;
+  --dt-field: #323248; --dt-field-hover: #3b3b52; --dt-text: #ebecff; --dt-text-sub: #b1b2d2;
+  --dt-border: #3b3b52; --dt-border-sub: #323248; --dt-primary: #adb0ff; --dt-primary-accent: #999bed;
+  --dt-primary-cont: #212138; --dt-primary-cont-emph: #292944; --dt-on-accent: #1f2037;
+  --dt-warning: #eea83f; --dt-warning-cont-emph: #332c34; --dt-critical: #ff999c; --dt-critical-cont: #251c2e; --dt-success: #6fc3ba; --dt-chart-1: #0072f5;
+  --dt-shadow-raised: 0 0 0 1px #f0f0f514, 0 1px 2px #111122, 0 4px 8px #111122cc;
+  --dt-shadow-float: 0 0 0 1px #f0f0f514, 0 1px 2px #111122, 0 7px 8px #111122cc;
+  --dt-shadow-field: inset 0 0 0 1px #ebecff1f, inset 0 1px 0 #ebecff14, 0 1px 1px -1px #11112280;
+  --tt: #45AEE0; --tt-soft: #12324A; --tt-ink: #8FD0EF; --tt-ring: rgba(69, 174, 224, 0.4);
+  --hub: #A88DD8; --hub-soft: #28213D; --hub-ink: #CDBDEB;
+  --ov-warn: #F2A465; --ov-warn-soft: #3A2616; --on-accent: #0B1420; --scrim: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--dt-base);
+  color: var(--dt-text);
+  font-family: var(--font-demo);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1560px;
+  margin: 0 auto;
+  padding-inline: 24px;
+  padding-block: 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--tt); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; word-break: auto-phrase; margin: 0; }
+p { margin: 0; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- デモの外枠（ヘッダー・注記） ---------- */
+.topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; justify-content: space-between; }
+.brand { display: flex; flex-direction: column; line-height: 1.4; }
+.brand-name { font-weight: 700; font-size: 17px; }
+.brand-sub { font-size: 13px; color: var(--dt-text-sub); }
+.scene-nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.scene-nav button {
+  border: 1px solid var(--dt-border);
+  background: var(--dt-surface);
+  color: var(--dt-text-sub);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.scene-nav button[aria-current="true"] { background: var(--dt-text); border-color: var(--dt-text); color: var(--dt-base); font-weight: 700; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.tool { border: 1px solid var(--dt-border); background: transparent; color: var(--dt-text-sub); border-radius: 6px; padding: 5px 12px; font-size: 14px; }
+.tool[aria-pressed="true"] { background: var(--dt-container); color: var(--dt-text); font-weight: 700; }
+.disclaimer {
+  display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: center; justify-content: space-between;
+  border: 1px solid var(--dt-border); background: var(--dt-surface); border-radius: 9px;
+  padding: 8px 16px; font-size: 14px; color: var(--dt-text-sub);
+}
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.l-dt { background: var(--dt-surface); border: 1px solid var(--dt-primary); }
+.l-tt { background: var(--tt); }
+.l-hub { background: var(--hub); }
+
+.scene { display: flex; flex-direction: column; gap: 14px; }
+.scene-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.scene-head > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.eyebrow { font-size: 13px; color: var(--dt-text-sub); letter-spacing: 0.06em; }
+.scene-head h1 { font-size: clamp(22px, 2.2vw, 28px); line-height: 1.4; }
+.lede { font-size: 17px; color: var(--dt-text-sub); }
+.tag { border: 1px solid var(--dt-border); color: var(--dt-text-sub); border-radius: 6px; padding: 2px 10px; font-size: 13px; white-space: nowrap; }
+
+/* ---------- ブラウザ枠 ---------- */
+.window {
+  border: 1px solid var(--dt-border);
+  border-radius: 12px;
+  background: var(--dt-base);
+  box-shadow: var(--dt-shadow-float);
+  min-width: 0;
+}
+.win-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--dt-border-sub);
+  background: var(--dt-container);
+  border-radius: 12px 12px 0 0;
+  font-size: 12px; color: var(--dt-text-sub);
+}
+.dots { display: inline-flex; gap: 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--dt-field-hover); display: inline-block; }
+
+/* ---------- 画面イメージ（架空） ---------- */
+.dt {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--dock-w) minmax(0, 1fr) 364px;
+  grid-template-rows: auto;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.4286;
+  color: var(--dt-text);
+  min-height: 600px;
+}
+.dock {
+  grid-column: 1;
+  grid-row: 1;
+  background: var(--dt-container);
+  border-right: 1px solid var(--dt-border-sub);
+  padding: 10px 8px;
+  display: flex; flex-direction: column; gap: 2px;
+  border-radius: 0 0 0 12px;
+}
+.dock-group { display: grid; gap: 2px; }
+.dock-sep { height: 1px; background: var(--dt-border); margin: 6px 6px; }
+.dock-label { font-size: 12px; color: var(--dt-text-sub); padding: 4px 8px 2px; }
+.dock-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; border-radius: 6px;
+  color: var(--dt-text); font-size: 14px; white-space: nowrap;
+}
+.dock-item svg { width: 18px; height: 18px; flex: none; }
+.dock-item.active { background: var(--dt-primary-cont-emph); color: var(--dt-primary); font-weight: 500; }
+.dock-spacer { flex: 1; }
+.avatar {
+  width: 22px; height: 22px; border-radius: 50%; flex: none;
+  display: inline-grid; place-items: center; font-size: 11px; font-weight: 700;
+  background: var(--dt-primary-accent); color: var(--dt-on-accent);
+}
+.dt-app { grid-column: 2 / 4; grid-row: 1; display: flex; flex-direction: column; min-width: 0; background: var(--dt-base); border-radius: 0 0 12px 0; }
+.appheader {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 48px; padding: 0 16px;
+  background: var(--dt-surface);
+  border-bottom: 1px solid var(--dt-border-sub);
+}
+.ah-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex-wrap: wrap; }
+.app-icon {
+  width: 24px; height: 24px; border-radius: 6px; flex: none;
+  display: inline-grid; place-items: center;
+  background: var(--dt-primary-cont-emph); color: var(--dt-primary);
+}
+.app-icon svg { width: 16px; height: 16px; }
+.app-name { font-weight: 600; font-size: 14px; }
+.ah-nav { display: flex; gap: 2px; flex-wrap: wrap; }
+.ah-nav span { position: relative; padding: 13px 10px; color: var(--dt-text-sub); font-weight: 500; }
+.ah-nav span.active { color: var(--dt-primary); }
+.ah-nav span.active::after {
+  content: ""; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+  width: 20px; height: 2px; border-radius: 12px; background: currentColor;
+}
+.dt-look-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 6px; font-weight: 500; color: var(--dt-text);
+  background: var(--dt-field); box-shadow: var(--dt-shadow-field); white-space: nowrap;
+}
+.dt-look-btn svg { width: 14px; height: 14px; }
+.dt-page { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.crumbs { font-size: 12px; color: var(--dt-text-sub); }
+.tb-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.dt-h { font-size: 20px; font-weight: 600; line-height: 1.4; }
+.dt-h3 { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dt-field {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 4px 0 10px; min-height: 32px;
+  border-radius: 6px;
+  background: var(--dt-field);
+  box-shadow: var(--dt-shadow-field);
+}
+.dt-field label, .dt-field .pre { display: inline-flex; align-items: center; gap: 6px; color: var(--dt-text-sub); font-weight: 500; white-space: nowrap; }
+.dt-field svg { width: 14px; height: 14px; }
+.dt-field select {
+  border: 0; background: transparent; color: var(--dt-text);
+  font-size: 14px; font-weight: 500; padding: 6px 4px; min-width: 0; max-width: 100%;
+  border-radius: 4px;
+}
+.dt-field select:disabled { opacity: 0.5; cursor: not-allowed; }
+.dt-field:focus-within { box-shadow: var(--dt-shadow-field), 0 0 0 2px var(--dt-primary); }
+.dt-field.block { display: flex; flex-direction: column; align-items: stretch; gap: 2px; padding: 6px 8px 4px 10px; }
+.dt-field.block label, .dt-field.block .pre { font-size: 12px; }
+.dt-field.block select { padding: 2px 0 4px; }
+.locked { color: var(--dt-text-sub); font-weight: 500; padding: 2px 0 4px; }
+.tip-anchor { position: relative; display: inline-flex; border-radius: 6px; }
+.dt-accent {
+  border: 0; border-radius: 6px; padding: 6px 14px; min-height: 32px;
+  background: var(--dt-primary-accent); color: var(--dt-on-accent); font-weight: 500; font-size: 14px;
+}
+.dt-emph {
+  border: 0; border-radius: 6px; padding: 6px 14px; min-height: 32px;
+  background: var(--dt-field); color: var(--dt-text); font-weight: 500; font-size: 14px; box-shadow: var(--dt-shadow-field);
+}
+.surface {
+  background: var(--dt-surface);
+  border-radius: 12px;
+  box-shadow: var(--dt-shadow-raised);
+  padding: 14px 16px;
+  display: grid; gap: 10px;
+  min-width: 0;
+  position: relative;
+}
+.surface-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--dt-text-sub); }
+.chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.sw-cmp { background: var(--dt-container-emph); border: 1px solid var(--dt-border); }
+.sw-tgt { background: var(--dt-warning-cont-emph); border: 1px solid var(--dt-warning); }
+.sw-line { background: var(--dt-chart-1); }
+.chart-wrap { overflow-x: auto; }
+.chart { width: 100%; min-width: 420px; height: auto; display: block; }
+.c-grid { stroke: var(--dt-border-sub); stroke-width: 1; }
+.c-band-cmp { fill: var(--dt-container-emph); }
+.c-band-tgt { fill: var(--dt-warning-cont-emph); }
+.c-band-txt { fill: var(--dt-text-sub); font-size: 11px; font-family: var(--font); }
+.c-area { fill: var(--dt-chart-1); fill-opacity: 0.08; }
+.c-line { stroke: var(--dt-chart-1); stroke-width: 2; fill: none; }
+.c-txt { fill: var(--dt-text-sub); font-size: 11px; font-family: var(--font); }
+.c-hit { fill: var(--dt-warning); }
+.c-hit-txt { fill: var(--dt-warning); font-size: 12px; font-weight: 600; font-family: var(--font); }
+
+.table-wrap { overflow-x: auto; }
+.dtable { width: 100%; border-collapse: collapse; min-width: 440px; font-size: 14px; }
+.dtable th, .dtable td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--dt-border-sub); vertical-align: middle; }
+.dtable thead th { color: var(--dt-text-sub); font-weight: 500; font-size: 13px; line-height: 1.4; border-bottom-color: var(--dt-border); }
+.dtable tbody th { font-weight: 400; }
+.dtable .big { font-size: 20px; font-weight: 600; }
+.dtable .up { color: var(--dt-warning); }
+.dt-callout { background: var(--dt-container); border-radius: 9px; padding: 10px 14px; font-size: 14px; }
+.dt-fine { font-size: 12px; color: var(--dt-text-sub); }
+.empty {
+  display: grid; gap: 8px; justify-items: center; text-align: center;
+  padding: 36px 16px; color: var(--dt-text-sub);
+  background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-raised);
+}
+.empty svg { width: 36px; height: 36px; color: var(--dt-border); }
+
+/* デモ②：問題一覧・問題の詳細 */
+.row-link { border: 0; background: transparent; padding: 0; color: var(--dt-primary); font-weight: 500; text-align: left; font-size: 14px; }
+.row-link:hover { text-decoration: underline; }
+.status { display: inline-block; font-size: 12px; font-weight: 500; border-radius: 999px; padding: 1px 10px; background: var(--dt-container); color: var(--dt-text-sub); white-space: nowrap; }
+.status.active { background: var(--dt-warning-cont-emph); color: var(--dt-warning); }
+.plist { min-width: 0; }
+.dt-tabs { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--dt-border); }
+.dt-tabs button { border: 0; background: transparent; padding: 8px 14px; font-weight: 500; font-size: 14px; color: var(--dt-text-sub); position: relative; border-radius: 6px 6px 0 0; }
+.dt-tabs button.active { color: var(--dt-primary); }
+.dt-tabs button.active::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: currentColor; }
+.kv { display: grid; grid-template-columns: minmax(8em, 13em) minmax(0, 1fr); margin: 0; }
+.kv > * { margin: 0; padding: 10px 4px; border-bottom: 1px solid var(--dt-border-sub); }
+.kv dt { color: var(--dt-text-sub); }
+.lv { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; }
+.lv.error { background: var(--dt-critical-cont); color: var(--dt-critical); }
+.lv.warn { background: var(--dt-warning-cont-emph); color: var(--dt-warning); }
+.lv.info { background: var(--dt-container); color: var(--dt-text-sub); }
+.logs td:first-child { white-space: nowrap; }
+.tt-modal {
+  position: absolute; grid-column: 2 / -1; grid-row: 1; inset: 0; z-index: 15;
+  background: var(--scrim);
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 96px 388px 24px 24px;
+  border-radius: 0 0 12px 0;
+}
+.tt-modal-card {
+  width: 100%; max-width: 560px;
+  background: var(--dt-surface); border-radius: 12px; border-top: 5px solid var(--tt);
+  box-shadow: var(--dt-shadow-float), 0 12px 32px -8px var(--tt-ring);
+  padding: 18px 20px; display: grid; gap: 10px;
+  font-family: var(--font-demo); font-size: 15px; line-height: 1.65; color: var(--dt-text);
+}
+.proc { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+.proc span { display: block; color: var(--dt-text-sub); font-size: 14px; }
+.msg { white-space: pre-wrap; background: var(--dt-container); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; margin-top: 4px; color: var(--dt-text); }
+
+/* デモ③：ひな型 */
+.section-label { font-size: 13px; font-weight: 600; color: var(--dt-text-sub); }
+.tpl-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; position: relative; border-radius: 12px; }
+.tpl {
+  position: relative; display: grid; gap: 4px; align-content: start;
+  background: var(--dt-surface); border-radius: 9px; box-shadow: var(--dt-shadow-raised);
+  padding: 12px 14px; cursor: pointer; min-width: 0; border: 1px solid transparent;
+}
+.tpl input { position: absolute; opacity: 0; pointer-events: none; }
+.tpl:has(input:checked) { border-color: var(--dt-primary); background: var(--dt-primary-cont); }
+.tpl:has(input:focus-visible) { outline: 2px solid var(--dt-primary); outline-offset: 2px; }
+.tpl-name { font-weight: 600; }
+.tpl-desc { color: var(--dt-text-sub); font-size: 13px; }
+.badge { justify-self: start; font-size: 11px; border-radius: 4px; padding: 1px 6px; background: var(--dt-container); color: var(--dt-text-sub); }
+.edit-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.changes ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.changes li { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; }
+.changes .k { color: var(--dt-text-sub); min-width: 7.5em; }
+.st { font-size: 11px; border-radius: 4px; padding: 1px 6px; background: var(--dt-container); color: var(--dt-text-sub); }
+.st.on { background: var(--dt-primary-accent); color: var(--dt-on-accent); }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.checks li::before { content: "✓"; color: var(--dt-success); font-weight: 700; margin-right: 8px; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.status { background: var(--dt-container); border-radius: 6px; padding: 8px 12px; }
+.dql { display: grid; gap: 2px; border-top: 1px solid var(--dt-border-sub); padding-top: 10px; }
+.dql span { color: var(--dt-text-sub); }
+
+/* ---------- テックタッチ／AI Hub（オーバーレイ） ---------- */
+.overlay {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: start;
+  position: sticky;
+  top: 16px;
+  margin: 60px 16px 16px 0;
+  z-index: 20;
+  background: var(--dt-surface);
+  border-radius: 12px;
+  border: 1px solid var(--dt-border);
+  border-top: 5px solid var(--tt);
+  box-shadow: var(--dt-shadow-float), 0 12px 32px -8px var(--tt-ring);
+  padding: 16px 18px 18px;
+  display: flex; flex-direction: column; gap: 12px;
+  font-family: var(--font-demo);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--dt-text);
+}
+.overlay.hub { border-top-color: var(--hub); }
+.has-overlay .dt-page { padding-right: 384px; }
+.ov-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ov-pill { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 10px; background: var(--tt); color: var(--on-accent); }
+.overlay.hub .ov-pill { background: var(--hub); }
+.ov-kicker { font-size: 12px; color: var(--dt-text-sub); }
+.ov-brand { font-weight: 700; color: var(--tt-ink); font-size: 16px; margin-top: -6px; }
+.overlay.hub .ov-brand { color: var(--hub-ink); }
+.ov-title { font-size: 18px; line-height: 1.45; }
+.ov-text { color: var(--dt-text-sub); font-size: 14px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: st; }
+.steps li {
+  counter-increment: st;
+  display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: center;
+  padding: 4px 8px; border-radius: 6px; font-size: 14px; color: var(--dt-text-sub);
+}
+.steps li::before {
+  content: counter(st);
+  display: inline-grid; place-items: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid var(--dt-border); font-size: 11px;
+}
+.steps li.done { color: var(--dt-text); }
+.steps li.done::before { content: "✓"; background: var(--dt-success); border-color: var(--dt-success); color: var(--on-accent); }
+.steps li.now { background: var(--tt-soft); color: var(--tt-ink); font-weight: 700; }
+.steps li.now::before { background: var(--tt); border-color: var(--tt); color: var(--on-accent); }
+.now-box { font-weight: 700; }
+.alert { background: var(--ov-warn-soft); border: 1px solid var(--ov-warn); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+.soft { background: var(--tt-soft); border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+.overlay.hub .soft { background: var(--hub-soft); }
+.refs { font-size: 12px; color: var(--dt-text-sub); }
+.part { border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; font-size: 14px; }
+.part.tt { background: var(--tt-soft); }
+.part.hub { background: var(--hub-soft); }
+.part-head { font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+.part.tt .part-head { color: var(--tt-ink); }
+.part.hub .part-head { color: var(--hub-ink); }
+.actions { display: flex; gap: 8px; }
+.btn { border: 1px solid transparent; border-radius: 8px; padding: 10px 16px; font-weight: 700; font-size: 15px; line-height: 1.4; }
+.btn-primary { background: var(--tt); color: var(--on-accent); flex: 1; }
+.overlay.hub .btn-primary { background: var(--hub); }
+.btn-ghost { background: transparent; border-color: var(--dt-border); color: var(--dt-text-sub); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* テックタッチが画面に追加する要素（入口ボタン・？アイコン） */
+.tt-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px dashed var(--tt); color: var(--tt-ink); background: var(--tt-soft);
+  border-radius: 6px; padding: 2px 10px; font-size: 13px; font-weight: 700; font-family: var(--font-demo);
+}
+
+/* ガイドの対象箇所と吹き出し */
+.is-target { outline: 3px solid var(--tt); outline-offset: 4px; animation: ring 1.8s ease-out infinite; }
+@keyframes ring {
+  0% { box-shadow: 0 0 0 0 var(--tt-ring); }
+  70% { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.dt-field.is-target, .tip-anchor.is-target { animation: none; }
+.balloon {
+  position: absolute; top: calc(100% + 12px); left: 0; z-index: 40;
+  width: max-content; max-width: min(360px, 78vw);
+  background: var(--tt); color: var(--on-accent);
+  border-radius: 8px; padding: 8px 12px;
+  font-family: var(--font-demo); font-size: 14px; font-weight: 700; line-height: 1.5;
+  box-shadow: var(--dt-shadow-float);
+  pointer-events: none;
+}
+.balloon::before {
+  content: ""; position: absolute; top: -8px; left: var(--ax, 20px);
+  border: 8px solid transparent; border-top: 0; border-bottom-color: var(--tt);
+}
+.balloon small { display: block; font-weight: 400; font-size: 12.5px; opacity: 0.95; }
+.balloon.r { left: auto; right: 0; }
+.balloon.r::before { left: auto; right: var(--axr, 20px); }
+.balloon.warn { background: var(--ov-warn); }
+.balloon.warn::before { border-bottom-color: var(--ov-warn); }
+
+/* ---------- 伺いたいこと・進行メモ ---------- */
+.ask {
+  display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline;
+  background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 9px;
+  padding: 12px 18px; font-size: 18px;
+}
+.ask strong { font-size: 14px; background: var(--dt-text); color: var(--dt-base); border-radius: 999px; padding: 2px 12px; white-space: nowrap; }
+.ask span { min-width: 0; }
+.notes { background: var(--dt-container); border: 1px solid var(--dt-border); border-radius: 12px; padding: 16px 22px; display: grid; gap: 12px; font-size: 15px; }
+.notes h2 { font-size: 17px; }
+.notes h3 { font-size: 15px; color: var(--dt-text-sub); }
+.notes ul { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.notes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; }
+.notes-grid > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.kbd { font-size: 13px; color: var(--dt-text-sub); }
+.foot { font-size: 12px; color: var(--dt-text-sub); text-align: right; }
+
+/* ---------- 吹き出しの向き・Dockの基準位置 ---------- */
+.dock-item { position: relative; }
+.balloon.s { top: 50%; left: calc(100% + 14px); transform: translateY(-50%); }
+.balloon.s::before { top: 50%; left: -8px; margin-top: -8px; border-style: solid; border-width: 8px 8px 8px 0; border-color: transparent var(--tt) transparent transparent; }
+.balloon.warn.s::before { border-color: transparent var(--ov-warn) transparent transparent; }
+
+/* ---------- 業務の流れ（進行バー）・場面説明 ---------- */
+.journey { display: flex; flex-wrap: wrap; gap: 6px; }
+.jn {
+  flex: 1 1 210px;
+  display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 10px; align-items: center;
+  text-align: left; padding: 8px 12px; border-radius: 9px;
+  border: 1px solid var(--dt-border); background: var(--dt-surface); color: var(--dt-text-sub);
+}
+.jn .no {
+  grid-row: 1 / 3; width: 26px; height: 26px; border-radius: 50%;
+  display: inline-grid; place-items: center; font-size: 12px; font-weight: 700;
+  border: 1px solid var(--dt-border); background: var(--dt-surface);
+}
+.jn .jl { font-weight: 700; font-size: 14px; line-height: 1.4; color: var(--dt-text); }
+.jn .jt { font-size: 12px; line-height: 1.4; }
+.jn.now { border-color: var(--dt-text); box-shadow: inset 0 0 0 1px var(--dt-text); }
+.jn.now .no { background: var(--dt-text); border-color: var(--dt-text); color: var(--dt-base); }
+.jn.done .no { background: var(--dt-success); border-color: var(--dt-success); color: var(--on-accent); }
+.jn.todo .jl { color: var(--dt-text-sub); font-weight: 500; }
+.story {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 18px; align-items: start;
+  background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 12px; padding: 14px 18px;
+}
+.story-time {
+  grid-row: 1 / 4; min-width: 4.4em; padding-right: 18px; border-right: 1px solid var(--dt-border);
+  font-size: 30px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums;
+}
+.story-time small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--dt-text-sub); }
+.story h1 { font-size: clamp(20px, 2vw, 26px); line-height: 1.4; }
+.story-text { color: var(--dt-text-sub); font-size: 15px; }
+.story-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.story-tags span { font-size: 12px; border-radius: 999px; padding: 1px 10px; background: var(--dt-container); color: var(--dt-text-sub); }
+
+/* ---------- Dock（押せる項目） ---------- */
+button.dock-item { width: 100%; border: 0; background: transparent; text-align: left; font: inherit; color: var(--dt-text); cursor: pointer; }
+button.dock-item:hover { background: var(--dt-container-emph); }
+button.dock-item.active:hover { background: var(--dt-primary-cont-emph); }
+
+/* ---------- 社内チャット（架空） ---------- */
+.chat {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 2px 12px; align-items: start;
+  background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-float);
+  border-left: 4px solid var(--dt-text-sub); padding: 12px 14px; font-family: var(--font-demo);
+}
+.chat .av { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--dt-container-emph); font-weight: 700; }
+.chat .who { font-size: 13px; color: var(--dt-text-sub); }
+.chat .who b { color: var(--dt-text); margin-right: 8px; }
+.chat .say { font-size: 15px; line-height: 1.6; }
+.chat .src { font-size: 11px; color: var(--dt-text-sub); }
+.chat-close { border: 0; background: transparent; color: var(--dt-text-sub); font-size: 13px; padding: 2px 6px; }
+
+/* ---------- ホーム（架空） ---------- */
+.home-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.app-tile {
+  display: grid; gap: 6px; justify-items: start; text-align: left; font: inherit;
+  background: var(--dt-surface); border: 0; border-radius: 12px; box-shadow: var(--dt-shadow-raised);
+  padding: 14px 16px; color: var(--dt-text);
+}
+button.app-tile { cursor: pointer; }
+.app-tile .app-icon { width: 32px; height: 32px; }
+.app-tile .app-icon svg { width: 20px; height: 20px; }
+.app-tile b { font-weight: 600; }
+.app-tile span.d { color: var(--dt-text-sub); font-size: 13px; }
+
+/* ---------- テックタッチのツールチップ（案） ---------- */
+.tip-wrap { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.tt-q {
+  display: inline-grid; place-items: center; width: 20px; height: 20px; padding: 0; flex: none;
+  border-radius: 50%; border: 1px solid var(--tt); color: var(--tt); background: var(--tt-soft);
+  font-size: 12px; font-weight: 700; line-height: 1;
+}
+.tt-q[aria-expanded="true"] { background: var(--tt); color: var(--on-accent); }
+.tt-tip {
+  position: absolute; top: calc(100% + 10px); left: -10px; z-index: 35;
+  width: min(340px, 78vw); padding: 10px 12px;
+  background: var(--dt-surface); border: 2px solid var(--tt); border-radius: 10px; box-shadow: var(--dt-shadow-float);
+  font-family: var(--font-demo); font-size: 13.5px; font-weight: 400; line-height: 1.6; color: var(--dt-text); white-space: normal;
+}
+.tt-tip .lab { display: block; margin-bottom: 2px; font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* ---------- 画面内のお知らせ・ボタン ---------- */
+.dt-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; background: var(--dt-warning-cont-emph); border-radius: 9px; padding: 10px 14px; }
+.dt-banner b { color: var(--dt-warning); }
+.title-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
+.share-chip { font-size: 12px; border-radius: 999px; padding: 1px 10px; background: var(--dt-primary-cont-emph); color: var(--dt-primary); font-weight: 500; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px; display: grid; gap: 2px; }
+.kpi span { font-size: 12.5px; color: var(--dt-text-sub); }
+.kpi b { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- パネル：ガイド一覧・記録 ---------- */
+.glist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.gitem {
+  width: 100%; display: grid; gap: 2px; text-align: left; font: inherit; font-family: var(--font-demo);
+  border: 1px solid var(--dt-border); border-radius: 9px; background: var(--dt-surface); padding: 9px 12px; color: var(--dt-text);
+}
+button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-soft); }
+.overlay.hub button.gitem { border-color: var(--hub); background: var(--hub-soft); }
+.gname { font-weight: 700; font-size: 14px; }
+.gmeta { font-size: 12px; color: var(--dt-text-sub); }
+.rec-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.rec-list li { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 8px; }
+.rec-list .t { color: var(--dt-text-sub); font-variant-numeric: tabular-nums; }
+.steps.compact li { padding: 2px 8px; font-size: 13.5px; }
+
+/* ---------- 振り返り ---------- */
+.summary { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; }
+.sum-card {
+  background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 12px;
+  padding: 18px 20px; display: grid; gap: 12px; align-content: start; min-width: 0;
+}
+.sum-card.wide { grid-column: 1 / -1; }
+.sum-card h2 { font-size: 18px; line-height: 1.4; }
+.sum-note { font-size: 13px; color: var(--dt-text-sub); }
+.tl { list-style: none; margin: 0; padding: 0; display: grid; }
+.tl li { display: grid; grid-template-columns: 3.4em 16px minmax(0, 1fr); column-gap: 12px; }
+.tl .t { font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 1px; }
+.tl .rail { position: relative; }
+.tl .rail::before { content: ""; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--dt-border); }
+.tl li:first-child .rail::before { top: 9px; }
+.tl li:last-child .rail::before { bottom: auto; height: 9px; }
+.tl .rail::after { content: ""; position: absolute; left: 2px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--tt); }
+.tl .body { padding-bottom: 14px; }
+.tl .body b { display: block; }
+.tl .body span { color: var(--dt-text-sub); font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--dt-container); border-radius: 9px; padding: 10px 12px; display: grid; gap: 2px; align-content: start; }
+.stat b { font-size: 28px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--dt-text-sub); }
+.sum-list { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.flow3 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 20px; font-weight: 700; }
+.flow3 .arrow { color: var(--dt-text-sub); font-weight: 400; }
+
+@media (max-width: 1240px) {
+  :root { --dock-w: 56px; }
+  .dock-item .dl, .dock-label { display: none; }
+  .dock-item { justify-content: center; padding: 8px 0; }
+  .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1080px) {
+  .dt { grid-template-columns: var(--dock-w) minmax(0, 1fr); grid-template-rows: auto auto; }
+  .dock { grid-row: 1 / 3; }
+  .dt-app { grid-column: 2; border-radius: 0; }
+  .overlay { grid-column: 2; grid-row: 2; margin: 0 16px 16px; position: relative; top: auto; }
+  .has-overlay .dt-page { padding-right: 20px; }
+  .tt-modal { grid-column: 2; padding: 72px 24px 24px; border-radius: 0; }
+  .notes-grid, .summary { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .wrap { padding-inline: 16px; }
+  .dt { grid-template-columns: minmax(0, 1fr); }
+  .dock { display: none; }
+  .dt-app, .overlay { grid-column: 1; }
+  .tt-modal { grid-column: 1 / -1; padding: 48px 12px 12px; }
+  .kv { grid-template-columns: minmax(0, 1fr); }
+  .kv dt { border-bottom: 0; padding-bottom: 0; }
+  .dt-page { padding: 12px; }
+  .has-overlay .dt-page { padding-right: 12px; }
+  .overlay { margin: 0 12px 12px; padding: 14px; }
+  .toolbar > * { width: 100%; }
+  .dt-field select { flex: 1; }
+  .tip-anchor .dt-accent { width: 100%; }
+  .tpl-list, .edit-grid, .home-grid, .kpis, .stats { grid-template-columns: minmax(0, 1fr); }
+  .ah-nav span { padding: 10px 6px; }
+  .story { grid-template-columns: minmax(0, 1fr); }
+  .story-time { grid-row: auto; border-right: 0; padding-right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-target { animation: none; }
+}
+
+/* ==================== 本格デモで追加した部品 ==================== */
+.status { border-radius: 999px; padding: 1px 10px; }
+.done-msg { background: var(--dt-container); border-radius: 6px; padding: 8px 12px; font-size: 14px; }
+.dt-accent:disabled, .dt-emph:disabled { opacity: 0.45; cursor: not-allowed; }
+.info { background: var(--dt-container); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; color: var(--dt-text-sub); }
+.jn { flex: 1 1 140px; }
+
+/* 視点（運用者／SRE）の印。色ではなく塗りの有無で見分ける */
+.rc {
+  display: inline-block; vertical-align: 1px; margin-right: 6px; border-radius: 4px; padding: 0 6px;
+  font-size: 11px; font-weight: 700; line-height: 1.6; letter-spacing: 0.02em; white-space: nowrap;
+}
+.rc.ops { border: 1px solid var(--dt-text-sub); color: var(--dt-text); background: var(--dt-surface); }
+.rc.sre { border: 1px solid var(--dt-text); background: var(--dt-text); color: var(--dt-base); }
+.story h1 .rc { font-size: 13px; vertical-align: 4px; }
+.jn .jt { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 0; }
+.jn { padding: 8px 10px; column-gap: 8px; }
+.jn .jl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13.5px; }
+
+/* 文字の入力欄（ワークフローの名前） */
+.dt-field input[type="text"] {
+  border: 0; background: transparent; color: var(--dt-text); font-size: 14px; font-weight: 500;
+  padding: 2px 0 4px; min-width: 0; width: 100%; border-radius: 4px;
+}
+.dt-field input[type="text"]:focus { outline: none; }
+.dt-field input[type="text"]:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* AI Hub が画面に添える要素（構想） */
+.hub-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px dashed var(--hub); color: var(--hub-ink); background: var(--hub-soft);
+  border-radius: 6px; padding: 4px 12px; font-size: 13px; font-weight: 700; font-family: var(--font-demo); cursor: pointer;
+}
+.hub-card {
+  border: 1px dashed var(--hub); background: var(--hub-soft); border-radius: 12px; padding: 12px 14px;
+  display: grid; gap: 6px; font-family: var(--font-demo); font-size: 14px; line-height: 1.6;
+}
+.hub-card .lab { font-size: 12px; font-weight: 700; color: var(--hub-ink); }
+
+/* フローティングバナーのプレビュー（案） */
+.banner-preview {
+  border: 1px dashed var(--tt); background: var(--tt-soft); border-radius: 10px; padding: 10px 14px;
+  display: grid; gap: 2px; font-family: var(--font-demo); font-size: 14px;
+}
+.banner-preview .lab { font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* 振り返り：運用者とSREの2列 */
+.lanes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
+.lane { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.lane h3 { font-size: 15px; line-height: 1.5; }
+.sum-list.plain { padding-left: 1.1em; font-size: 14px; }
+
+/* 説明用の進行（場面8：テックタッチ管理画面の上） */
+.overlay.note { border-top-color: var(--dt-text-sub); box-shadow: var(--dt-shadow-float); }
+.overlay.note .ov-pill { background: var(--dt-text-sub); }
+.overlay.note .steps li.now { background: var(--dt-container); color: var(--dt-text); }
+.overlay.note .steps li.now::before { background: var(--dt-text-sub); border-color: var(--dt-text-sub); }
+.overlay.note .btn-primary { background: var(--dt-text); color: var(--dt-base); }
+.overlay.note .soft { background: var(--dt-container); }
+.balloon.note { background: var(--dt-text); color: var(--dt-base); }
+.balloon.note::before { border-bottom-color: var(--dt-text); }
+.is-target.note-target { outline-color: var(--dt-text-sub); animation: none; }
+
+/* ポップアップ：役割を選ぶ */
+.role-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.role {
+  display: grid; gap: 2px; text-align: left; font: inherit; font-family: var(--font-demo);
+  border: 1px solid var(--dt-border); border-radius: 9px; background: var(--dt-surface); padding: 10px 12px; color: var(--dt-text); cursor: pointer;
+}
+.role b { font-size: 15px; }
+.role span { font-size: 12.5px; color: var(--dt-text-sub); line-height: 1.5; }
+.role.rec { border-color: var(--tt); background: var(--tt-soft); }
+
+/* ダッシュボードのタイル */
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile {
+  position: relative; display: grid; gap: 4px; align-content: start; min-width: 0;
+  text-align: left; font: inherit; color: var(--dt-text);
+  background: var(--dt-surface); border: 0; border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px;
+}
+button.tile { cursor: pointer; }
+button.tile:hover { box-shadow: var(--dt-shadow-float); }
+.t-name { font-size: 13px; color: var(--dt-text-sub); font-weight: 500; }
+.t-val { font-size: 24px; font-weight: 600; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.t-val.ok { color: var(--dt-success); }
+.t-val.bad { color: var(--dt-warning); }
+.t-sub { font-size: 12px; color: var(--dt-text-sub); }
+.spark { width: 100%; height: 30px; display: block; }
+.spark polyline { fill: none; stroke: var(--dt-chart-1); stroke-width: 1.6; }
+.bar { height: 8px; border-radius: 999px; background: var(--dt-container-emph); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 999px; background: var(--dt-success); }
+
+/* 根本原因・推薦 */
+.rc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.flowline { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.flowline .n { border-radius: 6px; padding: 2px 8px; background: var(--dt-container); font-size: 13px; }
+.flowline .n.root { background: var(--dt-warning-cont-emph); color: var(--dt-warning); font-weight: 600; }
+.flowline .a { color: var(--dt-text-sub); }
+
+/* AI Assistant（流用） */
+.nb-sec { background: var(--dt-surface); border-radius: 12px; box-shadow: var(--dt-shadow-raised); padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.nb-sec-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.nb-kind { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; background: var(--dt-container); color: var(--dt-text-sub); }
+.code {
+  margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--dt-container); color: var(--dt-text);
+  font-family: "SFMono-Regular", Consolas, Menlo, "BIZ UDGothic", "Yu Gothic", monospace; font-size: 13px; line-height: 1.6;
+  white-space: pre-wrap; overflow-x: auto;
+}
+.assist { border: 1px solid var(--dt-primary); border-radius: 12px; background: var(--dt-surface); padding: 12px 14px; display: grid; gap: 8px; box-shadow: var(--dt-shadow-raised); }
+.assist-head { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--dt-primary); }
+.assist-head svg, .dt-emph svg, .dt-accent svg { width: 15px; height: 15px; vertical-align: -2px; }
+.bubble { justify-self: end; max-width: 85%; background: var(--dt-primary-cont-emph); border-radius: 12px 12px 4px 12px; padding: 8px 12px; }
+.assist ul { margin: 0; padding-left: 1.2em; font-size: 13.5px; color: var(--dt-text-sub); }
+.ai-label { font-size: 11.5px; color: var(--dt-text-sub); }
+.c-bar { fill: var(--dt-chart-1); }
+.c-bar.hot { fill: var(--dt-warning); }
+
+/* ワークフロー */
+.wf { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 14px; align-items: start; }
+.wf-flow { display: grid; justify-items: stretch; }
+.wf-node { background: var(--dt-surface); border-radius: 10px; box-shadow: var(--dt-shadow-raised); padding: 10px 12px; display: grid; gap: 2px; }
+.wf-node .k { font-size: 11px; font-weight: 700; color: var(--dt-text-sub); }
+.wf-node b { font-weight: 600; }
+.wf-node .v { font-size: 13px; color: var(--dt-text-sub); }
+.wf-node.unset b { color: var(--dt-text-sub); font-weight: 500; }
+.wf-arrow { justify-self: center; width: 2px; height: 20px; background: var(--dt-border); position: relative; }
+.wf-arrow::after { content: ""; position: absolute; bottom: -2px; left: -4px; border: 5px solid transparent; border-bottom: 0; border-top-color: var(--dt-border); }
+.wf-form { align-content: start; }
+button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%; }
+.tpl[aria-pressed="true"] { border-color: var(--dt-primary); background: var(--dt-primary-cont); }
+.tpl-list > .tip-anchor { display: grid; }
+
+/* テックタッチが画面に添える注記（案） */
+.tt-note {
+  border: 1px dashed var(--tt); background: var(--tt-soft); border-radius: 9px; padding: 9px 14px;
+  font-family: var(--font-demo); font-size: 14px; line-height: 1.6; color: var(--dt-text); display: grid; gap: 2px;
+}
+.tt-note .lab { font-size: 11px; font-weight: 700; color: var(--tt-ink); }
+
+/* テックタッチ管理画面（イメージ・架空） */
+.tt-admin .dock { background: var(--dt-surface); }
+.tt-admin .dock-item.active { background: var(--tt-soft); color: var(--tt-ink); font-weight: 700; }
+.app-icon.tt { background: var(--tt-soft); color: var(--tt-ink); }
+.rate-low { color: var(--dt-warning); font-weight: 700; }
+.funnel { display: grid; gap: 6px; }
+.fn-row { display: grid; grid-template-columns: minmax(9em, 15em) minmax(0, 1fr) 3.2em; gap: 10px; align-items: center; font-size: 13.5px; }
+.fn-bar { height: 18px; border-radius: 4px; background: var(--dt-container); overflow: hidden; }
+.fn-bar i { display: block; height: 100%; background: var(--tt); }
+.fn-row.hot { font-weight: 700; }
+.fn-row.hot .fn-bar i { background: var(--ov-warn); }
+.fn-row .cnt { text-align: right; font-variant-numeric: tabular-nums; }
+.edit-card { display: grid; gap: 8px; }
+.edit-field { display: grid; gap: 2px; }
+.edit-field .k { font-size: 12px; color: var(--dt-text-sub); font-weight: 600; }
+.edit-field .v { border-radius: 8px; padding: 8px 10px; background: var(--dt-container); font-size: 14px; }
+.edit-field.new .v { background: var(--tt-soft); border: 1px dashed var(--tt); }
+.measure { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.measure th, .measure td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--dt-border-sub); vertical-align: top; }
+.measure thead th { color: var(--dt-text-sub); font-weight: 600; font-size: 12.5px; }
+
+@media (max-width: 1240px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wf { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 1080px) {
+  .rc-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .tiles, .role-list, .lanes { grid-template-columns: minmax(0, 1fr); }
+  .fn-row { grid-template-columns: minmax(0, 1fr) 3em; }
+  .fn-row .fn-bar { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* 管理画面の表：数値の列は折り返さない */
+#an-table thead th, #an-table td { white-space: nowrap; }
+
+/* 内容の多いポップアップ（場面4の連絡と引き継ぎ）が枠からはみ出さないように */
+.tt-modal-card { max-height: 100%; overflow-y: auto; }
+@media (min-width: 1081px) {
+  .tt-modal { padding-top: 40px; }
+}
+.tt-modal-card > .actions { position: sticky; bottom: -18px; margin: 0 -20px -18px; padding: 10px 20px 14px; background: var(--dt-surface); border-radius: 0 0 12px 12px; }
+/* 場面4・5：問題へのコメント（流用） */
+#c4-comments { display: grid; gap: 10px; }
+.cm-box { border: 1px solid var(--dt-border, rgba(127,127,127,.35)); border-radius: 9px; padding: 10px 12px; display: grid; gap: 4px; background: var(--dt-surface); }
+.cm-box.empty { color: var(--dt-text-sub); font-size: 14px; min-height: 44px; }
+.cm-l { margin: 0; font-size: 14px; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 0 10px; align-items: baseline; }
+.cm-l .k { flex: 0 0 auto; min-width: 5.5em; color: var(--dt-text-sub); font-size: 13px; }
+.cm-fields { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: 10px; margin-top: 6px; }
+.cm-fields select { min-width: 0; max-width: 100%; }
+.cm-item { display: grid; gap: 4px; border-left: 3px solid var(--dt-primary); padding: 2px 0 2px 12px; }
+.cm-who { margin: 0 0 4px; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.cm-who .avatar { width: 24px; height: 24px; font-size: 12px; }
+#c4-explain p { margin: 0; font-size: 14px; }
+@media (max-width: 700px) { .cm-fields { grid-template-columns: minmax(0, 1fr); } }
+
+/* ==================== Splunk版で追加・上書きした部品 ==================== */
+/* Dock は使わない（Splunk Web は上部バー＋アプリバー）。色は Splunk Web の画面イメージに寄せた架空の配色 */
+:root {
+  --dock-w: 0px;
+  --sp-top: #1f2326;
+  --sp-green: #53a051;
+  --dt-primary: #006d9c;
+  --dt-primary-accent: #006d9c;
+  --dt-primary-cont: #eaf3f8;
+  --dt-primary-cont-emph: #dbeaf2;
+  --dt-chart-1: #006d9c;
+}
+:root[data-theme="dark"] { --dt-primary: #6cc1ea; --dt-primary-accent: #3a8fb7; --dt-primary-cont: #1c2b36; --dt-primary-cont-emph: #22384a; --dt-chart-1: #4aa8d8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --dt-primary: #6cc1ea; --dt-primary-accent: #3a8fb7; --dt-primary-cont: #1c2b36; --dt-primary-cont-emph: #22384a; --dt-chart-1: #4aa8d8; } }
+@media (max-width: 1240px) { :root { --dock-w: 0px; } }
+.dt { min-height: 640px; }
+.dt-app { border-radius: 0 0 12px 12px; }
+.overlay { margin-top: 56px; }
+
+/* 上部バー（黒）とアプリバー */
+.sp-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap;
+  min-height: 40px; padding: 4px 16px; background: var(--sp-top); color: #f2f2f2; font-size: 13px;
+}
+.sp-top .logo { font-weight: 700; letter-spacing: 0.01em; }
+.sp-top .menus { display: flex; flex-wrap: wrap; gap: 2px 14px; opacity: 0.9; }
+.sp-top .menus .user { font-weight: 600; opacity: 1; }
+.sp-top.intra { background: #34404d; }
+.ah-nav button { border: 0; background: transparent; font: inherit; color: var(--dt-text-sub); font-weight: 500; padding: 13px 10px; position: relative; cursor: pointer; border-radius: 6px 6px 0 0; }
+.ah-nav button.active { color: var(--dt-primary); }
+.ah-nav button.active::after { content: ""; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: 20px; height: 2px; border-radius: 12px; background: currentColor; }
+.ah-nav button:hover { background: var(--dt-container); }
+.ah-nav .balloon { font-family: var(--font-demo); }
+
+/* 視点の印（SOC担当者／SOC責任者） */
+.rc.soc { border: 1px solid var(--dt-text-sub); color: var(--dt-text); background: var(--dt-surface); }
+.rc.lead { border: 1px solid var(--dt-text); background: var(--dt-text); color: var(--dt-base); }
+
+/* 画面の区別（凡例） */
+.sc { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; margin-right: 6px; white-space: nowrap; }
+.sc-splunk, .l-sp { background: var(--dt-primary-cont-emph); color: var(--dt-primary); }
+.sc-tt { background: var(--tt-soft); color: var(--tt-ink); }
+.sc-hub { background: var(--hub-soft); color: var(--hub-ink); }
+.sc-intra, .l-in { background: var(--dt-container-emph); color: var(--dt-text-sub); }
+.legend .l-sp { border: 1px solid var(--dt-primary); }
+.legend .l-in { border: 1px solid var(--dt-text-sub); }
+
+.tt-chip svg, .hub-chip svg { width: 15px; height: 15px; flex: none; }
+.tt-chip { position: relative; cursor: pointer; }
+
+/* 検索画面 */
+.sp-search { display: grid; gap: 12px; min-width: 0; }
+.sp-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; border: 1px solid var(--dt-border); border-radius: 4px; overflow: hidden; background: var(--dt-surface); }
+.spl-box { margin: 0; padding: 10px 12px; min-height: 64px; font-family: "SFMono-Regular", Consolas, Menlo, "BIZ UDGothic", monospace; font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-all; color: var(--dt-text); }
+.spl-box.ph { color: var(--dt-text-sub); }
+.sp-time { display: flex; align-items: center; padding: 0 12px; border-left: 1px solid var(--dt-border); white-space: nowrap; color: var(--dt-text-sub); font-size: 13px; }
+.sp-go { position: relative; border: 0; background: var(--sp-green); color: #fff; width: 48px; display: grid; place-items: center; cursor: pointer; }
+.sp-go svg { width: 20px; height: 20px; }
+.sp-go .balloon { left: auto; right: 0; }
+.sp-go .balloon::before { left: auto; right: var(--axr, 16px); }
+.sp-summary { font-size: 14px; }
+.sp-summary .ok { color: var(--dt-success); font-weight: 700; }
+.sp-res .idx { color: var(--dt-text-sub); width: 2em; }
+.sp-res tr.hit td { background: var(--dt-warning-cont-emph); }
+.sp-res td { font-variant-numeric: tabular-nums; position: relative; }
+.sw-ok { background: var(--dt-success); }
+.c-bar { fill: var(--dt-chart-1); }
+.c-bar.hot { fill: var(--dt-warning); }
+.c-line.ok { stroke: var(--dt-success); }
+.c-dot { fill: var(--dt-chart-1); }
+.c-dot.ok { fill: var(--dt-success); }
+.sp-menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; display: grid; min-width: 200px; background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 6px; box-shadow: var(--dt-shadow-float); padding: 4px 0; }
+.sp-menu button { position: relative; border: 0; background: transparent; text-align: left; padding: 8px 14px; font: inherit; color: var(--dt-text); cursor: pointer; }
+.sp-menu button:hover { background: var(--dt-container); }
+.sp-menu .balloon { left: 100%; top: 0; margin-left: 12px; }
+.sp-menu .balloon::before { display: none; }
+.tip-anchor.block { display: block; }
+
+/* Splunk AI Assistant（画面イメージ・架空） */
+.sp-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 340px); gap: 14px; align-items: start; }
+.assist { min-width: 0; }
+.assist .bubble { font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+.as-ans { display: grid; gap: 6px; }
+.as-ans .code { font-size: 12px; }
+.as-in { position: relative; display: grid; gap: 8px; }
+.as-in textarea, .hub-win textarea { width: 100%; border: 1px solid var(--dt-border); border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 13px; line-height: 1.55; background: var(--dt-container); color: var(--dt-text); resize: vertical; }
+.as-in textarea:focus, .hub-win textarea:focus { outline: 2px solid var(--dt-primary); outline-offset: 1px; }
+
+/* AI Hub（構想・架空画面） */
+.hub-win { border: 2px dashed var(--hub); background: var(--hub-soft); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; font-family: var(--font-demo); font-size: 14px; line-height: 1.6; min-width: 0; }
+.hub-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.hub-head b { font-size: 15px; color: var(--hub-ink); }
+.hubpill { background: var(--hub); }
+.kb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--dt-text-sub); }
+.kb { border: 1px solid var(--hub); color: var(--hub-ink); background: var(--dt-surface); border-radius: 999px; padding: 0 10px; font-size: 12px; font-weight: 700; }
+.hub-ans { display: grid; gap: 6px; }
+.hub-win .lab { font-size: 12px; font-weight: 700; color: var(--hub-ink); }
+.hub-win .kv { background: var(--dt-surface); border-radius: 8px; padding: 2px 12px; }
+.hub-win .kv > * { padding: 6px 4px; font-size: 13.5px; }
+.hub-win .kv dt { font-weight: 700; color: var(--hub-ink); }
+.hub-win .code.req { background: var(--dt-surface); font-family: var(--font-demo); font-size: 13px; white-space: pre-wrap; }
+.hub-win .dtable { background: var(--dt-surface); border-radius: 8px; font-size: 13px; }
+.hub-win .dtable th, .hub-win .dtable td { padding: 7px 10px; }
+.hub-btn { background: var(--hub); color: var(--on-accent); }
+.hub-chip { position: relative; }
+.st.ng { background: var(--ov-warn-soft); color: var(--ov-warn); border: 1px solid var(--ov-warn); }
+.st.on { background: var(--dt-success); color: var(--on-accent); }
+
+/* Dashboard Studio（画面イメージ・架空） */
+.studio { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px; align-items: start; }
+.canvas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.panel { background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 6px; padding: 10px 12px; display: grid; gap: 6px; min-width: 0; align-content: start; position: relative; }
+.panel.wide { grid-column: 1 / -1; }
+.panel-title { font-size: 13px; font-weight: 600; }
+.panel .dtable { min-width: 0; font-size: 13px; }
+.panel .chart { min-width: 0; }
+.single { font-size: 30px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.single.bad { color: var(--dt-warning); }
+.empty-panel { color: var(--dt-text-sub); border-style: dashed; text-align: center; padding: 28px 12px; }
+.add-form { display: grid; gap: 8px; background: var(--dt-container); border-radius: 8px; padding: 12px; align-content: start; }
+.dt-field.block select { width: 100%; }
+
+/* ダイアログ（Splunk風・架空） */
+.sp-modal { padding-top: 48px; align-items: flex-start; }
+.sp-dialog-card { border-top: 0; max-width: 620px; gap: 8px; }
+.dlg-head { font-weight: 600; font-size: 16px; border-bottom: 1px solid var(--dt-border); padding-bottom: 8px; }
+.dlg-row { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 8px; align-items: center; font-size: 14px; }
+.dlg-row .k { color: var(--dt-text-sub); font-size: 13px; }
+.dlg-row .dt-field { display: flex; }
+.dlg-row .dt-field select, .dlg-row .dt-field input { flex: 1; }
+.sp-btn { background: var(--sp-green); color: #fff; }
+.overlay.note .btn-primary { background: var(--dt-text); color: var(--dt-base); }
+
+/* SSE（画面イメージ・架空） */
+.sse-list { display: grid; gap: 8px; }
+.sse-row { position: relative; display: grid; gap: 2px; text-align: left; font: inherit; color: var(--dt-text); background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 8px; padding: 10px 14px; cursor: pointer; }
+.sse-row b { font-size: 15px; }
+.sse-row span { font-size: 13px; color: var(--dt-text-sub); }
+.sse-row.dim { opacity: 0.6; }
+.sse-sec { background: var(--dt-surface); border-radius: 10px; box-shadow: var(--dt-shadow-raised); padding: 10px 14px; display: grid; gap: 4px; }
+.sec-btn { display: grid; gap: 4px; width: 100%; text-align: left; border: 0; background: transparent; font: inherit; color: inherit; padding: 0; cursor: pointer; }
+
+/* 一次調査のチェックリスト・記録 */
+.ck-grid { display: grid; gap: 6px; }
+.ck-row { display: grid; grid-template-columns: minmax(0, 1fr) 170px; gap: 8px; align-items: center; font-size: 14px; }
+.ck-row .dt-field { display: flex; }
+.ck-row select { width: 100%; }
+
+/* 社内ポータル（架空） */
+.i-card { background: var(--dt-surface); border: 1px solid var(--dt-border); border-left: 5px solid var(--dt-text-sub); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; font-family: var(--font-demo); font-size: 14.5px; line-height: 1.65; position: relative; }
+.i-card .lab { font-size: 12px; font-weight: 700; color: var(--dt-text-sub); }
+.i-quote { margin: 0; padding: 8px 14px; border-left: 3px solid var(--dt-primary); background: var(--dt-container); font-size: 15px; }
+.i-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; }
+.i-chain .n { background: var(--dt-surface); border: 1px solid var(--dt-border); border-radius: 8px; padding: 6px 12px; font-size: 14px; }
+.i-chain .n.wait { border-color: var(--ov-warn); color: var(--ov-warn); font-weight: 700; background: var(--ov-warn-soft); }
+.i-chain .a { color: var(--dt-text-sub); }
+.i-goals { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; }
+.dt.intra .dt-page { background: var(--dt-container); border-radius: 0 0 0 12px; }
+.chat { position: relative; }
+
+@media (max-width: 1080px) {
+  /* ダイアログが本文の高さに収まるように（パネルは下に並ぶ） */
+  .dt-app { min-height: 620px; }
+}
+@media (max-width: 1240px) {
+  .sp-split { grid-template-columns: minmax(0, 1fr); }
+  .studio { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .canvas { grid-template-columns: minmax(0, 1fr); }
+  .dlg-row, .ck-row { grid-template-columns: minmax(0, 1fr); }
+  .sp-bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .sp-time { display: none; }
+  .sp-top { padding: 6px 12px; }
+  .ah-nav button { padding: 10px 6px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" lang="ja">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name">Splunk Cloud × テックタッチ（DAP＋AI Hub）　SIEM／SOC活用デモ（イメージ）</span>
+      <span class="brand-sub">架空のA社SOC：Splunk Cloud＋Security Essentials（ESなし）。SOC担当者が、依頼から検索・可視化・検知・調査・改善までを自分で進める（37分版／20分版）</span>
+    </div>
+    <div class="tools">
+      <button type="button" class="tool" id="notes-btn" aria-pressed="false" aria-controls="notes">進行メモ</button>
+      <button type="button" class="tool" id="reset-btn">この場面を最初から</button>
+      <button type="button" class="tool" id="theme-btn">表示：自動</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    <span>イメージデモ。画面・人物・企業名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。接続元IPは文書用の予約アドレス（RFC 5737）です。</span>
+    <span class="legend" aria-label="画面の区別">
+      <span><i class="l-sp"></i>Splunkの画面イメージ（架空）</span>
+      <span><i class="l-tt"></i>テックタッチ ガイド（案）</span>
+      <span><i class="l-hub"></i>AI Hub（構想・例文）</span>
+      <span><i class="l-in"></i>社内（架空）</span>
+    </span>
+  </div>
+
+  <nav class="journey" id="journey" aria-label="デモの流れ"></nav>
+  <section class="story" id="story" aria-live="polite"></section>
+  <div id="stage"></div>
+  <p class="ask" id="ask"><strong>伺いたいこと</strong><span id="ask-text"></span></p>
+
+  <!-- ==================== 進行メモ（発表者用・既定は非表示） ==================== -->
+  <section class="notes" id="notes" hidden aria-label="進行メモ">
+    <h2>進行メモ（発表者用）</h2>
+    <div class="notes-grid">
+      <div>
+        <h3>この場面の進め方</h3>
+        <ul data-for="1">
+          <li>【S0】37分版 2:00／20分版 1:00。社内ポータル（架空）の依頼カードから始めます。</li>
+          <li>話すこと：「Splunkの機能を増やすデモではありません。既にSplunkに入っているログを、SOC担当者自身が必要な分析・監視・調査・改善に使えるようにするデモです」。</li>
+          <li>見せる結果：課題は「機能不足」ではなく「実行力と業務適合の不足」。成果物を5つ先に示します。</li>
+          <li>問いかけ：「SPLやダッシュボードの変更を、いまは誰に頼み、どれくらい待っていますか」</li>
+        </ul>
+        <ul data-for="2" hidden>
+          <li>【S1】37分版 3:00／20分版 2:00。Before。テックタッチのガイドはまだ出しません（説明用のパネルだけ）。</li>
+          <li>見せ場：不十分な検索（教材。Assistantの実出力ではないと明示）を実行すると、ケースC（成功が失敗より前）まで候補に入る。検算済み（5章）。</li>
+          <li>話すこと：「構文が通ることと、SOCの検知要件に正しいことは別です」。委託先への依頼で止まるのがA社のBefore。</li>
+          <li>問いかけ：「生成した検索やAIの出力が正しいかを、いまはどなたが、どう確かめていますか」</li>
+        </ul>
+        <ul data-for="3" hidden>
+          <li>【S2】37分版 4:00／20分版 2:30。検索画面の上の「SOC分析アシスト」（テックタッチ）からAI Hubを開きます。</li>
+          <li>見せ場：日本語の依頼 → AI Hubが対象・条件・追加条件・確認・分析の分け方に整理 → Assistant向けの依頼文（列名・書式入り）。</li>
+          <li>合格判定：依頼文に「15分」「10件以上」「異なる5ユーザー」「同一管理者」「失敗後の成功」が入っている。</li>
+          <li>話すこと：AI Hubの回答は本番前に確かめた例文。AI Hub → Assistant は手動コピー（デモ確定方式）。</li>
+          <li>問いかけ：「Splunk AI Assistantに何をどう頼むか、御社ではどなたが決めていますか」</li>
+        </ul>
+        <ul data-for="4" hidden>
+          <li>【S3】37分版 5:00／20分版 3:00。Assistantの出力はそのまま表示します（進行ルール）。このデモのSPL案は準備した参考画面です。実機で適切な検索が出れば、そのまま評価します。</li>
+          <li>見せ場：AI Hub「SOC基準との照合」が、構文ではなく業務条件（ログ辞書・ユーザー数・同一ユーザー・前後関係・最終検証）で評価し、修正依頼文を作る。</li>
+          <li>入力チェック：照合の前に「検索に入れる」を押すと、ガイドが止めます（社内ルール・架空）。</li>
+          <li>話すこと：Assistantの精度が1年前より上がったことを示す公開の根拠は見当たりません。だから毎回、業務条件で確かめます。</li>
+          <li>問いかけ：「AIが作った検索を、御社の検知要件に照らして確かめる工程は、いまありますか」</li>
+        </ul>
+        <ul data-for="5" hidden>
+          <li>【S4】37分版 5:00／20分版 3:00（Q1・Q2の説明を短く）。レポート一覧からQ1→Q2→Q3→Q4の順に実行します。順番が違うと案内します。</li>
+          <li>合格判定：Q1がA36・B18・C12・D4。Q2がA・C。Q3がAのみ。期待値はPythonで検算（Splunk実機での実行は構築時にSEが確認）。</li>
+          <li>話すこと：「Cは、同一IPで失敗と管理者の成功の両方があっても、時刻が逆です。数だけの検索をダッシュボードに載せると、SOCは誤った印象を持ちます」。</li>
+          <li>問いかけ：「検知条件を変えたとき、正解のテストケースで確かめる仕組みは、いまありますか」</li>
+        </ul>
+        <ul data-for="6" hidden>
+          <li>【S5】37分版 6:00／20分版 3:00（Q1とQ3の2枚だけ）。Dashboard Studio（画面イメージ・架空）。</li>
+          <li>見せ場：命名規則「チーム_対象_用途」の入力チェック → 保存済みレポートをデータソースに4パネル → 共有範囲「自分だけ」なら案内 → 保存。</li>
+          <li>話すこと：「今まで委託先に依頼していた定型的な可視化の変更を、担当者自身が進めます。Splunkの検索・ダッシュボードを使いながら、AI Hubが判断材料を示し、テックタッチが完成までの手順を支えます」。</li>
+          <li>確認が必要：保存済みレポートをデータソースにする操作（ds.savedSearch／名前を付けて保存＞ダッシュボードパネル）は実機で確かめる（9章 #7）。入力チェックで保存を止められるか（#9）。</li>
+          <li>問いかけ：「ダッシュボードの作成・変更は、いま誰が、どの基準で行っていますか」</li>
+        </ul>
+        <ul data-for="7" hidden>
+          <li>【S6】37分版 4:00／20分版 2:00（設定画面を見せて口頭で補う）。SSEのSecurity Content → A社の基準をツールチップ → 検索 → 名前を付けて保存＞アラート。</li>
+          <li>見せ場：名前（命名規則）、実行の間隔（リアルタイムを選ぶと案内）、抑制（空なら案内）、通知先（個人なら案内）、「トリガーされたアラートに追加」。</li>
+          <li>話すこと：SSEはESの専用機能ではない。固定CSVの定期実行は本番監視にならないので、本番はQ5の骨格でインデックス化された認証イベントを検索する。</li>
+          <li>確認が必要：schedule_search の権限（既定はadminとpower）、Splunk Cloudのスケジュール時刻はUTC、「トリガーされたアラートに追加」を付けないと一覧に出ず既定24時間で消える（9章 #8）。SSEの項目名と日本語表示（#10）。</li>
+          <li>問いかけ：「検知コンテンツを入れた後、自社のログと運用条件に合わせて直す作業は、いま誰が担っていますか」</li>
+        </ul>
+        <ul data-for="8" hidden>
+          <li>【S7】37分版 5:00／20分版 2:30。トリガーされたアラートからケースAの結果を開き、AI Hub（P3・KB04）で整理し、チェックリストを埋めて引き継ぎます。</li>
+          <li>見せ場：チェックリストに空があると引き継げない（入力チェック・案）。④正規アクセス・⑤影響範囲は「未確認」のまま渡す。侵害の成立は推定しない。</li>
+          <li>話すこと：「ログの検索はSplunk、検索案はAssistant、当社の調査基準と次の行動はAI Hub、手順の抜け漏れ防止はテックタッチです。これを一人のSOC担当者の業務としてつなぎます」。</li>
+          <li>問いかけ：「アラートの後の一次調査は、いま手順書どおりに進んでいますか。上位者への引き継ぎは、どの形で残っていますか」</li>
+        </ul>
+        <ul data-for="9" hidden>
+          <li>【S8】37分版 3:00／20分版 1:00。記録を4項目で残し（空なら案内）、AI Hub（P4）で変更申請案、改善チケットを起票。</li>
+          <li>クロージング：「Splunkを別のSIEMに入れ替える前に、既存のSplunkを使いこなす力を高められないか。AI Assistantを残し、AI Hubで自社業務に適合させ、テックタッチで操作と調査を完了する。SOC担当者が自分で改善できる業務の範囲を増やす提案です」。</li>
+          <li>問いかけ：「検知条件や手順を直したとき、その履歴はいまどこに残っていますか。次の担当者は、それを読めますか」</li>
+        </ul>
+        <ul data-for="10" hidden>
+          <li>目安1分。回数はこのデモを操作した回数です。効果の数値ではありません。</li>
+          <li>「本日伺いたいこと」から、聞き手に近い問いを一つ選んで直近の具体例を伺い、最初に確かめる作業を一つ決めます。</li>
+        </ul>
+        <h3>全体</h3>
+        <ul>
+          <li>冒頭で「イメージデモです。画面・人物・企業名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません」とお伝えする。</li>
+          <li>37分版：全場面を通す。20分版：S0 1:00、S1 2:00、S2 2:30、S3 3:00、S4 3:00（Q1・Q2を短く）、S5 3:00（Q1とQ3の2枚）、S6 2:00（口頭で補う）、S7 2:30、S8 1:00。</li>
+          <li>画面の区別を常に言い分ける：【Splunk】実機の画面（検索、ダッシュボード、アラート、SSE、AI Assistant）／【テックタッチ】画面の上のガイド・ツールチップ・入力チェック／【AI Hub】回答は本番前に確かめた例文／【社内（架空）】チャット・チケット・依頼票。</li>
+          <li>AI機能は分けて評価する：Splunk AI Assistant（SPL生成・説明）は実機の出力をそのまま使う。AI Hub（構想）は社内のログ辞書・検知基準・調査手順との照合だけを担う。精度や削減率の数値はお約束しない。</li>
+          <li>対象はSplunk Cloud＋SSE（ESなし）のお客様。ESをお使いの場合は付録Bのとおり画面を差し替える。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>想定問答（10章から）</h3>
+        <ul>
+          <li>「Splunk AI AssistantがあればAI Hubは要らないのでは」→ Assistantは、Splunkの機能として使います。AI Hubが担うのは、御社固有のログ辞書・検知基準・調査手順との照合と、確認事項の整理です。Assistantの回答が御社の要件に合っているかを確かめる工程を支えます。</li>
+          <li>「XSIAMやCrowdStrikeに移れば、使いこなせるのでは」→ 乗り換えても、社内の判断基準・手順・記録の形は、新しい画面に合わせて作り直すことになります。テックタッチは、いまのSplunkの上で、それを社内の画面に置きます。乗り換えの判断そのものは、御社の評価軸で行われるものです。</li>
+          <li>「乗り換えの理由は費用です」→ 費用の課題は、テックタッチでは解決できません。社内でSplunkが使われていないことも理由の一つであれば、使う人の広がりを確かめるところ（S8）からお手伝いできます。</li>
+          <li>「委託先の仕事を取り上げる話ですか」→ いいえ。監視と検知は委託先に続けていただき、社内で確かめ、直し、記録できるようにする話です。</li>
+          <li>「SOCの端末は外部につながらない／VDIです」→ 拡張機能を入れられるか（端末の種類、ネットワークの条件、配布の手続き）を、御社の環境で最初に確かめます。</li>
+          <li>「AIにログを渡して大丈夫ですか」→ 渡す情報の範囲を、御社の方針で決めます。SplunkのAIとAI Hubのどちらにも、ログを渡すかどうかを先に決めます。AI Hubは外部のAIサービスを利用します。御社のAI環境をつなぐ形も、特約で認められています（詳細は確認のうえご案内します）。</li>
+          <li>「Splunkの画面がよく変わりますが」→ ガイドごとに持ち主と見直し日を決め、Splunk Cloudの更新に合わせて点検します。対象は、よく止まる作業に絞ります。</li>
+          <li>「効果はどれくらいですか」→ 現時点で数値はお約束しません。一つの作業で、7章の指標（自力完了率・所要時間・依頼件数・検証）を測って確かめます。</li>
+        </ul>
+        <p class="kbd">キー操作：→ 次へ ／ ← 戻る ／ 1〜9 場面の切り替え（1=S0 … 9=S8） ／ 0 振り返り ／ N 進行メモ ／ R この場面を最初から</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">イメージデモ（シナリオ1.1・2026年10月8日作成）　Splunk Cloud＋SSE×テックタッチ（DAP＋AI Hub）</p>
+</div>
+
+<script>
+(function () {
+  document.documentElement.lang = "ja";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(t) {
+    return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+  function val(v, c) { return typeof v === "function" ? v(c) : v; }
+
+  /* ---------- アイコン（汎用の図形。製品のアイコンではありません） ---------- */
+  var ICON = {
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+    spark: '<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    play: '<path d="M7 5v14l11-7z"/>',
+    save: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+    shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+    copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+    doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h6M9 16h6"/>',
+    check: '<path d="m5 12 4 4L19 6"/>'
+  };
+  function svg(name) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[name] + "</svg>";
+  }
+
+  /* ---------- データ（すべて架空。data/demo_auth_events.csv と同じ値） ---------- */
+  var CASES = [
+    { id: "A", src: "198.51.100.24", fails: 36, users: 9, admin: "admin_ops", adminAt: "2026-10-08 09:10:00", note: "同一管理者 admin_ops が失敗の後に成功", verdict: "高優先度の調査候補" },
+    { id: "B", src: "203.0.113.40", fails: 18, users: 1, admin: "", note: "svc_batch 1アカウントに集中", verdict: "多数アカウントへの試行ではない" },
+    { id: "C", src: "192.0.2.51", fails: 12, users: 6, admin: "admin_fin", adminAt: "2026-10-08 09:00:05", note: "管理者 admin_fin の成功は失敗より前", verdict: "「失敗後の成功」ではない" },
+    { id: "D", src: "203.0.113.20", fails: 4, users: 3, admin: "", note: "閾値未満", verdict: "記録のみ" }
+  ];
+  var Q4_ROWS = [["2026-10-08 09:00", 25, 1], ["2026-10-08 09:05", 42, 0], ["2026-10-08 09:10", 3, 1]];
+  var SPL = {
+    before: '| inputlookup demo_auth_events.csv\n| stats count(eval(action="failure")) AS failures count(eval(action="success" AND privileged="true")) AS admin_successes BY src\n| where failures >= 10 AND admin_successes >= 1',
+    q0: '| inputlookup demo_auth_events.csv\n| stats count AS total_events dc(src) AS distinct_srcs dc(user) AS distinct_users',
+    q1: '| inputlookup demo_auth_events.csv\n| where action="failure"\n| stats count AS fail_count dc(user) AS failed_users BY src\n| sort - fail_count',
+    q2: '| inputlookup demo_auth_events.csv\n| eval epoch=strptime(event_time,"%Y-%m-%d %H:%M:%S")\n| where epoch>=strptime("2026-10-08 09:00:00","%Y-%m-%d %H:%M:%S") AND epoch<strptime("2026-10-08 09:15:00","%Y-%m-%d %H:%M:%S")\n| where action="failure"\n| stats count AS fail_count dc(user) AS failed_users BY src\n| where fail_count>=10 AND failed_users>=5\n| sort - fail_count',
+    q3: '| inputlookup demo_auth_events.csv\n| eval epoch=strptime(event_time,"%Y-%m-%d %H:%M:%S")\n| where epoch>=strptime("2026-10-08 09:00:00","%Y-%m-%d %H:%M:%S") AND epoch<strptime("2026-10-08 09:15:00","%Y-%m-%d %H:%M:%S")\n| eval fail_mark=if(action="failure",1,0), failed_user=if(action="failure",user,null())\n| eventstats sum(fail_mark) AS src_fail_count dc(failed_user) AS src_failed_users BY src\n| sort 0 src user epoch\n| streamstats sum(fail_mark) AS prior_user_failures BY src user\n| where action="success" AND privileged="true" AND prior_user_failures>=1 AND src_fail_count>=10 AND src_failed_users>=5\n| table src user event_time src_fail_count src_failed_users mfa',
+    q4: '| inputlookup demo_auth_events.csv\n| eval _time=strptime(event_time,"%Y-%m-%d %H:%M:%S")\n| timechart span=5m count(eval(action="failure")) AS failures count(eval(action="success")) AS successes',
+    ai1: '| inputlookup demo_auth_events.csv\n| stats count(eval(action="failure")) AS fail_count dc(eval(if(action="failure",user,null()))) AS failed_users count(eval(action="success" AND privileged="true")) AS admin_success BY src\n| where fail_count>=10 AND failed_users>=5 AND admin_success>=1'
+  };
+  var REPORTS = [
+    ["q1", "SOC_認証_Q1_IP別失敗ランキング", "接続元IP別の認証失敗件数と、失敗した異なるユーザー数", "v1.0"],
+    ["q2", "SOC_認証_Q2_閾値候補", "15分で失敗10件以上・異なる5ユーザー以上の接続元", "v1.0"],
+    ["q3", "SOC_認証_Q3_失敗後の特権成功", "同じ接続元・同じ特権アカウントで、失敗の後に成功", "v1.1（承認待ち）"],
+    ["q4", "SOC_認証_Q4_5分推移", "5分単位の失敗・成功の推移", "v1.0"]
+  ];
+  var REQUEST_IN = "VPNの認証失敗と管理者ログイン成功を関連付けて、監視ダッシュボードにしたい。SOC基準に沿って、Splunk AI Assistantへの依頼を整えてください。";
+  var REQUEST_OUT = "以下のCSVルックアップに対してSPLを作成してください。event_timeは %Y-%m-%d %H:%M:%S、srcが接続元IP、userがアカウント、actionはfailure／success、privilegedは文字列true／falseです。15分間に同一srcで失敗10件以上、かつ異なる失敗userが5以上あることに加え、同じsrc・同じ管理者userに対して、失敗の後で成功したイベントだけを抽出してください。成功が失敗より前のケースは除外してください。必要に応じてeventstats・sort・streamstatsなどを使い、処理を説明してください。";
+  var FIX_REQUEST = "先ほどのSPLに、次の2つの条件を追加してください。(1) 成功した管理者アカウント本人に、同じ接続元からの失敗があること（src と user の単位で判定）。(2) その失敗が成功より前に起きていること（時刻順。eventstats・sort・streamstats を使ってよい）。あわせて、対象を 2026-10-08 09:00〜09:15 の15分間に限定してください。";
+  var NAME_RULE = /^[^_\s]+_[^_\s]+_[^_\s]+$/;
+
+  /* ---------- グラフ（SVG。すべて架空の数値） ---------- */
+  function barChartSrc(rows) {
+    var w = 560, h = 190, pad = 36, bw = 64, gap = 60, max = 40;
+    var s = '<svg class="chart" viewBox="0 0 ' + w + " " + h + '" role="img" aria-label="接続元IP別の認証失敗件数（架空）">';
+    [0, 10, 20, 30, 40].forEach(function (v) { var y = h - 30 - (v / max) * (h - 60); s += '<line class="c-grid" x1="' + pad + '" x2="' + (w - 10) + '" y1="' + y + '" y2="' + y + '"/><text class="c-txt" x="' + (pad - 6) + '" y="' + (y + 4) + '" text-anchor="end">' + v + "</text>"; });
+    rows.forEach(function (r, i) {
+      var x = pad + 20 + i * (bw + gap), bh = (r.fails / max) * (h - 60), y = h - 30 - bh;
+      s += '<rect class="c-bar' + (r.id === "A" ? " hot" : "") + '" x="' + x + '" y="' + y + '" width="' + bw + '" height="' + bh + '" rx="3"/>' +
+        '<text class="c-txt" x="' + (x + bw / 2) + '" y="' + (h - 12) + '" text-anchor="middle">' + r.src + "</text>" +
+        '<text class="c-txt" x="' + (x + bw / 2) + '" y="' + (y - 5) + '" text-anchor="middle">' + r.fails + "</text>";
+    });
+    return s + "</svg>";
+  }
+  function lineChart5m() {
+    var w = 560, h = 190, pad = 36, max = 50, xs = [pad + 40, w / 2, w - 60];
+    var y = function (v) { return h - 30 - (v / max) * (h - 60); };
+    var s = '<svg class="chart" viewBox="0 0 ' + w + " " + h + '" role="img" aria-label="5分単位の認証失敗・成功の推移（架空）">';
+    [0, 10, 20, 30, 40, 50].forEach(function (v) { s += '<line class="c-grid" x1="' + pad + '" x2="' + (w - 10) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="c-txt" x="' + (pad - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + "</text>"; });
+    var f = Q4_ROWS.map(function (r, i) { return xs[i] + "," + y(r[1]); }).join(" ");
+    var g = Q4_ROWS.map(function (r, i) { return xs[i] + "," + y(r[2]); }).join(" ");
+    s += '<polyline class="c-line" points="' + f + '"/><polyline class="c-line ok" points="' + g + '"/>';
+    Q4_ROWS.forEach(function (r, i) {
+      s += '<circle class="c-dot" cx="' + xs[i] + '" cy="' + y(r[1]) + '" r="4"/><circle class="c-dot ok" cx="' + xs[i] + '" cy="' + y(r[2]) + '" r="4"/>' +
+        '<text class="c-txt" x="' + xs[i] + '" y="' + (h - 12) + '" text-anchor="middle">' + r[0].slice(11) + "</text>";
+    });
+    return s + "</svg>";
+  }
+
+  /* ---------- 画面の部品 ---------- */
+  function sel(id, key, opts, cur, disabled) {
+    return '<select id="' + id + '" data-id="' + key + '"' + (disabled ? " disabled" : "") + ">" + opts.map(function (o) {
+      var v = typeof o === "string" ? o : o[0], t = typeof o === "string" ? o : o[1];
+      return '<option value="' + esc(v) + '"' + (v === cur ? " selected" : "") + ">" + esc(t) + "</option>";
+    }).join("") + "</select>";
+  }
+  function txt(id, key, cur, ph, disabled) {
+    return '<input type="text" id="' + id + '" data-id="' + key + '" value="' + esc(cur || "") + '" placeholder="' + esc(ph || "") + '"' + (disabled ? " disabled" : "") + ">";
+  }
+  function qBtn(key, label) {
+    return '<button type="button" class="tt-q" data-tip="' + key + '" aria-expanded="' + (S.tip === key) + '" aria-label="' + label + '">?</button>';
+  }
+  var TIPS = {
+    std: ["A社の検知基準 D-01（社内・架空）", "15分間に同一の接続元から失敗10件以上、かつ失敗した異なるアカウントが5以上。加えて、同じ特権アカウントで失敗の後に成功があれば「高優先度の調査候補」。侵害の成立は推定しません。"],
+    sched: ["アラートの実行間隔（社内基準・架空）", "定期実行の15分ごとにします。リアルタイム検索は使いません（Splunkも定期実行を勧めています）。Splunk Cloudではスケジュールの時刻がUTCになる点に注意します。"],
+    disp: ["判定区分の定義（社内・架空）", "誤検知＝検知条件は満たすが脅威ではない／正当な利用＝本人の操作と確認できた／要対応＝インシデントとして対応する。本人確認が済むまでは「候補」のままにします。"],
+    kpi: ["ダッシュボードの数値の読み方（社内・架空）", "認証失敗は件数だけでなく、失敗した異なるアカウント数と、同じ特権アカウントの失敗後の成功を見ます。件数だけで判断しません。"]
+  };
+  function tipHTML(key) {
+    if (S.tip !== key) return "";
+    return '<span class="tt-tip" role="tooltip"><span class="lab">テックタッチ ツールチップ（案）：' + TIPS[key][0] + "</span>" + TIPS[key][1] + "</span>";
+  }
+  function tipWrap(id, label, key, aria) {
+    return '<span class="tip-wrap" id="' + id + '">' + label + qBtn(key, aria) + tipHTML(key) + "</span>";
+  }
+  function guideList(title, text, items) {
+    return '<h3 class="ov-title">' + title + '</h3><p class="ov-text">' + text + '</p><ul class="glist">' + items.map(function (g) {
+      return g[2] ? '<li><button type="button" class="gitem" data-id="g-start" id="g-start"><span class="gname">' + g[0] + '</span><span class="gmeta">' + g[1] + "</span></button></li>"
+        : '<li><div class="gitem"><span class="gname">' + g[0] + '</span><span class="gmeta">' + g[1] + "</span></div></li>";
+    }).join("") + "</ul>";
+  }
+  function recList(rows, note) {
+    return '<div class="soft"><p><b>記録（例）</b></p><ul class="rec-list">' + rows.map(function (r) {
+      return '<li><span class="t">' + r[0] + "</span><span>" + r[1] + "</span></li>";
+    }).join("") + "</ul></div>" + '<p class="refs">' + (note || "時刻・記録はすべて架空です。") + "</p>";
+  }
+  function clickIs(id) { return function (c, ev) { return ev.kind === "click" && ev.id === id ? "done" : null; }; }
+  function pickIs(id, want, wrong) {
+    return function (c, ev) {
+      if (ev.kind !== "pick" || ev.id !== id || !ev.value) return null;
+      if (ev.value === want) return "done";
+      return { wrong: typeof wrong === "function" ? wrong(ev.value) : wrong };
+    };
+  }
+  function autoPick(id, want) { return function (c) { c.vals[id] = want; return "done"; }; }
+  function autoTip(key) { return function () { S.tip = key; note(); return "done"; }; }
+  function fine(t) { return '<p class="dt-fine">' + t + "</p>"; }
+  function code(s) { return '<pre class="code">' + esc(s) + "</pre>"; }
+  function screenTag(kind) {
+    var L = { splunk: "Splunk", tt: "テックタッチ", hub: "AI Hub", intra: "社内（架空）" };
+    return '<span class="sc sc-' + kind + '">' + L[kind] + "</span>";
+  }
+
+  /* ==================== 場面の定義（S0〜S8＋振り返り） ==================== */
+  var SUMMARY = 10;
+  var CH = {};
+  var NAV = '.ah-nav [data-id="nav-';
+  var GOALS = ["①認証分析用SPL（Q1〜Q4）", "②監視ダッシュボード", "③検知条件と保存検索（設計）", "④一次調査の根拠と記録", "⑤変更・改善ナレッジ"];
+  var REQ_WORDS = ["15分", "10件以上", "異なる失敗user", "同じsrc・同じ管理者user", "失敗の後で成功"];
+
+  /* ---------- S0：現場の問題（説明用） ---------- */
+  CH[1] = {
+    role: "lead", time: "S0", timeSub: "00:00–02:00", av: "中", who: "中村（SOC責任者・架空）",
+    title: "機能が足りないのではなく、入れたSplunkを社内で使い切れていない",
+    text: "架空のA社SOCは、Splunk CloudでVPNログを監視しています。委託先が作った検知はありますが、社内で直せません。SOC責任者の中村さん（架空）が、次の改善を依頼しました。このデモは、Splunkの機能を増やすデモではありません。既にSplunkに入っているログを、SOC担当者自身が分析・監視・調査・改善に使えるようにするデモです。",
+    tags: ["S0", "SOC責任者の視点", "現状とゴール", "37分版 2:00／20分版 1:00"],
+    ask: "SPLやダッシュボードの変更を、いまは誰に頼み、どれくらい待っていますか？",
+    kind: "note", kicker: "説明（画面は社内ポータルのイメージ・架空）", guide: "現場の問題と、デモのゴール",
+    init: function () { return { step: 0, app: "intra", view: "card", vals: {} }; },
+    startIds: ["i-card", "g-start"], startLabel: "依頼カードを開く",
+    intro: function () {
+      return guideList("この場面で見せること", "社内ポータル（架空）の依頼カードから始めます。課題が「機能不足」ではなく「実行力と業務適合の不足」であることを示します。",
+        [["現場の問題と、デモのゴール", "3ステップ・目安2分", true]]);
+    },
+    steps: [
+      { label: "依頼カードを読む", target: "#i-card", tip: "① SOC責任者からの依頼（架空）", sub: "認証失敗の広がりの後の、管理者ログイン成功を見たい",
+        now: "SOC責任者の依頼を読みます。「ダッシュボードを作り、検知した後の一次調査まで標準化してください」。",
+        why: "依頼の中身は、Splunkの新機能ではありません。既にあるログを、社内の基準で分析・監視・調査できるようにすることです。",
+        btn: "従来の流れを見る", handle: clickIs("i-flow"), after: function (c) { c.view = "flow"; } },
+      { label: "従来の流れを確かめる", target: "#i-flow-chain", tip: "② いまは委託先に依頼して待つ", sub: "SPLの修正もダッシュボードの変更も、社内では直せない（架空）",
+        now: "担当者 → 委託先 → 見積・改修 → 確認、の流れです。待ち時間は社内で把握できていません（架空）。",
+        why: "Splunk AI Assistantを活かし、AI Hubで社内の運用基準に結び付け、テックタッチで実行を支えると、この流れのどこが変わるかを、S1以降で見ます。",
+        btn: "ゴールを見る", handle: clickIs("i-goal"), after: function (c) { c.view = "goal"; } },
+      { label: "デモ終了時の成果物を確かめる", target: "#i-goal-list", tip: "③ 画面に残す5つの成果物", sub: "SPL・ダッシュボード・検知設計・調査記録・ナレッジ",
+        now: "デモの終わりに、5つの成果物を画面に残します。", why: "成果物で判断していただくため、先に並べます。数値の効果はお約束しません。",
+        btn: "S1へ（Before）" }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">課題は「機能不足」ではなく「実行力と業務適合の不足」です。</p><div class="soft"><p><b>デモ終了時に残す成果物</b></p><ul class="sum-list plain">' +
+        GOALS.map(function (g) { return "<li>" + g + "</li>"; }).join("") + "</ul></div>" + '<p class="refs">画面・人物・数値はすべて架空です。</p>';
+    },
+    nextLabel: "S1へ進む（Before）"
+  };
+
+  /* ---------- S1：Before — AIがあっても完成しない（説明用） ---------- */
+  CH[2] = {
+    role: "soc", time: "S1", timeSub: "02:00–05:00", av: "山", who: "山田（SOC担当者・架空）",
+    title: "Before：件数は見えている。しかし「同一管理者」「失敗の後」を正しく表せない",
+    text: "SOC担当者の山田さん（架空）は、既存のダッシュボードで認証失敗の件数は見えています。しかし、同じIPから複数ユーザーに失敗した後、対象の管理者本人がログインに成功したかを正確に表すには、対象ユーザー数と時間の順序が必要です。生成された検索が目的に合っているか確かめられず、委託先に依頼します。",
+    tags: ["S1", "SOC担当者の視点", "仮説1　SPLと集計の作り方に迷う", "37分版 3:00／20分版 2:00"],
+    ask: "生成した検索やAIの出力が「正しいか」を、いまはどなたが、どう確かめていますか？",
+    kind: "note", kicker: "説明（Before。テックタッチのガイドはまだ無い）", guide: "Before：依頼 → 既存の画面 → 不十分な検索 → 委託先へ",
+    init: function () { return { step: 0, app: "intra", view: "request", q: null, ran: null, tab: "stats", vals: {} }; },
+    startIds: ["i-req", "g-start"], startLabel: "依頼文を読む",
+    intro: function () {
+      return guideList("この場面で見せること", "AIで検索を生成しても、SOCの検知要件に正しいかは別です。不十分な検索でケースCまで候補に入ることを、固定のテストログで見せます。",
+        [["Before：依頼 → 既存の画面 → 不十分な検索 → 委託先へ", "5ステップ・目安3分", true]]);
+    },
+    steps: [
+      { label: "依頼文を読む", target: "#i-req", tip: "① 社内チャットの依頼文（架空）", sub: "「複数アカウントへの失敗の後、管理者ログインが成功したケース」",
+        now: "依頼の要点は三つです。異なるアカウントへの失敗、同じ管理者本人、失敗の後の成功。", why: "この三つを検索で表せるかが、Beforeの分かれ目です。",
+        btn: "既存のダッシュボードを開く", handle: clickIs("i-open-splunk"), after: function (c) { c.app = "dashboards"; c.view = "old"; } },
+      { label: "既存のダッシュボードを見る", target: "#d-old-panel", tip: "② 認証失敗の「件数」は見えています", sub: "異なるアカウント数と、失敗と成功の順序は見えない",
+        now: "委託先が作ったダッシュボード（架空）には、認証失敗の件数だけがあります。", why: "件数だけでは、同じ管理者本人の「失敗の後の成功」を区別できません。",
+        btn: "検索を開く", after: function (c) { c.app = "search"; c.q = "before"; } },
+      { label: "不十分な検索を実行する", target: "#sp-run", tip: "③ 条件を省いた検索を実行します（教材）", sub: "Assistantの実出力ではなく、意図的に条件を省いた例",
+        now: "接続元IPごとに「失敗の件数」と「特権アカウントの成功の件数」を数えて絞るだけの検索です。", why: "構文は通ります。しかし、成功が失敗より前でも、同一ユーザーでなくても、同じIPなら一致します。",
+        handle: clickIs("sp-run"), after: function (c) { c.ran = "before"; } },
+      { label: "結果にケースCが混ざることを確かめる", target: "#res-row-C", tip: "④ C（192.0.2.51）は管理者の成功が失敗より前", sub: "「失敗後の成功」ではないのに候補に入る（検算済み）",
+        now: "AとCの2件が残りました。Cは管理者 admin_fin の成功（09:00:05）が失敗より前で、「失敗後の成功」ではありません。",
+        why: "数だけの検索をダッシュボードに載せると、SOCは誤った印象を持ちます。担当者は、これが正しいかを確かめられず、委託先に依頼します。",
+        btn: "委託先に依頼する", after: function (c) { c.app = "intra"; c.view = "ticket"; } },
+      { label: "改修依頼チケットを見る", target: "#i-ticket", tip: "⑤ 委託先の回答待ち（架空）", sub: "ここで止まるのが、いまのA社のBefore",
+        now: "改修依頼を出し、回答を待ちます。SOCの監視は、その間は変わりません。", why: "次のS2から、同じ依頼を、AI Hub・Splunk AI Assistant・テックタッチでSOC担当者自身が進めます。",
+        btn: "Beforeを終える" }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">構文が通ることと、SOCの検知要件に正しいことは別です。</p>' +
+        '<div class="soft"><p><b>不十分な検索の問題</b></p><ul class="sum-list plain"><li>異なる失敗アカウント数を見ていない</li><li>管理者の失敗と成功が同一アカウントかを見ていない</li><li>成功が失敗より後かを見ていない</li></ul></div>' +
+        '<p class="refs">この検索は教材です。Splunk AI Assistantの実際の出力ではありません。</p>';
+    },
+    nextLabel: "S2へ進む（要件整理）"
+  };
+
+  /* ---------- S2：AI Hubで「何を依頼するか」を具体化する ---------- */
+  CH[3] = {
+    role: "soc", time: "S2", timeSub: "05:00–09:00", av: "山", who: "山田（SOC担当者・架空）",
+    title: "日本語の依頼を、AI Hubが社内要件（ログ辞書・検知基準）に基づく依頼文にする",
+    text: "山田さん（架空）は、Splunkの検索画面の上に出るテックタッチのガイド「SOC分析アシスト」からAI Hubを開き、やりたいことを日本語で書きます。AI Hubは、A社のログ辞書（KB01）・検知基準（KB02）・承認済み検索（KB03）を参照し、Splunk AI Assistantへの依頼文を作ります。良いプロンプトを書ける人だけがAIを使える、という状態を減らします。",
+    tags: ["S2", "SOC担当者の視点", "仮説2　AIへの依頼を社内要件に合わせられない", "37分版 4:00／20分版 2:30"],
+    ask: "Splunk AI Assistantに何をどう頼むか、御社ではどなたが決めていますか？",
+    kind: "hub", kicker: "ガイド＋AI Hub（構想・例文）", guide: "SOC分析アシスト：依頼を社内要件に整える",
+    init: function () { return { step: 0, app: "search", q: null, ran: null, tab: "stats", chip: true, hub: 0, copied: false, vals: { "hub-in": "" } }; },
+    startIds: ["chip-soc", "g-start"], startLabel: "「SOC分析アシスト」を開く",
+    onStart: function (c) { c.hub = 1; },
+    intro: function () {
+      return guideList("おすすめのガイド", "検索画面の上の「SOC分析アシスト」を押すと、AI Hub（構想・架空画面）が開きます。",
+        [["SOC分析アシスト：依頼を社内要件に整える", "4ステップ・目安4分", true]]);
+    },
+    steps: [
+      { label: "やりたいことを日本語で書く", target: "#hub-in-wrap", tip: "① 日本語で、やりたいことを書きます", sub: "SPLの用語は要りません",
+        now: "AI Hubの入力欄に、やりたいことを日本語で書きます。「例文を入れる」で、台本の依頼文が入ります。",
+        hub: "参照するナレッジ（P1）：KB01 ログ辞書、KB02 検知基準、KB03 承認済み検索。AI Hubは、この三つに照らして依頼を整理します。",
+        btn: "例文を入れる",
+        handle: function (c, ev) {
+          if (ev.kind === "click" && ev.id === "hub-fill") { c.vals["hub-in"] = REQUEST_IN; return "done"; }
+          if (ev.kind === "pick" && ev.id === "hub-in") return ev.value.trim() ? "done" : { wrong: "依頼が空です。やりたいことを日本語で書くか、「例文を入れる」を押します。" };
+          return null;
+        },
+        auto: function (c) { c.vals["hub-in"] = REQUEST_IN; return "done"; },
+        after: function (c) { c.hub = 2; } },
+      { label: "AI Hubに送る", target: "#hub-send", tip: "② AI Hubに送ります", sub: "回答は、本番前に確かめた例文を使います",
+        now: "「整理する」を押します。AI Hubが、対象・条件・追加条件・確認事項・分析の分け方を整理します。",
+        hub: "AI Hubの回答は、デモでは本番前に確かめた例文です。実環境では、御社のナレッジに合わせて検証します。",
+        handle: clickIs("hub-send"), after: function (c) { c.hub = 3; } },
+      { label: "整理された要件を確かめる", target: "#hub-req", tip: "③ 依頼文に5つの言葉が入っているか", sub: "15分／10件以上／異なる5ユーザー／同一管理者／失敗後の成功",
+        now: "Assistant向けの依頼文に、「15分」「10件以上」「異なる失敗user」「同じsrc・同じ管理者user」「失敗の後で成功」が入っていることを確かめます（S2の合格判定）。",
+        hub: "列名と書式を依頼文に書く理由：Splunk AI Assistantがルックアップの列構成を自動で把握するという公式の記載は見当たりません。AI HubがKB01から列名を補います。",
+        btn: "確かめた" },
+      { label: "依頼文をコピーする", target: "#hub-copy", tip: "④ コピーして、S3でAssistantに貼ります", sub: "AI Hub → Splunk AI Assistant は手動コピー（デモ確定方式）",
+        now: "依頼文をコピーします。次の場面で、Splunk AI Assistantの入力欄に貼ります。",
+        hub: "AI HubとAssistantの間の受け渡しは手動コピーです（2.4）。画面が2つになるため、リハーサルで見やすさを確かめます（9章 #2）。",
+        handle: clickIs("hub-copy"), after: function (c) { c.copied = true; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">依頼文をコピーしました。S3でSplunk AI Assistantに貼ります。</p>' +
+        '<div class="soft"><p><b>S2の合格判定</b></p><ul class="sum-list plain">' + REQ_WORDS.map(function (w) { return "<li>" + w + "</li>"; }).join("") + "</ul></div>" +
+        '<p class="refs">AI Hubの回答は本番前に確かめた例文です。実環境の項目名やデータ構造に合わせた検証が必要です。</p>';
+    },
+    nextLabel: "S3へ進む（SPL生成・確認）"
+  };
+
+  /* ---------- S3：Assistantを使い、AI Hubが業務適合を確かめる ---------- */
+  var CHECK_ROWS = [
+    ["ログ辞書", "src、user、action、privileged を使っているか", "実際の列名を確認", true],
+    ["ユーザー数", "失敗10件だけでなく、異なる5アカウント以上か", "dc(user) に相当する条件を確認", true],
+    ["同一ユーザー", "管理者の失敗と成功が同一アカウントか", "src、user 単位の判定を確認", false],
+    ["前後関係", "管理者の成功が失敗より後か", "時刻順の判定（streamstats など）を確認", false],
+    ["最終検証", "ケースA/B/C/Dの期待結果を満たすか", "Splunkの実行結果と突き合わせる（S4）", null]
+  ];
+  CH[4] = {
+    role: "soc", time: "S3", timeSub: "09:00–14:00", av: "山", who: "山田（SOC担当者・架空）",
+    title: "AssistantのSPL案を、AI HubがSOCの業務条件で照合し、修正依頼を作る",
+    text: "山田さん（架空）は、S2の依頼文をSplunk AI Assistantに貼り、SPL案を受け取ります。Assistantの出力はそのまま表示します（進行ルール）。AI Hubは、構文ではなくSOCの業務条件（異なるアカウント数・同一ユーザー・前後関係・時間範囲）で照合し、不足があればAssistantへの修正依頼文を作ります。再生成したSPLは、Splunkの検索画面で実行して確かめます。",
+    tags: ["S3", "SOC担当者の視点", "仮説2　AIの出力の妥当性を判断できない", "37分版 5:00／20分版 3:00"],
+    ask: "AIが作った検索を、御社の検知要件に照らして確かめる工程は、いまありますか？",
+    kind: "hub", kicker: "AI Assistant（Splunkの機能）＋AI Hub（構想・例文）", guide: "AssistantのSPL案を、SOC基準で確かめる",
+    init: function () { return { step: 0, app: "search", q: null, ran: null, tab: "stats", assist: true, stage: 0, hub: 0, fixPasted: false, vals: {} }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("おすすめのガイド", "Splunk AI Assistant（画面イメージ・架空）に依頼文を貼り、SPL案を受け取ります。AI Hubが業務条件で照合します。",
+        [["AssistantのSPL案を、SOC基準で確かめる", "5ステップ・目安5分", true]]);
+    },
+    free: function (c, ev) {
+      if (ev.kind === "click" && ev.id === "as-insert" && c.hub < 3) {
+        fix("【入力チェック（案）】照合の前に、検索へ入れようとしています。先にAI Hubで「同一ユーザー」「前後関係」「時間範囲」を確かめます（社内ルール・架空）。");
+        return true;
+      }
+      return false;
+    },
+    steps: [
+      { label: "依頼文をAssistantに貼る", target: "#as-input", tip: "① S2でコピーした依頼文を貼ります", sub: "Splunk AI Assistant（S&Rの横のパネル・画面イメージ）",
+        now: "Splunk AI Assistantの入力欄に、S2の依頼文を貼ります。", hub: "依頼文には、列名・書式・15分・10件以上・異なる5ユーザー・同一管理者・失敗後の成功が入っています。",
+        btn: "貼り付ける", handle: clickIs("as-paste"), after: function (c) { c.stage = 1; } },
+      { label: "SPL案を生成する", target: "#as-send", tip: "② 送信して、SPL案を受け取ります", sub: "出力はそのまま表示（特定の失敗を演出しない）",
+        now: "送信します。表示されるSPL案は、デモ用に準備した参考画面です。実機ではAssistantの出力をそのまま使います。",
+        hub: "進行ルール：適切な検索が出た場合はそのまま評価します。条件が欠けていれば、その内容をAI Hubに渡して補います。",
+        handle: clickIs("as-send"), after: function (c) { c.stage = 2; } },
+      { label: "AI Hubで業務条件と照合する", target: "#hub-check", tip: "③ 「SOC基準との照合」を開きます", sub: "構文ではなく、SOCの業務条件で確かめる（P2）",
+        now: "「SOC基準との照合」を押します。AI Hubが、ログ辞書・ユーザー数・同一ユーザー・前後関係・最終検証の5項目で評価します。",
+        hub: "担当者の入力（P2）：「次のSPL案を、KB01〜KB03と照合してください。①参照するログ・フィールド、②異なるアカウント数、③同じ管理者本人の失敗後の成功、④除外条件、⑤時間範囲を表で評価し、不足箇所についてAssistantへの修正依頼文を作ってください。検索結果の真偽は断定せず、実データで確認する項目を示してください。」",
+        handle: clickIs("hub-check"), after: function (c) { c.hub = 3; } },
+      { label: "修正依頼を戻して再生成する", target: function (c) { return c.fixPasted ? "#as-send" : "#hub-copy-fix"; },
+        tip: function (c) { return c.fixPasted ? "④ 送信して、再生成します" : "④ 修正依頼文をAssistantに戻します"; },
+        sub: function (c) { return c.fixPasted ? "同一ユーザー・前後関係・時間範囲を足した案が返る想定" : "AI Hubが作った修正依頼文をコピーして貼ります"; },
+        now: function (c) { return c.fixPasted ? "送信します。再生成されたSPLは、eventstats・sort・streamstats で同一ユーザー・前後関係を扱います。" : "照合表の下の修正依頼文を、Assistantに戻します。"; },
+        hub: "修正依頼文の要点：(1) 成功した管理者本人に同じ接続元からの失敗があること（src と user の単位）。(2) その失敗が成功より前であること（時刻順）。(3) 対象を 09:00〜09:15 の15分間に限定。",
+        btn: function (c) { return c.fixPasted ? "送信する" : "修正依頼文を貼る"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "hub-copy-fix" && !c.fixPasted) { c.fixPasted = true; c.stage = 3; return "ok"; }
+          if (ev.id === "as-send" && c.fixPasted) return "done";
+          return null;
+        },
+        auto: function (c) { if (!c.fixPasted) { c.fixPasted = true; c.stage = 3; return "ok"; } return "done"; },
+        after: function (c) { c.stage = 4; } },
+      { label: "検索に入れて実行する", target: function (c) { return c.q === "q3" ? "#sp-run" : "#as-insert2"; },
+        tip: function (c) { return c.q === "q3" ? "⑤ 実行して、Aだけが残ることを確かめます" : "⑤ 再生成したSPLを検索に入れます"; },
+        sub: function (c) { return c.q === "q3" ? "期待：198.51.100.24 / admin_ops / 09:10:00 の1行" : "「検索に入れる」を押します"; },
+        now: function (c) { return c.q === "q3" ? "検索を実行します。固定のテストログで、ケースAだけが残れば合格です。" : "再生成したSPLを「検索に入れる」で検索バーに入れます。"; },
+        hub: "AI Hubは真偽を断定しません。最終的な正しさは、S4でテストケースA/B/C/Dと照合して確かめます。",
+        btn: function (c) { return c.q === "q3" ? "実行する" : "検索に入れる"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "as-insert2" && c.q !== "q3") { c.q = "q3"; return "ok"; }
+          if (ev.id === "sp-run" && c.q === "q3") return "done";
+          return null;
+        },
+        auto: function (c) { if (c.q !== "q3") { c.q = "q3"; return "ok"; } return "done"; },
+        after: function (c) { c.ran = "q3"; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">再生成したSPLで、ケースAだけが残りました。</p>' +
+        '<div class="soft"><p><b>S3の合格判定</b></p><p>AI Hubが、SPLの構文ではなくSOCの業務条件に基づくチェックリストを出す。</p></div>' +
+        '<p class="refs">Assistantの回答は、デモ本番では準備した例ではなく実機の出力を使います。Assistantの精度が1年前より上がったことを示す公開の根拠は見当たりません（結論0）。</p>';
+    },
+    nextLabel: "S4へ進む（データ検証）"
+  };
+
+  /* ---------- S4：正解ログに照らし、誤検知の候補を区別する ---------- */
+  var Q_ORDER = ["q1", "q2", "q3", "q4"];
+  var Q_LABEL = { q1: "Q1 IP別の失敗ランキング", q2: "Q2 閾値候補", q3: "Q3 失敗後の特権成功", q4: "Q4 5分推移" };
+  var Q_EXPECT = { q1: "A=36件/9人、B=18件/1人、C=12件/6人、D=4件/3人", q2: "AとCが残る（15分・10件以上・異なる5ユーザー以上）", q3: "Aだけが残る（同一管理者・失敗後の成功）", q4: "09:00 失敗25・成功1／09:05 失敗42・成功0／09:10 失敗3・成功1" };
+  function qStep(key, n) {
+    var idx = Q_ORDER.indexOf(key);
+    var why = { q1: "A〜Dの4件が並びます。件数だけでなく「異なる失敗ユーザー数」を見ます。Bは18件でも1アカウントです。",
+      q2: "AとCが残ります。Cは12件・6人で閾値を満たしますが、管理者の成功は失敗より前です。",
+      q3: "Aだけが残ります。「同一管理者」「失敗の後の成功」の条件が要ることを示す核心です。",
+      q4: "5分単位の推移です。09:05に失敗が集中し、09:10に成功が1件（admin_ops）あります。" }[key];
+    // 段階：nav（レポート一覧を開く）→ open（レポートを開く）→ run（実行）
+    var ph = function (c) { return c.q === key ? "run" : c.app === "reports" ? "open" : "nav"; };
+    return {
+      label: Q_LABEL[key] + "を実行する",
+      target: function (c) { var p = ph(c); return p === "nav" ? NAV + 'reports"]' : p === "open" ? "#rep-" + key : "#sp-run"; },
+      tip: function (c) { var p = ph(c); return p === "nav" ? n + " 「レポート」を開きます" : p === "open" ? n + " 「" + REPORTS[idx][1] + "」を開きます" : n + " 実行します"; },
+      sub: function (c) { var p = ph(c); return p === "nav" ? "保存済みレポート（Q1〜Q4）は、ここにあります" : p === "open" ? "期待：" + Q_EXPECT[key] : "結果を期待値と見比べます"; },
+      redo: "ガイドの順に開き直します",
+      now: function (c) { var p = ph(c); return p === "nav" ? "上の「レポート」から、保存済みレポートの一覧を開きます。" : p === "open" ? "「" + REPORTS[idx][1] + "」を開きます。" : "検索を実行し、結果を期待値と見比べます。"; },
+      why: why,
+      btn: function (c) { var p = ph(c); return p === "nav" ? "レポートを開く" : p === "open" ? "このレポートを開く" : "実行する"; },
+      handle: function (c, ev) {
+        if (ev.kind !== "click") return null;
+        if (ev.id === "nav-reports") { c.app = "reports"; return "ok"; }
+        if (ev.id === "nav-search") { c.app = "search"; return "ok"; }
+        var m = /^rep-(q[1-4])$/.exec(ev.id);
+        if (m) {
+          if (m[1] === key) { c.app = "search"; c.q = key; c.tab = key === "q4" ? "viz" : "stats"; return "ok"; }
+          return { wrong: "順番が違います。次は「" + Q_LABEL[key] + "」です。Q1→Q2→Q3→Q4の順に、期待値と見比べます（ガイドの順・架空）。" };
+        }
+        if (ev.id === "sp-run" && c.q === key) return "done";
+        return null;
+      },
+      auto: function (c) {
+        var p = ph(c);
+        if (p === "nav") { c.app = "reports"; return "ok"; }
+        if (p === "open") { c.app = "search"; c.q = key; c.tab = key === "q4" ? "viz" : "stats"; return "ok"; }
+        return "done";
+      },
+      after: function (c) { c.ran = key; c.done[key] = true; }
+    };
+  }
+  CH[5] = {
+    role: "soc", time: "S4", timeSub: "14:00–19:00", av: "山", who: "山田（SOC担当者・架空）",
+    title: "固定のテストログに照らし、ケースA／B／C／Dを区別する",
+    text: "山田さん（架空）は、CSVルックアップとして読み込んだ固定のテストログ（72件・架空）に、承認済みの検索Q1〜Q4を順に実行します。Q1でA〜Dが並び、Q2でAとCが残り、Q3でAだけが残ります。この差を見せることで、AIの出力を「検証できる分析結果」に変えます。テックタッチのガイドは、保存済みレポートの場所と実行の順番を案内します。",
+    tags: ["S4", "SOC担当者の視点", "仮説2　検証の方法が無い", "37分版 5:00／20分版 3:00"],
+    ask: "検知条件を変えたとき、正解のテストケースで確かめる仕組みは、いまありますか？",
+    kind: "tt", kicker: "操作ナビ（案）", guide: "正解ログに照らして、ケースA〜Dを区別する",
+    init: function () { return { step: 0, app: "search", q: null, ran: null, tab: "stats", done: {}, vals: {} }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("おすすめのガイド", "保存済みレポートQ1〜Q4を順に実行し、期待値（5章の検算結果）と見比べます。",
+        [["正解ログに照らして、ケースA〜Dを区別する", "4ステップ・目安5分", true]]);
+    },
+    steps: [qStep("q1", "①"), qStep("q2", "②"), qStep("q3", "③"), qStep("q4", "④")],
+    doneHTML: function () {
+      return '<p class="now-box">Q1がA36・B18・C12・D4。Q2がA・C。Q3がAのみ。S4の合格判定を満たしました。</p>' +
+        '<div class="soft"><p><b>ケースの判定（架空）</b></p><ul class="rec-list">' + CASES.map(function (k) { return '<li><span class="t">' + k.id + "</span><span>" + k.note + " → " + k.verdict + "</span></li>"; }).join("") + "</ul></div>" +
+        '<p class="refs">期待値はPythonで検算したものです。Splunk実機での実行は構築時にSEが確かめます（8.1）。</p>';
+    },
+    nextLabel: "S5へ進む（可視化）"
+  };
+
+  /* ---------- S5：テックタッチのガイドで監視ダッシュボードを完成する ---------- */
+  var VIZ_LABEL = { bar: "棒グラフ", table: "表", line: "折れ線グラフ", single: "単一値" };
+  function panelStep(key, viz, n, why) {
+    var idx = Q_ORDER.indexOf(key);
+    return {
+      label: Q_LABEL[key] + "を" + VIZ_LABEL[viz] + "で追加する",
+      target: function (c) { return c.vals["ds"] !== key ? "#f-ds" : c.vals["viz"] !== viz ? "#f-viz" : "#db-add"; },
+      tip: function (c) { return c.vals["ds"] !== key ? n + " データソースに「" + REPORTS[idx][1] + "」を選びます" : c.vals["viz"] !== viz ? n + " 可視化を「" + VIZ_LABEL[viz] + "」にします" : n + " 「追加」を押します"; },
+      sub: function (c) { return c.vals["ds"] !== key ? "保存済みレポートをデータソースにします（ds.savedSearch。実機で要確認）" : c.vals["viz"] !== viz ? why : "パネルがキャンバスに置かれます"; },
+      redo: "選び直します",
+      now: function (c) { return c.vals["ds"] !== key ? "データソースに「" + REPORTS[idx][1] + "」を選びます。" : c.vals["viz"] !== viz ? "可視化を「" + VIZ_LABEL[viz] + "」にします。" : "「追加」を押します。"; },
+      why: why,
+      btn: function (c) { return c.vals["ds"] !== key ? "データソースを選ぶ" : c.vals["viz"] !== viz ? "可視化を選ぶ" : "追加する"; },
+      handle: function (c, ev) {
+        if (ev.kind === "pick" && ev.id === "ds") {
+          if (ev.value === key) return "ok";
+          if (!ev.value) return null;
+          return { wrong: "順番が違います。次は「" + REPORTS[idx][1] + "」です（ガイドの順・架空）。" };
+        }
+        if (ev.kind === "pick" && ev.id === "viz") {
+          if (!ev.value) return null;
+          if (ev.value === viz) return "ok";
+          return { wrong: "【入力チェック（案）】" + Q_LABEL[key] + "は「" + VIZ_LABEL[viz] + "」にします。" + why };
+        }
+        if (ev.kind === "click" && ev.id === "db-add") {
+          if (c.vals["ds"] === key && c.vals["viz"] === viz) return "done";
+          return { wrong: "データソースと可視化を先に選びます。" };
+        }
+        return null;
+      },
+      auto: function (c) {
+        if (c.vals["ds"] !== key) { c.vals["ds"] = key; return "ok"; }
+        if (c.vals["viz"] !== viz) { c.vals["viz"] = viz; return "ok"; }
+        return "done";
+      },
+      after: function (c) { c.panels.push({ ds: key, viz: viz }); c.vals["ds"] = ""; c.vals["viz"] = ""; }
+    };
+  }
+  CH[6] = {
+    role: "soc", time: "S5", timeSub: "19:00–25:00", av: "山", who: "山田（SOC担当者・架空）",
+    title: "テックタッチのガイドで、SOC認証監視ダッシュボードを完成させる",
+    text: "山田さん（架空）は、Dashboard Studio（画面イメージ・架空）で監視ダッシュボードを作ります。テックタッチのガイドは、命名規則の入力チェック、保存済みレポートをデータソースにする手順、可視化の種類、共有範囲の入力チェックを、1画面ずつ案内します。今まで委託先に依頼していた定型的な可視化の変更を、担当者自身が進めます。",
+    tags: ["S5", "SOC担当者の視点", "仮説3　作成・修正で止まる", "37分版 6:00／20分版 3:00（Q1とQ3の2枚）"],
+    ask: "ダッシュボードの作成・変更は、いま誰が、どの基準で行っていますか？",
+    kind: "tt", kicker: "操作ナビ＋入力チェック（案）", guide: "SOC認証監視ダッシュボードを作る",
+    init: function () { return { step: 0, app: "dashboards", view: "list", panels: [], saved: false, vals: { "db-name": "", "db-share": "", ds: "", viz: "" } }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("おすすめのガイド", "新規ダッシュボードを作り、Q1〜Q4のパネルを置き、共有範囲を確かめて保存します。20分版はQ1とQ3の2枚だけにします。",
+        [["SOC認証監視ダッシュボードを作る", "6ステップ・目安6分", true]]);
+    },
+    steps: [
+      { label: "新規ダッシュボードを作る（命名規則）", target: function (c) { return c.view === "list" ? "#db-new" : !NAME_RULE.test(c.vals["db-name"]) ? "#f-db-name" : "#db-create"; },
+        tip: function (c) { return c.view === "list" ? "① 「新規ダッシュボードを作成」を押します" : !NAME_RULE.test(c.vals["db-name"]) ? "① 名前は「チーム_対象_用途」の形にします" : "① 「作成」を押します"; },
+        sub: function (c) { return c.view === "list" ? "Dashboard Studioで作ります" : !NAME_RULE.test(c.vals["db-name"]) ? "例：A社_SOC認証監視_デモ（入力チェック・案）" : "Dashboard Studioの編集画面が開きます"; },
+        redo: "名前を直します",
+        now: function (c) { return c.view === "list" ? "「新規ダッシュボードを作成」を押します。" : !NAME_RULE.test(c.vals["db-name"]) ? "名前を「A社_SOC認証監視_デモ」の形（チーム_対象_用途）で入力します。" : "「作成」を押します。"; },
+        why: "名前の形をそろえると、委託先が作ったものと社内で作ったものを、一覧で見分けられます（社内ルール・架空）。",
+        btn: function (c) { return c.view === "list" ? "新規作成を開く" : !NAME_RULE.test(c.vals["db-name"]) ? "例の名前を入れる" : "作成する"; },
+        handle: function (c, ev) {
+          if (ev.kind === "click" && ev.id === "db-new" && c.view === "list") { c.view = "new"; return "ok"; }
+          if (ev.kind === "pick" && ev.id === "db-name") {
+            if (NAME_RULE.test(ev.value)) return "ok";
+            return { wrong: "【入力チェック（案）】名前は「チーム_対象_用途」の形にします。例：A社_SOC認証監視_デモ（社内ルール・架空）。" };
+          }
+          if (ev.kind === "click" && ev.id === "db-create" && c.view === "new") {
+            if (NAME_RULE.test(c.vals["db-name"])) return "done";
+            return { wrong: "【入力チェック（案）】名前が命名規則に合っていません。「チーム_対象_用途」の形にします。" };
+          }
+          return null;
+        },
+        auto: function (c) {
+          if (c.view === "list") { c.view = "new"; return "ok"; }
+          if (!NAME_RULE.test(c.vals["db-name"])) { c.vals["db-name"] = "A社_SOC認証監視_デモ"; return "ok"; }
+          return "done";
+        },
+        after: function (c) { c.view = "edit"; } },
+      panelStep("q1", "bar", "②", "IP別の件数を比べるので、棒グラフにします。"),
+      panelStep("q2", "table", "③", "異なる失敗アカウント数を件数と並べて読むので、表にします。"),
+      panelStep("q3", "table", "④", "対象のIP・アカウント・時刻・MFAを読むので、表にします。"),
+      panelStep("q4", "line", "⑤", "5分単位の推移を見るので、折れ線グラフにします。"),
+      { label: "共有範囲を確かめて保存する", target: function (c) { return c.vals["db-share"] !== "team" ? "#f-db-share" : "#db-save"; },
+        tip: function (c) { return c.vals["db-share"] !== "team" ? "⑥ 共有範囲を「SOCチーム（アプリ）」にします" : "⑥ 保存します"; },
+        sub: function (c) { return c.vals["db-share"] !== "team" ? "「自分だけ」のままだと、チームの監視に使えません（入力チェック・案）" : "検索期間は「過去15分」のまま（デモはCSVの固定ログ）"; },
+        redo: "共有範囲を選び直します",
+        now: function (c) { return c.vals["db-share"] !== "team" ? "共有範囲を「SOCチーム（アプリ）」にします。" : "「保存」を押します。"; },
+        why: "権限・共有範囲は、Splunkの機能です。テックタッチは「このチームでは何を選ぶか」だけを案内します。",
+        btn: function (c) { return c.vals["db-share"] !== "team" ? "共有範囲を選ぶ" : "保存する"; },
+        handle: function (c, ev) {
+          if (ev.kind === "pick" && ev.id === "db-share") {
+            if (ev.value === "team") return "ok";
+            if (ev.value === "me") return { wrong: "【入力チェック（案）】共有範囲が「自分だけ」です。SOCチームの監視に使うため「SOCチーム（アプリ）」にします（社内ルール・架空）。" };
+            if (ev.value === "all") return { wrong: "【入力チェック（案）】「すべてのアプリ」は、他部門にも見えます。「SOCチーム（アプリ）」にします（社内ルール・架空）。" };
+            return null;
+          }
+          if (ev.kind === "click" && ev.id === "db-save") {
+            if (c.vals["db-share"] === "team") return "done";
+            return { wrong: "【入力チェック（案）】共有範囲を先に確かめます。" };
+          }
+          return null;
+        },
+        auto: function (c) { if (c.vals["db-share"] !== "team") { c.vals["db-share"] = "team"; return "ok"; } return "done"; },
+        after: function (c) { c.saved = true; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">ダッシュボードを保存しました。A/B/Cの差を確認できる4パネルです。</p>' + recList([
+        ["19:02", "新規作成（名前：A社_SOC認証監視_デモ。命名規則の入力チェック）"], ["19:10", "Q1棒・Q2表・Q3表・Q4折れ線の4パネル"], ["19:14", "共有範囲「SOCチーム」で保存"]
+      ], "時刻・記録は架空です。保存済みレポートをデータソースにする操作は、実機で確かめます（9章 #7）。");
+    },
+    nextLabel: "S6へ進む（検知）"
+  };
+
+  /* ---------- S6：SSEを参照し、検知へつなぐ ---------- */
+  var SPL_Q5 = '（本番用の骨格。実行しない）\nindex=<認証ログのインデックス> sourcetype=<VPN認証のsourcetype> earliest=-15m\n| eval src=<接続元IPのフィールド>, user=<アカウントのフィールド>, action=<結果のフィールド>, privileged=<特権判定>\n| … Q3と同じ eventstats／sort／streamstats の判定 …';
+  CH[7] = {
+    role: "soc", time: "S6", timeSub: "25:00–29:00", av: "山", who: "山田（SOC担当者・架空）",
+    title: "SSEの検知コンテンツを参照し、A社の基準どおりのアラートにする",
+    text: "山田さん（架空）は、Splunk Security Essentials（SSE）のSecurity Contentで認証関連の検知コンテンツを開き、必要なログ・誤検知になりやすい条件・対応のしかたを確かめます（Splunkの機能）。A社の検知基準（KB02）はテックタッチのツールチップで示します。アラートの保存画面では、名前・実行の間隔・抑制・通知先・「トリガーされたアラートに追加」を、入力チェック付きで設定します。委託先に頼まずにアラートを足せる姿です。",
+    tags: ["S6", "SOC担当者の視点", "仮説3　検知のチューニングで止まる", "37分版 4:00／20分版 2:00"],
+    ask: "検知コンテンツを入れた後、自社のログと運用条件に合わせて直す作業は、いま誰が担っていますか？",
+    kind: "tt", kicker: "ツールチップ＋入力チェック（案）", guide: "SSEを参照して、社内基準どおりのアラートを作る",
+    init: function () { return { step: 0, app: "sse", view: "list", q: null, ran: null, tab: "stats", menu: false, dialog: false, savedAlert: false, vals: { "al-name": "", "al-sched": "", "al-throttle": "", "al-to": "", "al-add": "" } }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("おすすめのガイド", "SSEの検知コンテンツを参照し、A社の基準をツールチップで確かめ、アラートの保存画面を社内基準どおりに埋めます。",
+        [["SSEを参照して、社内基準どおりのアラートを作る", "7ステップ・目安4分", true]]);
+    },
+    free: function (c, ev) {
+      if (ev.kind === "click" && /^sse-item-other/.test(ev.id)) { S.info = "このデモでは「Detect Password Spray Attempts」を開きます。他のコンテンツ名は省略しています（架空）。"; return true; }
+      return false;
+    },
+    steps: [
+      { label: "SSEで検知コンテンツを開く", target: function (c) { return c.view === "list" ? "#sse-item-ps" : "#sse-kfp"; },
+        tip: function (c) { return c.view === "list" ? "① 「Detect Password Spray Attempts」を開きます" : "① Known False Positives と How to Respond を読みます"; },
+        sub: function (c) { return c.view === "list" ? "SSEのSecurity Content（Splunkの機能）" : "必要なログ、誤検知になりやすい条件、対応のしかた"; },
+        now: function (c) { return c.view === "list" ? "Security Contentの一覧から「Detect Password Spray Attempts」を開きます。" : "必要なログ、Known False Positives（誤検知になりやすい条件）、How to Respond（対応のしかた）を読みます。"; },
+        why: "SSEはSplunk Cloud Platformで使える無料のアプリで、ESの専用機能ではありません。検知コンテンツを「入れて終わり」にせず、自社のログと条件に合わせます。",
+        btn: function (c) { return c.view === "list" ? "コンテンツを開く" : "読んだ"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "sse-item-ps" && c.view === "list") { c.view = "detail"; return "ok"; }
+          if (ev.id === "sse-kfp" && c.view === "detail") return "done";
+          return null;
+        },
+        auto: function (c) { if (c.view === "list") { c.view = "detail"; return "ok"; } return "done"; } },
+      { label: "A社の検知基準をツールチップで確かめる", target: "#tw-std", tip: "② 「?」でA社の基準（KB02）を表示します", sub: "15分・失敗10件以上・異なる5アカウント以上（架空）",
+        now: "「?」を押して、A社の検知基準 D-01（架空）を表示します。", why: "SSEの一般的な条件と、A社の基準は別です。基準は画面の上で、同じ言葉で確かめます。",
+        btn: "基準を表示する",
+        handle: function (c, ev) { return ev.kind === "tip" && ev.id === "std" ? "done" : null; },
+        auto: autoTip("std") },
+      { label: "本番用の検索の設計を確かめる", target: "#sse-q5", tip: "③ 本番用は、インデックス化された認証イベントを検索します", sub: "固定CSVの定期実行は、継続的な監視にはなりません",
+        now: "Q2を参考に、本番用はインデックス化された認証イベントを検索する設計（Q5の骨格）に置き換えることを確かめます。",
+        why: "デモでは、過去ログへの検索検証（S4）と、アラート設定の設計・画面操作（この場面）を切り分けて説明します。",
+        btn: "検索を開く", after: function (c) { c.app = "search"; c.q = "q2"; c.ran = "q2"; } },
+      { label: "名前を付けて保存 ＞ アラート", target: function (c) { return c.menu ? "#sa-alert" : "#sp-saveas"; },
+        tip: function (c) { return c.menu ? "④ 「アラート」を選びます" : "④ 「名前を付けて保存」を開きます"; },
+        sub: function (c) { return c.menu ? "アラートの保存画面が開きます" : "検索 → 名前を付けて保存 ＞ アラート"; },
+        now: function (c) { return c.menu ? "「アラート」を選びます。" : "検索結果の右上の「名前を付けて保存」を開きます。"; },
+        why: "アラートの保存は、Splunkの機能です。定期実行には schedule_search の権限が要ります（既定ではadminとpower。9章 #8）。",
+        btn: function (c) { return c.menu ? "アラートを選ぶ" : "メニューを開く"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "click") return null;
+          if (ev.id === "sp-saveas" && !c.menu) { c.menu = true; return "ok"; }
+          if (ev.id === "sa-alert" && c.menu) return "done";
+          if (/^sa-/.test(ev.id)) return { wrong: "このデモでは「アラート」を選びます。レポートやダッシュボードパネルは、別のガイドで扱います（架空）。" };
+          return null;
+        },
+        auto: function (c) { if (!c.menu) { c.menu = true; return "ok"; } return "done"; },
+        after: function (c) { c.menu = false; c.dialog = true; } },
+      { label: "名前と実行の間隔を決める", target: function (c) { return !NAME_RULE.test(c.vals["al-name"]) ? "#f-al-name" : "#f-al-sched"; },
+        tip: function (c) { return !NAME_RULE.test(c.vals["al-name"]) ? "⑤ 名前は「SOC_対象_用途」の形にします" : "⑤ 実行の間隔は「15分ごと」にします"; },
+        sub: function (c) { return !NAME_RULE.test(c.vals["al-name"]) ? "例：SOC_認証_失敗後の特権成功（入力チェック・案）" : "リアルタイムは使いません（社内基準・架空）"; },
+        redo: "直します",
+        now: function (c) { return !NAME_RULE.test(c.vals["al-name"]) ? "名前を「SOC_認証_失敗後の特権成功」の形で入力します。" : "アラートタイプを「スケジュール（15分ごと）」にします。"; },
+        why: "Splunk Cloudでは、スケジュールの時刻がUTCになります（9章 #8）。",
+        btn: function (c) { return !NAME_RULE.test(c.vals["al-name"]) ? "例の名前を入れる" : "15分ごとにする"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "pick") return null;
+          if (ev.id === "al-name") return NAME_RULE.test(ev.value) ? "ok" : { wrong: "【入力チェック（案）】名前は「SOC_対象_用途」の形にします。例：SOC_認証_失敗後の特権成功（社内ルール・架空）。" };
+          if (ev.id === "al-sched") {
+            if (!ev.value) return null;
+            if (ev.value === "rt") return { wrong: "【入力チェック（案）】リアルタイム検索は使いません。定期実行の「15分ごと」にします（Splunkも定期実行を勧めています。社内基準・架空）。" };
+            if (ev.value !== "15m") return { wrong: "【入力チェック（案）】A社の基準は「15分ごと」です（社内基準・架空）。" };
+            return NAME_RULE.test(c.vals["al-name"]) ? "done" : "ok";
+          }
+          return null;
+        },
+        auto: function (c) { if (!NAME_RULE.test(c.vals["al-name"])) { c.vals["al-name"] = "SOC_認証_失敗後の特権成功"; return "ok"; } c.vals["al-sched"] = "15m"; return "done"; } },
+      { label: "抑制と通知先を決める", target: function (c) { return c.vals["al-throttle"] !== "60src" ? "#f-al-throttle" : "#f-al-to"; },
+        tip: function (c) { return c.vals["al-throttle"] !== "60src" ? "⑥ 抑制を「同じsrcで60分」にします" : "⑥ 通知先はSOCチームの共有アドレスにします"; },
+        sub: function (c) { return c.vals["al-throttle"] !== "60src" ? "空のままだと、同じ接続元で通知が続きます（入力チェック・案）" : "個人のアドレスだと、不在のときに見落とします（入力チェック・案）"; },
+        redo: "選び直します",
+        now: function (c) { return c.vals["al-throttle"] !== "60src" ? "抑制を「同じ src で60分」にします。" : "通知先を「SOCチーム（共有アドレス）」にします。"; },
+        why: "抑制と通知は、Splunkの機能です。テックタッチは、A社が何を選ぶか（社内基準・架空）だけを案内します。",
+        btn: function (c) { return c.vals["al-throttle"] !== "60src" ? "抑制を選ぶ" : "通知先を選ぶ"; },
+        handle: function (c, ev) {
+          if (ev.kind !== "pick") return null;
+          if (ev.id === "al-throttle") {
+            if (!ev.value) return null;
+            if (ev.value === "none") return { wrong: "【入力チェック（案）】抑制が空です。同じ src で60分抑制します（社内基準・架空）。" };
+            return "ok";
+          }
+          if (ev.id === "al-to") {
+            if (!ev.value) return null;
+            if (ev.value === "me") return { wrong: "【入力チェック（案）】個人のアドレスは、担当者が不在のときに見落とします。SOCチームの共有アドレスにします（社内基準・架空）。" };
+            return c.vals["al-throttle"] === "60src" ? "done" : "ok";
+          }
+          return null;
+        },
+        auto: function (c) { if (c.vals["al-throttle"] !== "60src") { c.vals["al-throttle"] = "60src"; return "ok"; } c.vals["al-to"] = "soc"; return "done"; } },
+      { label: "トリガーされたアラートに追加して保存する", target: function (c) { return c.vals["al-add"] !== "yes" ? "#f-al-add" : "#al-save"; },
+        tip: function (c) { return c.vals["al-add"] !== "yes" ? "⑦ 「トリガーされたアラートに追加」を付けます" : "⑦ 保存します"; },
+        sub: function (c) { return c.vals["al-add"] !== "yes" ? "付けないとActivityの一覧に出ません（既定で24時間で消える）" : "S7でこの一覧から結果を開きます"; },
+        redo: "直します",
+        now: function (c) { return c.vals["al-add"] !== "yes" ? "「トリガーされたアラートに追加」を「追加する」にします。" : "「保存」を押します。"; },
+        why: "付けないと、S7の「トリガーされたアラート」の一覧に出ません（公式の記載。9章 #8）。",
+        btn: function (c) { return c.vals["al-add"] !== "yes" ? "追加するにする" : "保存する"; },
+        handle: function (c, ev) {
+          if (ev.kind === "pick" && ev.id === "al-add") {
+            if (!ev.value) return null;
+            return ev.value === "yes" ? "ok" : { wrong: "【入力チェック（案）】「追加しない」だと、トリガーされたアラートの一覧に出ません。「追加する」にします（社内基準・架空）。" };
+          }
+          if (ev.kind === "click" && ev.id === "al-save") {
+            if (c.vals["al-add"] === "yes") return "done";
+            return { wrong: "【入力チェック（案）】「トリガーされたアラートに追加」を先に付けます。" };
+          }
+          return null;
+        },
+        auto: function (c) { if (c.vals["al-add"] !== "yes") { c.vals["al-add"] = "yes"; return "ok"; } return "done"; },
+        after: function (c) { c.dialog = false; c.savedAlert = true; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">アラート「SOC_認証_失敗後の特権成功」を保存しました。</p>' +
+        '<div class="soft"><p><b>設定（社内基準・架空）</b></p><ul class="sum-list plain"><li>15分ごと（cron）。リアルタイムは使わない</li><li>トリガー条件：結果が1件以上</li><li>抑制：同じ src で60分</li><li>通知先：SOCチームの共有アドレス</li><li>トリガーされたアラートに追加</li></ul></div>' +
+        '<p class="refs">注意：固定CSVの inputlookup をそのまま定期実行しても、継続的な本番監視にはなりません。本番はQ5の骨格でインデックス化された認証イベントを検索します。</p>';
+    },
+    nextLabel: "S7へ進む（一次調査）"
+  };
+
+  /* ---------- S7：アラート後の一次調査を標準化する ---------- */
+  var CK = [["ck1", "① 時刻（検知条件・対象時刻）"], ["ck2", "② 対象（アカウント・接続元）"], ["ck3", "③ MFAの結果"], ["ck4", "④ 正規アクセスか（本人確認）"], ["ck5", "⑤ 影響範囲（成功後の操作）"], ["ck6", "⑥ 根拠の記録・引き継ぎ"]];
+  var CK_FILL = { ck1: "done", ck2: "done", ck3: "done", ck4: "todo", ck5: "todo", ck6: "done" };
+  var EXTRA_REQ = "接続元 198.51.100.24 と、アカウント admin_ops について、2026-10-08 09:10:00 以降の操作履歴（VPNセッション、アクセス先、権限変更）を、時間順に一覧する検索を作ってください。対象のインデックスとsourcetypeは <社内の名称> です。";
+  function ckEmpty(c) { for (var i = 0; i < CK.length; i++) if (!c.vals[CK[i][0]]) return CK[i][0]; return null; }
+  CH[8] = {
+    role: "soc", time: "S7", timeSub: "29:00–34:00", av: "山", who: "山田（SOC担当者・架空）",
+    title: "アラートの結果を、社内の一次調査手順で整理し、上位者へ引き継ぐ",
+    text: "アラート「SOC_認証_失敗後の特権成功」がケースAで発火しました（架空）。山田さん（架空）は、トリガーされたアラートから結果を開き、AI Hub（P3）でA社の一次調査手順（KB04）に沿って確認済み事実・追加の確認事項・エスカレーション基準を整理します。テックタッチのチェックリストが抜け漏れを防ぎ、未確認の項目が空なら案内します。ログの検索はSplunk、検索案はAssistant、調査基準と次の行動はAI Hub、手順の抜け漏れ防止はテックタッチです。",
+    tags: ["S7", "SOC担当者の視点", "仮説4　調査が属人化する", "37分版 5:00／20分版 2:30"],
+    ask: "アラートの後の一次調査は、いま手順書どおりに進んでいますか。上位者への引き継ぎは、どの形で残っていますか？",
+    kind: "hub", kicker: "チェックリスト＋AI Hub（構想・例文）", guide: "認証アラートの一次調査（KB04）",
+    init: function () { return { step: 0, app: "activity", view: "list", hub: 0, extra: false, handed: false, vals: { ck1: "", ck2: "", ck3: "", ck4: "", ck5: "", ck6: "" } }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("おすすめのガイド", "トリガーされたアラートから結果を開き、AI Hubで整理し、チェックリストを埋めて、上位者へ引き継ぎます。",
+        [["認証アラートの一次調査（KB04）", "5ステップ・目安5分", true]]);
+    },
+    free: function (c, ev) {
+      if (ev.kind === "click" && ev.id === "ck-handoff" && ckEmpty(c)) {
+        fix("【入力チェック（案）】チェックリストに空の項目があります。未確認なら「未確認」を選びます。空のまま引き継げません（社内ルール・架空）。");
+        return true;
+      }
+      return false;
+    },
+    steps: [
+      { label: "トリガーされたアラートを開く", target: "#act-row-a", tip: "① アクティビティ ＞ トリガーされたアラート", sub: "「結果を表示」でケースAの1行を開きます",
+        now: "トリガーされたアラートの一覧から、「SOC_認証_失敗後の特権成功」の「結果を表示」を開きます。",
+        hub: "一覧に出るのは、S6で「トリガーされたアラートに追加」を付けたからです。通知メールから開く導線も、実機で確かめます。",
+        handle: clickIs("act-row-a"), after: function (c) { c.view = "result"; } },
+      { label: "AI Hubで一次調査の整理をする", target: "#hub-p3", tip: "② 「一次調査の整理」を開きます", sub: "KB04の手順に沿って、事実と未確認を分ける（P3）",
+        now: "「一次調査の整理」を押します。AI Hubが、確認済み事実・追加の確認・判断の進め方・追加SPLの依頼に分けます。",
+        hub: "担当者の入力（P3）：「ケースA：同一IPから9アカウントに36件の失敗があり、その後 admin_ops で成功。KB04の認証手順に従って、確認済み事実・追加の確認事項・エスカレーション基準を整理してください。侵害の成立は推定しないでください。」",
+        handle: clickIs("hub-p3"), after: function (c) { c.hub = 3; } },
+      { label: "チェックリストを埋める", target: function (c) { var e = ckEmpty(c); return e ? "#f-" + e : "#ck-list"; },
+        tip: function (c) { var e = ckEmpty(c); return e ? "③ 空の項目を埋めます（確認済み／未確認）" : "③ 6項目が埋まりました"; },
+        sub: "未確認の項目は「未確認」と残します。空のままにしません（入力チェック・案）",
+        redo: "空の項目を埋めます",
+        now: "6項目を「確認済み」か「未確認」で埋めます。「例を入れる」で、AI Hubの整理に沿った例が入ります。",
+        hub: "AI Hubの整理に沿うと、①②③⑥は確認済み、④正規アクセス・⑤影響範囲は未確認です。未確認を隠さないことが引き継ぎの要点です。",
+        btn: "例を入れる",
+        handle: function (c, ev) {
+          if (ev.kind === "click" && ev.id === "ck-fill") { for (var k in CK_FILL) c.vals[k] = CK_FILL[k]; return "done"; }
+          if (ev.kind === "pick" && /^ck[1-6]$/.test(ev.id)) return ckEmpty(c) ? "ok" : "done";
+          return null;
+        },
+        auto: function (c) { for (var k in CK_FILL) c.vals[k] = CK_FILL[k]; return "done"; } },
+      { label: "追加検索をAssistantに依頼する", target: "#hub-copy-spl", tip: "④ 追加SPLの依頼文をAssistantに渡します", sub: "接続元IPと admin_ops の操作履歴を、時間範囲を限って確認",
+        now: "AI Hubが作った追加検索の依頼文を、Splunk AI Assistantに渡します。",
+        hub: "追加SPLの依頼文：「" + EXTRA_REQ + "」",
+        handle: clickIs("hub-copy-spl"), after: function (c) { c.extra = true; } },
+      { label: "上位者へ引き継ぐ", target: "#ck-handoff", tip: "⑤ 証跡と未確認事項を添えて引き継ぎます", sub: "確認済みと未確認を分けたまま渡す",
+        now: "「上位者へ引き継ぐ」を押します。確認済み事実と未確認事項を分けたまま、SOC上位者へ渡します。",
+        hub: "判断の進め方：調査の優先度を上げ、SOC上位者へ証跡と未確認事項を引き継ぐ。侵害の成立は推定しません。",
+        handle: clickIs("ck-handoff"), after: function (c) { c.handed = true; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">確認済み事実と未確認事項を分けて、上位者へ引き継ぎました。</p>' + recList([
+        ["29:05", "結果を開く：198.51.100.24 / admin_ops / 09:10:00（MFA approved）"], ["29:10", "AI Hub（P3）で整理。④正規アクセス・⑤影響範囲は未確認"], ["29:20", "追加検索を依頼し、上位者へ引き継ぎ"]
+      ], "時刻・記録は架空です。侵害の成立は推定しません。");
+    },
+    nextLabel: "S8へ進む（記録・改善）"
+  };
+
+  /* ---------- S8：記録・改善・エンディング ---------- */
+  var REC = [["r1", "事象", "2026年10月8日、接続元 198.51.100.24 から複数ユーザーへの認証失敗36件（9ユーザー）。対象に含まれる特権アカウント admin_ops で、その後の認証成功（09:10:00、MFA approved）を確認。"],
+    ["r2", "確認済み", "件数、接続元、対象ユーザー、時刻の順序、MFAの結果。"],
+    ["r3", "追加確認", "接続元の正規性、本人利用、成功後の操作。"],
+    ["r4", "対応", "SOC上位者へ優先的な追加調査を依頼。"]];
+  function recEmpty(c) { for (var i = 0; i < REC.length; i++) if (!(c.vals[REC[i][0]] || "").trim()) return REC[i][0]; return null; }
+  CH[9] = {
+    role: "soc", time: "S8", timeSub: "34:00–37:00", av: "山", who: "山田（SOC担当者・架空）",
+    title: "記録を残し、改善をナレッジにする。Splunkを入れ替える前に、使いこなす力を高める",
+    text: "山田さん（架空）は、一次調査の記録を社内のチケット管理（架空）に4項目で残します。AI Hub（P4）が、今回の変更をナレッジへ反映する候補（Q3を承認済みテンプレートに追加）を作り、改善チケットを起票します。委託先に依頼して待っていた改善が、SOC担当者の手で回り始める姿で締めます。",
+    tags: ["S8", "SOC担当者の視点", "仮説5　改善が残らない", "37分版 3:00／20分版 1:00"],
+    ask: "検知条件や手順を直したとき、その履歴はいまどこに残っていますか。次の担当者は、それを読めますか？",
+    kind: "hub", kicker: "入力チェック＋AI Hub（構想・例文）", guide: "一次調査の記録と、改善のナレッジ化",
+    init: function () { return { step: 0, app: "intra", view: "record", recorded: false, hub: 0, ticket: false, vals: { r1: "", r2: "", r3: "", r4: "" } }; },
+    startIds: ["g-start"],
+    intro: function () {
+      return guideList("おすすめのガイド", "記録を4項目で残し、AI Hubで改善候補を作り、改善チケットを起票します。",
+        [["一次調査の記録と、改善のナレッジ化", "4ステップ・目安3分", true]]);
+    },
+    steps: [
+      { label: "記録を4項目で残す", target: function (c) { var e = recEmpty(c); return e ? "#f-" + e : "#rec-form"; },
+        tip: function (c) { var e = recEmpty(c); return e ? "① 「" + REC.filter(function (r) { return r[0] === e; })[0][1] + "」を書きます" : "① 4項目が埋まりました"; },
+        sub: "事象・確認済み・追加確認・対応。空のままでは保存できません（入力チェック・案）",
+        redo: "空の項目を埋めます",
+        now: "事象・確認済み・追加確認・対応の4項目を書きます。「例文を入れる」で、台本の記録が入ります。",
+        hub: "記録の形は社内の基準（架空）です。確認済みと追加確認を分けて書くと、次の担当者が読み直せます。",
+        btn: "例文を入れる",
+        handle: function (c, ev) {
+          if (ev.kind === "click" && ev.id === "rec-fill") { REC.forEach(function (r) { c.vals[r[0]] = r[2]; }); return "done"; }
+          if (ev.kind === "pick" && /^r[1-4]$/.test(ev.id)) return recEmpty(c) ? "ok" : "done";
+          if (ev.kind === "click" && ev.id === "rec-save") return { wrong: "【入力チェック（案）】空の項目があります。4項目を埋めてから保存します（社内ルール・架空）。" };
+          return null;
+        },
+        auto: function (c) { REC.forEach(function (r) { c.vals[r[0]] = r[2]; }); return "done"; } },
+      { label: "記録を保存する", target: "#rec-save", tip: "② 保存します", sub: "チケット管理（架空）に残ります",
+        now: "「保存」を押します。", hub: "記録はSplunkの外（チケット管理など）に残す前提です。何を使っているかを伺います（9章 #12）。",
+        handle: clickIs("rec-save"), after: function (c) { c.recorded = true; } },
+      { label: "AI Hubで改善候補を作る", target: "#hub-p4", tip: "③ 「ナレッジへの反映候補」を開きます", sub: "今回の変更を、承認済みテンプレートに足す（P4）",
+        now: "「ナレッジへの反映候補」を押します。AI Hubが、変更申請の案を作ります。",
+        hub: "担当者の入力（P4）：「今回の一次調査と、Q3の検索を、KB03（承認済み検索）とKB05（事例）に反映する変更申請の案を作ってください。承認者と見直し日を含めてください。」",
+        handle: clickIs("hub-p4"), after: function (c) { c.hub = 3; } },
+      { label: "改善チケットを起票する", target: "#imp-ticket", tip: "④ 改善チケットを起票します", sub: "承認者：SOC責任者。見直し日を決める（架空）",
+        now: "「改善チケットを起票」を押します。Q3を承認済みテンプレートに追加する変更を、承認に回します。",
+        hub: "改善候補：失敗件数だけでなく、異なるアカウント数・同一ユーザー・前後関係を明示する検索（Q3）を承認済みテンプレートに追加。",
+        handle: clickIs("imp-ticket"), after: function (c) { c.ticket = true; c.view = "improve"; } }
+    ],
+    doneHTML: function () {
+      return '<p class="now-box">記録を残し、改善をナレッジにしました。5つの成果物がそろいました。</p>' +
+        '<div class="soft"><p><b>クロージング</b></p><p>Splunkを別のSIEMに入れ替える前に、既存のSplunkを使いこなす力を高められないか。AI Assistantを残し、AI Hubで自社業務に適合させ、テックタッチで操作と調査を完了する。SOC担当者が自分で改善できる業務の範囲を増やす提案です。</p></div>' +
+        '<p class="refs">画面・人物・数値はすべて架空です。</p>';
+    },
+    nextLabel: "振り返りへ"
+  };
+
+  /* ---------- 振り返り ---------- */
+  CH[10] = { title: "振り返り", time: "まとめ", timeSub: "37:00", text: "", tags: [], ask: "", kind: "note", kicker: "", guide: "", steps: [], init: function () { return { step: 0, vals: {} }; } };
+
+  var JOURNEY = [
+    [1, "現場の問題", "S0 2:00", "lead"], [2, "Before", "S1 3:00", "soc"], [3, "要件整理", "S2 4:00", "soc"], [4, "SPL生成・確認", "S3 5:00", "soc"],
+    [5, "データ検証", "S4 5:00", "soc"], [6, "可視化", "S5 6:00", "soc"], [7, "検知", "S6 4:00", "soc"], [8, "一次調査", "S7 5:00", "soc"], [9, "記録・改善", "S8 3:00", "soc"], [10, "振り返り", "まとめ", ""]
+  ];
+  var ROLE_LABEL = { soc: "SOC担当者", lead: "SOC責任者" };
+
+  /* ==================== 画面（Splunk Web の画面イメージ・架空） ==================== */
+  var RESULTS = {
+    before: { cols: ["src", "failures", "admin_successes"], rows: [["A", "198.51.100.24", 36, 1], ["C", "192.0.2.51", 12, 1]], note: "Cが混ざる：成功が失敗より前でも、同じ接続元IPなら一致する" },
+    q0: { cols: ["total_events", "distinct_srcs", "distinct_users"], rows: [["", 72, 4, 19]] },
+    q1: { cols: ["src", "fail_count", "failed_users"], rows: CASES.map(function (k) { return [k.id, k.src, k.fails, k.users]; }) },
+    q2: { cols: ["src", "fail_count", "failed_users"], rows: [["A", "198.51.100.24", 36, 9], ["C", "192.0.2.51", 12, 6]] },
+    q3: { cols: ["src", "user", "event_time", "src_fail_count", "src_failed_users", "mfa"], rows: [["A", "198.51.100.24", "admin_ops", "2026-10-08 09:10:00", 36, 9, "approved"]] },
+    q4: { cols: ["_time", "failures", "successes"], rows: Q4_ROWS.map(function (r) { return ["", r[0], r[1], r[2]]; }) }
+  };
+  var RUN_TITLE = { before: "不十分な例（教材）", q0: "Q0 データ件数の確認", q1: REPORTS[0][1], q2: REPORTS[1][1], q3: REPORTS[2][1], q4: REPORTS[3][1] };
+
+  function resultTable(key) {
+    var r = RESULTS[key];
+    return '<div class="table-wrap"><table class="dtable sp-res"><thead><tr><th class="idx">#</th>' + r.cols.map(function (c) { return "<th>" + c + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      r.rows.map(function (row, i) {
+        return "<tr" + (row[0] === "A" ? ' class="hit"' : "") + '><td class="idx">' + (i + 1) + "</td>" + row.slice(1).map(function (v, j) { return "<td" + (j === 0 ? ' id="res-row-' + (row[0] || i) + '"' : "") + ">" + esc(v) + "</td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table></div>";
+  }
+  function resultsHTML(c) {
+    if (!c.ran) return '<div class="empty">' + svg("search") + "<p>検索を実行すると、ここに結果が出ます。</p>" + fine("固定のテストログ（CSVルックアップ・72件・架空）に対する検索です。") + "</div>";
+    var r = RESULTS[c.ran], n = r.rows.length, tab = c.tab || "stats";
+    var tabs = '<div class="dt-tabs" aria-hidden="true"><button type="button">イベント</button><button type="button">パターン</button><button type="button"' + (tab === "stats" ? ' class="active"' : "") + '>統計情報 (' + n + ')</button><button type="button"' + (tab === "viz" ? ' class="active"' : "") + '>視覚エフェクト</button></div>';
+    var body = tab === "viz" && c.ran === "q4" ? '<div class="surface"><div class="chart-legend"><span><i class="sw-line"></i>failures</span><span><i class="sw-ok"></i>successes</span></div><div class="chart-wrap">' + lineChart5m() + "</div></div>" : resultTable(c.ran);
+    var cnt = c.ran === "q4" ? "3 行（5分単位）" : n + " 件の結果";
+    return '<p class="sp-summary"><span class="ok">✓</span> ' + cnt + '　<span class="dt-fine">2026/10/08 09:00:00 〜 09:15:00（固定のテストログ・架空）</span></p>' + tabs + body +
+      (r.note ? '<p class="dt-callout">' + r.note + "</p>" : "");
+  }
+  function saveAsMenu(c) {
+    if (!c.menu) return "";
+    return '<div class="sp-menu" role="menu"><button type="button" data-id="sa-report">レポート</button><button type="button" data-id="sa-panel">ダッシュボードパネル</button><button type="button" id="sa-alert" data-id="sa-alert">アラート</button><button type="button" data-id="sa-event">イベントタイプ</button></div>';
+  }
+  function searchBox(c) {
+    var spl = c.q ? SPL[c.q] : "";
+    return '<div class="title-row"><span class="dt-h">' + (c.q && RUN_TITLE[c.q] && c.q !== "before" ? esc(RUN_TITLE[c.q]) : "新規検索") + "</span>" +
+      '<span class="row-actions">' + (c.chip ? '<button type="button" class="tt-chip" id="chip-soc" data-id="chip-soc">' + svg("spark") + "SOC分析アシスト（テックタッチ）</button>" : "") +
+      '<span class="tip-anchor"><button type="button" class="dt-emph" id="sp-saveas" data-id="sp-saveas">名前を付けて保存 ▾</button>' + saveAsMenu(c) + "</span></span></div>" +
+      '<div class="sp-bar"><pre class="spl-box' + (spl ? "" : " ph") + '">' + (spl ? esc(spl) : "検索文字列を入力…") + '</pre><span class="sp-time">全時間 ▾</span>' +
+      '<button type="button" class="sp-go" id="sp-run" data-id="sp-run" aria-label="検索を実行">' + svg("search") + "</button></div>";
+  }
+  function bubbleU(t) { return '<div class="bubble">' + esc(t) + "</div>"; }
+  function answerA(spl, bullets, btnId, btnLabel) {
+    return '<div class="as-ans"><p class="ai-label">Splunk AI Assistant（参考画面・架空の表示）</p>' + code(spl) + '<ul>' + bullets.map(function (b) { return "<li>" + b + "</li>"; }).join("") + "</ul>" +
+      '<div class="row-actions"><button type="button" class="dt-accent" id="' + btnId + '" data-id="' + btnId + '">検索に入れる</button><button type="button" class="dt-emph">コピー</button></div></div>';
+  }
+  function assistHTML(c) {
+    var st = c.stage || 0, h = '<aside class="assist" aria-label="Splunk AI Assistant（画面イメージ・架空）"><div class="assist-head">' + svg("spark") + "Splunk AI Assistant</div>" +
+      fine("画面イメージ（架空）。有償のSplunk Cloudの機能で、トライアル環境では使えません。回答はデモ用に準備した参考画面です。");
+    if (st >= 2) h += bubbleU(REQUEST_OUT) + answerA(SPL.ai1, ["src ごとに失敗数、失敗した異なる user 数、特権アカウントの成功数を集計し、閾値で絞ります。", "（この案には、同一ユーザーの判定・前後関係・15分の時間範囲が入っていません。AI Hubで照合します）"], "as-insert", "検索に入れる");
+    if (st >= 2 && c.hub < 3) h += '<button type="button" class="hub-chip" id="hub-check" data-id="hub-check">' + svg("shield") + "SOC基準との照合（AI Hub）</button>";
+    if (st >= 4) h += bubbleU(FIX_REQUEST) + answerA(SPL.q3, ["eventstats で src ごとの失敗数と異なる失敗 user 数を付け、sort と streamstats で同じ src・user の「それ以前の失敗」を数えます。", "特権アカウントの成功で、それ以前の失敗が1件以上、かつ src の閾値を満たす行だけを残します。"], "as-insert2", "検索に入れる");
+    if (c.extra) h += bubbleU(EXTRA_REQ) + '<p class="ai-label">（回答の表示は省略。実機では追加検索の案が返ります・架空）</p>';
+    var ta = st === 1 ? REQUEST_OUT : st === 3 ? FIX_REQUEST : "";
+    if (!c.extra) h += '<div class="as-in" id="as-input"><textarea readonly rows="4" placeholder="質問や依頼を入力…" aria-label="Assistantへの入力">' + esc(ta) + "</textarea>" +
+      '<div class="row-actions">' + (st === 0 ? '<button type="button" class="dt-emph" id="as-paste" data-id="as-paste">' + svg("copy") + "貼り付け（S2の依頼文）</button>" : "") +
+      '<button type="button" class="dt-accent" id="as-send" data-id="as-send"' + (st === 1 || st === 3 ? "" : " disabled") + ">送信</button></div></div>";
+    return h + "</aside>";
+  }
+  function hubWin(c) {
+    if (!c.hub) return "";
+    var h = '<section class="hub-win" aria-label="AI Hub（構想・架空画面）"><div class="hub-head"><span class="ov-pill hubpill">AI Hub</span><b>SOC分析アシスト</b><span class="dt-fine">テックタッチのAI Hubの画面イメージ（構想・架空）。回答は本番前に確かめた例文</span></div>' +
+      '<p class="kb-row">参照ナレッジ：<span class="kb">KB01 ログ辞書</span><span class="kb">KB02 検知基準</span><span class="kb">KB03 承認済み検索</span><span class="dt-fine">（プロンプトP1）</span></p>' +
+      '<div class="tip-anchor block" id="hub-in-wrap"><textarea data-id="hub-in" id="hub-in" rows="3" placeholder="やりたいことを日本語で書いてください" aria-label="AI Hubへの依頼">' + esc(c.vals["hub-in"] || "") + "</textarea></div>" +
+      '<div class="row-actions"><button type="button" class="dt-emph" id="hub-fill" data-id="hub-fill">例文を入れる</button><button type="button" class="dt-accent hub-btn" id="hub-send" data-id="hub-send"' + (c.vals["hub-in"] ? "" : " disabled") + ">整理する</button></div>";
+    if (c.hub >= 3) {
+      h += '<div class="hub-ans"><p class="lab">AI Hubの整理（例文）</p><dl class="kv"><dt>対象</dt><dd>VPN認証イベント。フィールドは event_time、src、user、action、privileged（KB01）</dd>' +
+        "<dt>条件</dt><dd>15分間に同一IPから認証失敗10件以上、異なる失敗アカウント5以上（KB02 D-01）</dd>" +
+        "<dt>追加条件</dt><dd>同じIP・同じ管理者アカウントで、そのアカウントの失敗より後に成功がある</dd>" +
+        "<dt>確認</dt><dd>時刻、重複、例外条件、MFAの証跡</dd>" +
+        "<dt>分析の分け方</dt><dd>「IP別ランキング」「15分の閾値候補」「管理者の失敗後の成功」「時間推移」（KB03 Q1〜Q4）</dd></dl>" +
+        '<p class="lab">Splunk AI Assistant向けの依頼文</p><div class="tip-anchor block" id="hub-req"><pre class="code req">' + esc(REQUEST_OUT) + "</pre></div>" +
+        '<div class="row-actions"><button type="button" class="dt-accent hub-btn" id="hub-copy" data-id="hub-copy"' + (c.copied ? " disabled" : "") + ">" + svg("copy") + (c.copied ? "コピーしました" : "依頼文をコピー") + "</button></div></div>";
+    }
+    return h + "</section>";
+  }
+  function hubCheckCard(c) {
+    if (c.hub < 3) return "";
+    return '<section class="hub-win" aria-label="AI Hub：SOC基準との照合（構想・架空画面）"><div class="hub-head"><span class="ov-pill hubpill">AI Hub</span><b>SOC基準との照合（P2）</b><span class="dt-fine">構文ではなく、SOCの業務条件で評価（例文）</span></div>' +
+      '<div class="table-wrap"><table class="dtable hub-tbl"><thead><tr><th>確認事項</th><th>チェック内容</th><th>判定</th><th>次の行動</th></tr></thead><tbody>' +
+      CHECK_ROWS.map(function (r) { return "<tr><td><b>" + r[0] + "</b></td><td>" + r[1] + '</td><td>' + (r[3] === true ? '<span class="st on">入っている</span>' : r[3] === false ? '<span class="st ng">不足</span>' : '<span class="st">S4で確認</span>') + "</td><td>" + r[2] + "</td></tr>"; }).join("") + "</tbody></table></div>" +
+      '<p class="lab">Assistantへの修正依頼文</p><pre class="code req">' + esc(FIX_REQUEST) + "</pre>" +
+      '<div class="row-actions"><button type="button" class="dt-accent hub-btn" id="hub-copy-fix" data-id="hub-copy-fix"' + (c.fixPasted ? " disabled" : "") + ">" + svg("copy") + (c.fixPasted ? "Assistantに貼りました" : "修正依頼文をコピーしてAssistantに貼る") + "</button></div>" +
+      '<p class="dt-fine">AI Hubは検索結果の真偽を断定しません。最終検証はS4でテストケースA/B/C/Dと突き合わせます。</p></section>';
+  }
+  function pageSearch(c) {
+    var main = '<div class="sp-search">' + searchBox(c) + resultsHTML(c) + "</div>";
+    var h = S.ch === 3 ? hubWin(c) : "";
+    if (c.assist) return h + '<div class="sp-split">' + main + assistHTML(c) + "</div>" + (S.ch === 4 ? hubCheckCard(c) : "");
+    return h + main;
+  }
+  function pageReports() {
+    return '<div class="title-row"><span class="dt-h">レポート</span><span class="dt-fine">保存済みレポート（架空）。Q1〜Q4はSOCの承認済み検索（KB03）</span></div>' +
+      '<div class="table-wrap"><table class="dtable"><thead><tr><th>タイトル</th><th>説明</th><th>所有者</th><th>アプリ</th><th>共有</th><th>版</th></tr></thead><tbody>' +
+      REPORTS.map(function (r) { return '<tr><td><button type="button" class="row-link" id="rep-' + r[0] + '" data-id="rep-' + r[0] + '">' + r[1] + "</button></td><td>" + r[2] + "</td><td>山田</td><td>search</td><td>アプリ</td><td>" + r[3] + "</td></tr>"; }).join("") +
+      '<tr><td><span class="dt-fine">VPN認証_失敗数_委託先（表示省略）</span></td><td class="dt-fine">委託先作成の集計</td><td>委託先</td><td>search</td><td>アプリ</td><td>—</td></tr></tbody></table></div>';
+  }
+
+  /* ---------- ダッシュボード（一覧・旧・Dashboard Studio） ---------- */
+  function pageDashboards(c) {
+    if (c.view === "old") {
+      return '<p class="crumbs">ダッシュボード ＞ VPN認証_失敗数（委託先作成）</p><div class="title-row"><span class="dt-h">VPN認証_失敗数（委託先作成・架空）</span><span class="dt-fine">過去15分　最終更新 09:15</span></div>' +
+        '<div class="canvas"><div class="panel" id="d-old-panel"><p class="panel-title">認証失敗数（件）</p><p class="single bad">70</p><p class="dt-fine">接続元IP別・異なるアカウント数・失敗と成功の順序は表示していない</p></div>' +
+        '<div class="panel"><p class="panel-title">認証失敗数の推移（5分）</p><div class="chart-wrap">' + lineChart5m() + "</div></div></div>";
+    }
+    if (c.view === "edit") return studio(c);
+    var rows = [['<button type="button" class="row-link" data-id="dash-old">VPN認証_失敗数（委託先作成）</button>', "委託先", "アプリ", "2026-09-30"]];
+    if (c.saved) rows.unshift(["<b>" + esc(c.vals["db-name"]) + "</b>", "山田", "アプリ（SOCチーム）", "2026-10-08"]);
+    return '<div class="title-row"><span class="dt-h">ダッシュボード</span><button type="button" class="dt-accent" id="db-new" data-id="db-new">新規ダッシュボードを作成</button></div>' +
+      '<div class="table-wrap"><table class="dtable"><thead><tr><th>タイトル</th><th>所有者</th><th>共有</th><th>更新</th></tr></thead><tbody>' +
+      rows.map(function (r) { return "<tr>" + r.map(function (v) { return "<td>" + v + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
+  }
+  function panelHTML_db(p) {
+    var idx = Q_ORDER.indexOf(p.ds), title = REPORTS[idx][1];
+    var body = p.viz === "bar" ? '<div class="chart-wrap">' + barChartSrc(CASES) + "</div>" : p.viz === "line" ? '<div class="chart-wrap">' + lineChart5m() + "</div>" : resultTable(p.ds);
+    return '<div class="panel' + (p.viz === "line" || p.viz === "bar" ? " wide" : "") + '"><p class="panel-title">' + esc(title) + '　<span class="dt-fine">' + VIZ_LABEL[p.viz] + "・データソース：保存済みレポート</span></p>" + body + "</div>";
+  }
+  function studio(c) {
+    var dsOpts = [["", "選択…"]].concat(REPORTS.map(function (r) { return [r[0], r[1]]; }));
+    var vizOpts = [["", "選択…"], ["bar", "棒グラフ"], ["table", "表"], ["line", "折れ線グラフ"], ["single", "単一値"]];
+    return '<p class="crumbs">ダッシュボード ＞ ' + esc(c.vals["db-name"]) + '　<span class="dt-fine">Dashboard Studio（画面イメージ・架空）</span></p>' +
+      '<div class="title-row"><span class="dt-h">' + esc(c.vals["db-name"]) + '</span><span class="row-actions">' +
+      '<span class="dt-field tip-anchor" id="f-db-share"><label for="db-share">共有</label>' + sel("db-share", "db-share", [["", "選択…"], ["me", "自分だけ（非公開）"], ["team", "SOCチーム（アプリ）"], ["all", "すべてのアプリ"]], c.vals["db-share"]) + "</span>" +
+      '<button type="button" class="dt-accent" id="db-save" data-id="db-save"' + (c.saved ? " disabled" : "") + ">" + (c.saved ? "保存済み" : "保存") + "</button></span></div>" +
+      '<div class="studio"><div class="canvas">' +
+      '<div class="panel"><p class="panel-title">認証失敗（過去15分）　<span class="dt-fine">単一値・Q0</span></p><p class="single bad">70</p></div>' +
+      '<div class="panel"><p class="panel-title">接続元IP（過去15分）　<span class="dt-fine">単一値・Q0</span></p><p class="single">4</p></div>' +
+      c.panels.map(panelHTML_db).join("") +
+      (c.panels.length ? "" : '<div class="panel wide empty-panel">右の「可視化を追加」で、Q1〜Q4のパネルを置きます。</div>') + "</div>" +
+      '<div class="add-form"><p class="section-label">可視化を追加</p>' +
+      '<span class="dt-field block tip-anchor" id="f-ds"><label for="ds">データソース（保存済みレポート）</label>' + sel("ds", "ds", dsOpts, c.vals["ds"]) + "</span>" +
+      '<span class="dt-field block tip-anchor" id="f-viz"><label for="viz">可視化</label>' + sel("viz", "viz", vizOpts, c.vals["viz"]) + "</span>" +
+      '<button type="button" class="dt-accent" id="db-add" data-id="db-add">追加</button>' +
+      fine("検索期間：過去15分（デモは固定ログ）。保存済みレポートをデータソースにする操作（ds.savedSearch）は実機で確かめます。") + "</div></div>";
+  }
+  function dbNewDialog(c) {
+    return '<div class="tt-modal sp-modal" role="dialog" aria-labelledby="dlg-title"><div class="tt-modal-card sp-dialog-card">' +
+      '<p class="dlg-head" id="dlg-title">新規ダッシュボードを作成</p>' +
+      '<div class="dlg-row"><span class="k">ダッシュボードのタイトル</span><span class="dt-field tip-anchor" id="f-db-name">' + txt("db-name", "db-name", c.vals["db-name"], "チーム_対象_用途") + "</span></div>" +
+      '<div class="dlg-row"><span class="k">説明</span><span class="locked">SOC認証監視（Q1〜Q4）</span></div>' +
+      '<div class="dlg-row"><span class="k">権限</span><span class="locked">非公開（作成後に共有範囲を設定）</span></div>' +
+      '<div class="dlg-row"><span class="k">作成方法</span><span class="locked">● Dashboard Studio　○ Classic Dashboards</span></div>' +
+      '<div class="actions"><button type="button" class="btn btn-ghost" data-id="db-cancel">キャンセル</button><button type="button" class="btn btn-primary sp-btn" id="db-create" data-id="db-create">作成</button></div></div></div>';
+  }
+  CH[6].modal = function (c) { return c.view === "new" ? dbNewDialog(c) : ""; };
+
+  /* ---------- SSE（Security Essentials）とアラートの保存画面 ---------- */
+  function pageSSE(c) {
+    if (c.view === "list") {
+      return '<div class="title-row"><span class="dt-h">Security Content</span><span class="dt-fine">Splunk Security Essentials（画面イメージ・架空）。検索：認証</span></div>' +
+        '<div class="sse-list">' +
+        '<button type="button" class="sse-row" id="sse-item-ps" data-id="sse-item-ps"><b>Detect Password Spray Attempts</b><span>多数のアカウントに対する認証の試行を検知するコンテンツ（要約・架空）</span></button>' +
+        '<button type="button" class="sse-row dim" data-id="sse-item-other1"><b>（他のコンテンツ名は省略・架空）</b><span>認証関連</span></button>' +
+        '<button type="button" class="sse-row dim" data-id="sse-item-other2"><b>（他のコンテンツ名は省略・架空）</b><span>認証関連</span></button></div>' +
+        fine("SSEはSplunk Cloud Platformで使える無料のアプリで、ESの専用機能ではありません。項目名と日本語表示は実機で確かめます（9章 #10）。");
+    }
+    return '<p class="crumbs">Security Content ＞ Detect Password Spray Attempts</p><div class="title-row"><span class="dt-h">Detect Password Spray Attempts</span><span class="row-actions"><span class="dt-emph">Open in Search</span><span class="dt-emph">Schedule Saved Search</span></span></div>' +
+      '<div class="sse-sec"><p class="dt-h3">Description（要約・架空）</p><p>同じ接続元から多数のアカウントに対して、少数のパスワードで認証を試みる行動を検知します。</p></div>' +
+      '<div class="sse-sec"><p class="dt-h3">Data Sources（必要なログ）</p><p>認証ログ（VPN、IdP など）。A社では VPN 認証イベントを使います。</p></div>' +
+      '<div class="sse-sec tip-anchor block" id="sse-kfp"><button type="button" class="sec-btn" data-id="sse-kfp"><p class="dt-h3">Known False Positives（誤検知になりやすい条件）</p><p>パスワードを忘れた利用者の再試行、共有端末からの多数の利用者の認証、自動化された正規の処理など（要約・架空）。</p>' +
+      '<p class="dt-h3">How to Respond（対応のしかた）</p><p>接続元の正規性、対象アカウントの本人確認、成功後の操作の確認（要約・架空）。</p></button></div>' +
+      '<div class="tt-note"><span class="lab">テックタッチ（案）</span>' + tipWrap("tw-std", "A社の検知基準 D-01（KB02）", "std", "A社の検知基準を表示") + "</div>" +
+      '<div class="tt-note" id="sse-q5"><span class="lab">テックタッチ（案）：本番用の検索の骨格（Q5）</span><p>固定CSVの inputlookup をそのまま定期実行しても、継続的な本番監視にはなりません。本番用はインデックス化された認証イベントを検索します。</p>' + code(SPL_Q5) + "</div>";
+  }
+  function alertDialog(c) {
+    var v = c.vals;
+    return '<div class="tt-modal sp-modal" role="dialog" aria-labelledby="al-title"><div class="tt-modal-card sp-dialog-card">' +
+      '<p class="dlg-head" id="al-title">名前を付けて保存 ＞ アラート</p>' +
+      '<div class="dlg-row"><span class="k">タイトル</span><span class="dt-field tip-anchor" id="f-al-name">' + txt("al-name", "al-name", v["al-name"], "SOC_対象_用途") + "</span></div>" +
+      '<div class="dlg-row"><span class="k">説明</span><span class="locked">同一管理者で、失敗の後に成功（Q3）</span></div>' +
+      '<div class="dlg-row"><span class="k">権限</span><span class="locked">○ 非公開　● アプリで共有</span></div>' +
+      '<div class="dlg-row"><span class="k">アラートタイプ</span><span class="dt-field tip-anchor" id="f-al-sched">' + sel("al-sched", "al-sched", [["", "選択…"], ["15m", "スケジュール：15分ごと（cron）"], ["1h", "スケジュール：1時間ごと"], ["rt", "リアルタイム"]], v["al-sched"]) + "</span></div>" +
+      '<div class="dlg-row"><span class="k">時間範囲</span><span class="locked">過去15分（Splunk Cloudのスケジュール時刻はUTC）</span></div>' +
+      '<div class="dlg-row"><span class="k">トリガー条件</span><span class="locked">結果の数 が 0 より大きい　／　トリガー：1回</span></div>' +
+      '<div class="dlg-row"><span class="k">抑制</span><span class="dt-field tip-anchor" id="f-al-throttle">' + sel("al-throttle", "al-throttle", [["", "選択…"], ["none", "抑制しない"], ["60src", "同じ src で60分"]], v["al-throttle"]) + "</span></div>" +
+      '<div class="dlg-row"><span class="k">通知先（メール）</span><span class="dt-field tip-anchor" id="f-al-to">' + sel("al-to", "al-to", [["", "選択…"], ["me", "自分のメール"], ["soc", "SOCチーム（共有アドレス）"]], v["al-to"]) + "</span></div>" +
+      '<div class="dlg-row"><span class="k">トリガーされたアラートに追加</span><span class="dt-field tip-anchor" id="f-al-add">' + sel("al-add", "al-add", [["", "選択…"], ["yes", "追加する（重要度：中）"], ["no", "追加しない"]], v["al-add"]) + "</span></div>" +
+      '<div class="actions"><button type="button" class="btn btn-ghost" data-id="al-cancel">キャンセル</button><button type="button" class="btn btn-primary sp-btn" id="al-save" data-id="al-save">保存</button></div></div></div>';
+  }
+  CH[7].modal = function (c) { return c.dialog ? alertDialog(c) : ""; };
+
+  /* ---------- アクティビティ：トリガーされたアラート（S7） ---------- */
+  function hubP3(c) {
+    if (c.hub < 3) return "";
+    return '<section class="hub-win" aria-label="AI Hub：一次調査の整理（構想・架空画面）"><div class="hub-head"><span class="ov-pill hubpill">AI Hub</span><b>一次調査の整理（P3・KB04）</b><span class="dt-fine">例文。侵害の成立は推定しない</span></div>' +
+      '<dl class="kv"><dt>確認済み事実</dt><dd>接続元 198.51.100.24、失敗36件、9アカウント、admin_ops の成功 09:10:00、同一管理者で失敗→成功の時系列、MFA approved</dd>' +
+      "<dt>追加の確認</dt><dd>接続元の正規性、VPN／MFAの情報、本人確認、ログイン後の重要操作、端末の関連証跡</dd>" +
+      "<dt>判断の進め方</dt><dd>調査の優先度を上げ、SOC上位者へ証跡と未確認事項を引き継ぐ</dd>" +
+      "<dt>追加SPLの依頼</dt><dd>接続元IPと admin_ops の操作履歴を、特定の時間範囲で確認する依頼文をAssistantに渡す</dd></dl>" +
+      '<div class="row-actions"><button type="button" class="dt-accent hub-btn" id="hub-copy-spl" data-id="hub-copy-spl"' + (c.extra ? " disabled" : "") + ">" + svg("copy") + (c.extra ? "Assistantに渡しました" : "追加検索の依頼文をAssistantに渡す") + "</button></div></section>";
+  }
+  function checklist(c) {
+    var opts = [["", "選択…"], ["done", "確認済み"], ["todo", "未確認"]];
+    return '<div class="tt-note" id="ck-list"><span class="lab">テックタッチ 調査のチェックリスト（案）</span><div class="ck-grid">' +
+      CK.map(function (k) { return '<div class="ck-row"><span>' + k[1] + '</span><span class="dt-field tip-anchor" id="f-' + k[0] + '">' + sel(k[0], k[0], opts, c.vals[k[0]]) + "</span></div>"; }).join("") + "</div>" +
+      '<div class="row-actions"><button type="button" class="dt-emph" id="ck-fill" data-id="ck-fill">例を入れる</button><button type="button" class="dt-accent" id="ck-handoff" data-id="ck-handoff"' + (c.handed ? " disabled" : "") + ">" + (c.handed ? "引き継ぎ済み" : "上位者へ引き継ぐ") + "</button></div></div>";
+  }
+  function pageActivity(c) {
+    if (c.view === "list") {
+      return '<p class="crumbs">アクティビティ ＞ トリガーされたアラート</p><div class="title-row"><span class="dt-h">トリガーされたアラート</span><span class="dt-fine">既定で24時間で消えます（架空の一覧）</span></div>' +
+        '<div class="table-wrap"><table class="dtable"><thead><tr><th>時刻</th><th>発火元</th><th>アプリ</th><th>タイプ</th><th>重要度</th><th>モード</th><th>操作</th></tr></thead><tbody>' +
+        '<tr><td>2026-10-08 09:15:00</td><td>SOC_認証_失敗後の特権成功</td><td>search</td><td>保存済み検索</td><td>中</td><td>1回</td><td><button type="button" class="row-link" id="act-row-a" data-id="act-row-a">結果を表示</button></td></tr></tbody></table></div>';
+    }
+    var done = c.handed ? '<p class="done-msg">上位者へ引き継ぎました（確認済み事実と未確認事項を分けたまま）。記録はS8で残します。</p>' : "";
+    var main = '<p class="crumbs">アクティビティ ＞ トリガーされたアラート ＞ SOC_認証_失敗後の特権成功</p><div class="title-row"><span class="dt-h">SOC_認証_失敗後の特権成功　<span class="status active">1 件</span></span>' +
+      (c.hub < 3 ? '<button type="button" class="hub-chip" id="hub-p3" data-id="hub-p3">' + svg("shield") + "一次調査の整理（AI Hub）</button>" : "") + "</div>" + resultTable("q3") + hubP3(c) + checklist(c) + done;
+    return c.extra ? '<div class="sp-split"><div class="sp-search">' + main + "</div>" + assistHTML(c) + "</div>" : main;
+  }
+
+  /* ---------- 社内ポータル（架空）：S0・S1・S8 ---------- */
+  function intraChat(who, av, text) {
+    return '<div class="chat"><span class="av">' + av + '</span><div><p class="who"><b>' + who + '</b>社内チャット（架空）</p><p class="say">' + text + '</p></div><span class="src">09:00</span></div>';
+  }
+  function pageIntra(c) {
+    var v = c.view;
+    if (v === "card") {
+      return '<div class="i-card" id="i-card" data-id="i-card"><p class="lab">業務依頼カード　SOC-1040（架空）</p><p><b>依頼者：</b>SOC責任者 中村（架空）　<b>期限：</b>今月中</p>' +
+        '<blockquote class="i-quote">認証失敗が複数アカウントに広がった後、管理者ログインが成功するケースを見たい。ダッシュボードを作り、検知した後の一次調査まで標準化してください。</blockquote>' +
+        '<p class="dt-fine">現状：Splunk CloudでVPNログを監視。委託先が作った検知はあるが、社内で直せない。</p></div>' +
+        '<div class="row-actions"><button type="button" class="dt-emph" id="i-flow" data-id="i-flow">従来の流れを見る</button><button type="button" class="dt-emph" data-id="i-goal">ゴールを見る</button></div>';
+    }
+    if (v === "flow") {
+      return '<div class="i-card"><p class="lab">従来の流れ（架空）</p><div class="i-chain" id="i-flow-chain"><span class="n">SOC担当者が依頼票を書く</span><span class="a">→</span><span class="n">委託先が見積</span><span class="a">→</span><span class="n wait">待ち</span><span class="a">→</span><span class="n">委託先が改修</span><span class="a">→</span><span class="n wait">待ち</span><span class="a">→</span><span class="n">担当者が確認</span></div>' +
+        '<p class="dt-fine">待ち時間は社内で把握していません。SPLの修正もダッシュボードの変更も、この流れです。</p></div>' +
+        '<div class="row-actions"><button type="button" class="dt-emph" id="i-goal" data-id="i-goal">ゴールを見る</button></div>';
+    }
+    if (v === "goal") {
+      return '<div class="i-card"><p class="lab">デモ終了時に画面に残す成果物</p><ol class="i-goals" id="i-goal-list">' + GOALS.map(function (g) { return "<li>" + g.slice(1) + "</li>"; }).join("") + "</ol>" +
+        '<p class="dt-fine">Splunkの機能を増やすのではなく、既にあるログを、SOC担当者自身が分析・監視・調査・改善に使えるようにします。</p></div>';
+    }
+    if (v === "request") {
+      return '<div class="tip-anchor block" id="i-req" data-id="i-req">' + intraChat("中村（SOC責任者・架空）", "中", "認証失敗が複数アカウントに広がった後、管理者ログインが成功するケースを見たい。ダッシュボードを作り、検知した後の一次調査まで標準化してください。") + "</div>" +
+        '<div class="row-actions"><button type="button" class="dt-accent" id="i-open-splunk" data-id="i-open-splunk">既存のダッシュボードを開く（Splunk）</button></div>';
+    }
+    if (v === "ticket") {
+      return '<div class="i-card" id="i-ticket"><p class="lab">改修依頼チケット　SOC-1042（架空）</p><p><b>宛先：</b>委託先　<b>状態：</b><span class="status active">委託先の回答待ち</span></p>' +
+        "<p><b>依頼内容：</b>同一IPから複数ユーザーに認証失敗した後、対象の管理者本人がログインに成功したケースを抽出する検索と、ダッシュボードの変更。</p>" +
+        '<p class="dt-fine">作成 2026-10-08　回答予定：未定。この間、SOCの監視は変わりません。</p></div>';
+    }
+    if (v === "improve") {
+      return '<div class="i-card"><p class="lab">改善チケット　SOC-1043（架空）</p><p><b>件名：</b>承認済み検索テンプレートにQ3（失敗後の特権成功）を追加　<b>承認者：</b>SOC責任者　<b>見直し日：</b>2026-11-08</p>' +
+        "<p>内容：失敗件数だけでなく、異なるアカウント数・同一ユーザー・前後関係を明示する検索（Q3）を承認済みテンプレート（KB03）に追加。事例C-2026-10（ケースA）をKB05に登録。</p></div>" +
+        '<div class="i-card"><p class="lab">今日の成果物</p><ol class="i-goals">' + GOALS.map(function (g) { return "<li>" + g.slice(1) + "</li>"; }).join("") + "</ol></div>";
+    }
+    // record（S8）
+    var form = '<div class="i-card" id="rec-form"><p class="lab">一次調査の記録　SOC-1042-R（チケット管理・架空）</p>' +
+      REC.map(function (r) { return '<div class="dlg-row"><span class="k">' + r[1] + '</span><span class="dt-field tip-anchor" id="f-' + r[0] + '">' + txt(r[0], r[0], c.vals[r[0]], r[1] + "を書く", c.recorded) + "</span></div>"; }).join("") +
+      '<div class="row-actions"><button type="button" class="dt-emph" id="rec-fill" data-id="rec-fill"' + (c.recorded ? " disabled" : "") + '>例文を入れる</button><button type="button" class="dt-accent" id="rec-save" data-id="rec-save"' + (c.recorded ? " disabled" : "") + ">" + (c.recorded ? "保存済み" : "保存") + "</button></div></div>";
+    var hub = c.recorded && c.hub < 3 ? '<button type="button" class="hub-chip" id="hub-p4" data-id="hub-p4">' + svg("shield") + "ナレッジへの反映候補（AI Hub）</button>" : "";
+    var card = c.hub >= 3 ? '<section class="hub-win" aria-label="AI Hub：ナレッジへの反映候補（構想・架空画面）"><div class="hub-head"><span class="ov-pill hubpill">AI Hub</span><b>ナレッジへの反映候補（P4）</b><span class="dt-fine">例文</span></div>' +
+      '<dl class="kv"><dt>変更申請</dt><dd>KB03 承認済み検索に「Q3 失敗後の特権成功」を v1.1 として追加（現在：承認待ち）</dd><dt>事例</dt><dd>KB05 にケースA（2026-10-08）を登録。確認済み・未確認を分けて記載</dd><dt>承認者</dt><dd>SOC責任者　見直し日：2026-11-08</dd></dl>' +
+      '<div class="row-actions"><button type="button" class="dt-accent hub-btn" id="imp-ticket" data-id="imp-ticket">改善チケットを起票</button></div></section>' : "";
+    return form + hub + card;
+  }
+
+  /* ---------- 枠（上部バー・アプリバー） ---------- */
+  var APP_NAME = { search: "Search & Reporting", reports: "Search & Reporting", dashboards: "Search & Reporting", activity: "Search & Reporting", sse: "Security Essentials" };
+  function spTop(c) {
+    var d = D();
+    if (c.app === "intra") return '<div class="sp-top intra"><span class="logo">A社 社内ポータル（架空）</span><span class="menus"><span>チケット</span><span>チャット</span><span>ナレッジ</span><span class="user">' + d.who + " ▾</span></span></div>";
+    return '<div class="sp-top"><span class="logo">Splunk Cloud Platform（画面イメージ・架空）</span><span class="menus"><span>メッセージ ▾</span><span>設定 ▾</span><span>アクティビティ ▾</span><span>ヘルプ ▾</span><span class="user">' + d.who + " ▾</span></span></div>";
+  }
+  function appBar(c) {
+    if (c.app === "intra") return "";
+    var nav;
+    if (c.app === "sse") nav = [["", "ホーム"], ["", "Security Content", true]];
+    else nav = [["nav-search", "検索", c.app === "search"], ["", "分析"], ["", "データセット"], ["nav-reports", "レポート", c.app === "reports"], ["", "アラート"], ["nav-dashboards", "ダッシュボード", c.app === "dashboards"]];
+    return '<div class="appheader"><div class="ah-left"><span class="app-name">' + APP_NAME[c.app] + '</span><div class="ah-nav">' + nav.map(function (n) {
+      return n[0] ? '<button type="button" data-id="' + n[0] + '"' + (n[2] ? ' class="active"' : "") + ">" + n[1] + "</button>" : "<span" + (n[2] ? ' class="active"' : "") + ">" + n[1] + "</span>";
+    }).join("") + "</div></div></div>";
+  }
+  function pageHTML(c) {
+    switch (c.app) {
+      case "intra": return pageIntra(c);
+      case "search": return pageSearch(c);
+      case "reports": return pageReports(c);
+      case "dashboards": return pageDashboards(c);
+      case "sse": return pageSSE(c);
+      case "activity": return pageActivity(c);
+    }
+    return "";
+  }
+  function winTitle(c) {
+    return c.app === "intra" ? "社内ポータル（架空）　チケット管理・チャットのイメージ" : "Splunk Cloud Platform の画面イメージを踏襲（架空）";
+  }
+
+  /* ==================== 状態と操作 ==================== */
+  var S = { ch: 1, c: {}, tip: null, warn: null, info: null, stats: { steps: 0, fixes: 0, notes: 0 } };
+  var hist = [];
+  var pendingTop = false;
+  function snap() { hist.push(JSON.stringify(S)); if (hist.length > 300) hist.shift(); }
+  function undo() { if (!hist.length) return; S = JSON.parse(hist.pop()); render(); }
+  function C() { return S.c[S.ch]; }
+  function D() { return CH[S.ch]; }
+  function cur() { var c = C(), d = D(); return d.steps && c.step >= 1 ? d.steps[c.step - 1] : null; }
+  function fix(msg) { S.warn = msg; S.stats.fixes++; }
+  function note() { S.stats.notes++; }
+
+  function goChapter(n, quiet) {
+    if (!CH[n]) return;
+    S.ch = n;
+    S.c[n] = CH[n].init ? CH[n].init() : { step: 0, vals: {} };
+    S.tip = null; S.warn = null; S.info = null;
+    hist = []; pendingTop = true;
+    if (!quiet) render();
+  }
+  function start() {
+    var d = D(), c = C();
+    if (d.onStart) d.onStart(c);
+    c.step = 1; c.started = true;
+  }
+  function finish() {
+    var d = D(), c = C(), st = cur();
+    if (st.after) st.after(c);
+    c.step++;
+    if (d.kind !== "note") S.stats.steps++;
+    var nx = cur();
+    while (nx && nx.skip && nx.skip(c)) {
+      c.step++;
+      if (d.kind !== "note") S.stats.steps++;
+      nx = cur();
+    }
+  }
+  function resolve(r) {
+    if (r === "done") finish();
+    else if (r && r.wrong) fix(r.wrong);
+  }
+  function emit(ev) {
+    var d = D(), c = C();
+    if (!c || !d.steps) return;
+    if (ev.kind === "pick") c.vals[ev.id] = ev.value;
+    if (ev.kind === "tip") { S.tip = S.tip === ev.id ? null : ev.id; if (!S.tip) return; note(); }
+    if (d.free && d.free(c, ev)) return;
+    if (c.step === 0) {
+      if (ev.kind === "click" && d.startIds && d.startIds.indexOf(ev.id) >= 0) start();
+      return;
+    }
+    var st = cur();
+    if (!st) return;
+    var r = st.handle ? st.handle(c, ev) : null;
+    if (r) resolve(r);
+    else if (ev.kind === "click") S.info = "このデモでは、ガイドの順に進めます。次は「" + st.label + "」です。";
+  }
+  function primary() {
+    var d = D(), c = C();
+    if (S.ch === SUMMARY) return { label: "最初の場面へ", run: function () { goChapter(1, true); } };
+    if (c.step === 0) return { label: d.startLabel || "ガイドを開始", run: start };
+    if (c.step > d.steps.length) return { label: d.nextLabel, run: function () { goChapter(S.ch + 1, true); } };
+    var st = cur();
+    return { label: val(st.btn, c) || "次へ", run: function () { resolve(st.auto ? st.auto(c) : "done"); } };
+  }
+  function act(name, arg, value) {
+    if (name === "back") { undo(); return; }
+    if (name === "chapter") { goChapter(+arg); return; }
+    snap();
+    S.warn = null; S.info = null;
+    if (name !== "tip") S.tip = null;
+    if (name === "next") primary().run();
+    else if (name === "click") emit({ kind: "click", id: arg });
+    else if (name === "pick") emit({ kind: "pick", id: arg, value: value });
+    else if (name === "tip") emit({ kind: "tip", id: arg });
+    render();
+  }
+
+  /* ---------- テックタッチのパネル ---------- */
+  var PILL = { tt: "テックタッチ", hub: "テックタッチ＋AI Hub", note: "説明用" };
+  function stepsList(steps, now) {
+    return '<ol class="steps compact">' + steps.map(function (g, i) {
+      var n = i + 1;
+      return '<li class="' + (n < now ? "done" : n === now ? "now" : "") + '">' + g.label + "</li>";
+    }).join("") + "</ol>";
+  }
+  function msgs() {
+    return (S.warn ? '<p class="alert" role="alert">' + S.warn + "</p>" : "") + (S.info ? '<p class="info" role="status">' + S.info + "</p>" : "");
+  }
+  function actions() {
+    return '<div class="actions"><button type="button" class="btn btn-ghost" data-act="back"' + (hist.length ? "" : " disabled") + ">戻る</button>" +
+      '<button type="button" class="btn btn-primary" data-act="next" id="panel-next">' + primary().label + "</button></div>";
+  }
+  function panelHTML() {
+    var d = D(), c = C(), kind = d.kind || "tt";
+    var head = '<div class="ov-head"><span class="ov-pill">' + PILL[kind] + '</span><span class="ov-kicker">' + d.kicker + "</span></div>";
+    if (c.step === 0) return head + d.intro(c) + msgs() + actions();
+    if (c.step > d.steps.length) return head + '<h3 class="ov-title">' + d.guide + "</h3>" + stepsList(d.steps, c.step) + d.doneHTML(c) + actions();
+    var st = cur(), h = head + '<h3 class="ov-title">' + d.guide + "</h3>" + stepsList(d.steps, c.step);
+    if (kind === "hub") {
+      h += '<div class="part tt"><p class="part-head"><span>テックタッチ 操作ガイド</span><span class="num">' + c.step + " / " + d.steps.length + "</span></p><p>" + val(st.now, c) + "</p></div>" + msgs();
+      var hub = val(st.hub, c);
+      if (hub) h += '<div class="part hub"><p class="part-head"><span>AI Hub（例文）</span></p><p>' + hub + "</p></div>";
+      return h + '<p class="refs">AI Hubの回答は本番前に確かめた例文です。実環境の項目名やデータ構造に合わせた検証が必要です。</p>' + actions();
+    }
+    return h + '<p class="now-box">' + val(st.now, c) + "</p>" + msgs() + (st.why ? '<p class="soft">' + val(st.why, c) + "</p>" : "") + actions();
+  }
+
+  /* ---------- 振り返り ---------- */
+  function summaryHTML() {
+    var any = S.stats.steps > 0;
+    var stat = function (v, label) { return '<div class="stat"><b>' + (any ? v : "—") + "</b><span>" + label + "</span></div>"; };
+    var tl = function (t, title, desc) { return '<li><span class="t">' + t + '</span><span class="rail" aria-hidden="true"></span><div class="body"><b>' + title + "</b><span>" + desc + "</span></div></li>"; };
+    var asks = function (ns) { return '<ul class="sum-list">' + ns.map(function (n) { return "<li>" + CH[n].ask + "</li>"; }).join("") + "</ul>"; };
+    return '<div class="summary">' +
+      '<section class="sum-card wide"><h2>今日の流れ（架空）：SOC担当者が、依頼から改善までを自分で進める</h2><div class="lanes">' +
+      '<div class="lane"><h3>前半：依頼 → 検索の完成（Splunk AI Assistant＋AI Hub）</h3><ol class="tl">' +
+      tl("S0", "現場の問題", "機能不足ではなく、実行力と業務適合の不足。成果物を5つ決める") +
+      tl("S1", "Before", "件数は見えるが、同一管理者・失敗後の成功を表せず、委託先に依頼して待つ") +
+      tl("S2", "要件整理", "AI Hubが、日本語の依頼をログ辞書・検知基準に基づく依頼文にする") +
+      tl("S3", "SPL生成・確認", "AssistantのSPL案を、AI Hubが業務条件で照合し、修正依頼を作る") +
+      tl("S4", "データ検証", "固定ログでQ1〜Q4を実行。Q3でAだけが残る") +
+      '</ol></div><div class="lane"><h3>後半：監視 → 検知 → 調査 → 改善（テックタッチ＋AI Hub）</h3><ol class="tl">' +
+      tl("S5", "可視化", "命名規則・共有範囲の入力チェック付きで、4パネルのダッシュボードを保存") +
+      tl("S6", "検知", "SSEを参照し、A社の基準どおりのアラート（15分ごと・抑制・通知先）") +
+      tl("S7", "一次調査", "AI Hub（KB04）で事実と未確認を分け、チェックリストで引き継ぐ") +
+      tl("S8", "記録・改善", "記録を4項目で残し、Q3を承認済みテンプレートに足す改善チケット") +
+      '</ol><p class="sum-note">役割の固定：ログの検索はSplunk、検索案はAssistant、社内の基準と次の行動はAI Hub、手順の抜け漏れ防止と入力チェックはテックタッチ。</p></div></div></section>' +
+      '<section class="sum-card"><h2>このデモで、テックタッチが手当てした場面</h2><div class="stats">' +
+      stat(S.stats.steps, "ガイドで進めたステップ") + stat(S.stats.fixes, "選び直し・順番・入力の案内") + stat(S.stats.notes, "定義・基準・社内手順の表示") + "</div>" +
+      '<p class="sum-note">' + (any ? "このデモを操作した回数です。効果の数値ではありません。" : "場面を順に進めると、操作した回数を数えます。効果の数値ではありません。") + "</p></section>" +
+      '<section class="sum-card"><h2>確かめ方（案・7章）</h2><ul class="sum-list"><li>自力完了率：委託先に依頼せずに、SPLの修正・ダッシュボード・アラートを終えられた割合</li><li>所要時間：依頼から監視に載るまで</li><li>依頼件数：委託先への改修依頼の件数</li><li>検証：検知条件を変えたとき、テストケースA〜Dで確かめたか</li></ul>' +
+      '<p class="sum-note">数値の目標は、現状を伺ってから設定します。Splunk AI Assistantの精度が上がったことを示す公開の根拠は見当たらないため、Assistantの出力は毎回、業務条件で確かめます。</p></section>' +
+      '<section class="sum-card wide"><h2>本日伺いたいこと</h2><div class="lanes"><div class="lane"><h3>検索・検証について</h3>' + asks([1, 2, 3, 4, 5]) +
+      '</div><div class="lane"><h3>監視・検知・調査・改善について</h3>' + asks([6, 7, 8, 9]) + "</div></div></section>" +
+      '<section class="sum-card wide"><h2>最初の一歩</h2><p class="flow3"><span>先に確かめる（9章 #1〜#4）</span><span class="arrow">→</span><span>一つの作業で実画面を確かめる</span><span class="arrow">→</span><span>変化を測る</span></p>' +
+      '<p class="sum-note">画面・人物・数値はすべて架空です。Splunk Cloudの実画面での動作確認（テックタッチが画面の要素を安定して指せるか、AI HubとAssistantの受け渡し、端末への拡張機能の配布、検証環境）は、構築の最初に行います。</p></section></div>';
+  }
+
+  /* ---------- 吹き出し ---------- */
+  function point(target, text, warn, sub) {
+    var noteKind = D().kind === "note";
+    target.classList.add("is-target");
+    if (noteKind) target.classList.add("note-target");
+    var side = target.getAttribute("data-tip-side");
+    var b = document.createElement("div");
+    b.className = "balloon" + (warn ? " warn" : "") + (noteKind && !warn ? " note" : "") + (side === "right" ? " r" : side === "s" ? " s" : "");
+    b.textContent = text;
+    if (sub) { var sm = document.createElement("small"); sm.textContent = sub; b.appendChild(sm); }
+    target.appendChild(b);
+    keepInside(b, side === "right" ? "r" : side === "s" ? "s" : "l");
+  }
+  function rightLimit(el) {
+    var lim = document.documentElement.clientWidth - 8, pg = el.closest(".dt-page");
+    if (pg) { var pr = pg.getBoundingClientRect(); lim = Math.min(lim, pr.right - parseFloat(getComputedStyle(pg).paddingRight) + 8); }
+    return lim;
+  }
+  function keepInside(el, mode) {
+    var vw = document.documentElement.clientWidth, pad = 8, r = el.getBoundingClientRect(), lim = rightLimit(el);
+    if (mode === "s") {
+      if (r.right > lim) { el.classList.remove("s"); keepInside(el, "l"); }
+      return;
+    }
+    if (mode === "l" && r.right > lim) {
+      var shift = Math.min(r.right - lim, Math.max(0, r.left - pad));
+      el.style.left = (parseFloat(getComputedStyle(el).left) - shift) + "px";
+      el.style.setProperty("--ax", Math.min(20 + shift, r.width - 24) + "px");
+    } else if (mode === "r" && r.left < pad) {
+      var back = Math.min(pad - r.left, Math.max(0, vw - pad - r.right));
+      el.style.right = (parseFloat(getComputedStyle(el).right) - back) + "px";
+      el.style.setProperty("--axr", Math.min(20 + back, r.width - 24) + "px");
+    }
+  }
+  function guideTarget() {
+    var st = cur(), c = C();
+    if (S.ch === SUMMARY || !st) return null;
+    var s = val(st.target, c);
+    if (!s) return null;
+    var warn = !!S.warn;
+    return { sel: s, tip: warn && st.redo ? val(st.redo, c) : val(st.tip, c), sub: warn ? "" : val(st.sub, c), warn: warn };
+  }
+
+  /* ---------- 描画 ---------- */
+  function renderJourney() {
+    $("#journey").innerHTML = JOURNEY.map(function (j) {
+      var st = j[0] < S.ch ? "done" : j[0] === S.ch ? "now" : "todo";
+      return '<button type="button" class="jn ' + st + '" data-act="chapter" data-arg="' + j[0] + '"' + (st === "now" ? ' aria-current="step"' : "") + ">" +
+        '<span class="no">' + (st === "done" ? "✓" : j[0]) + '</span><span class="jl">' + j[1] + '</span><span class="jt">' +
+        (j[3] ? '<span class="rc ' + j[3] + '">' + ROLE_LABEL[j[3]] + "</span>" : "") + j[2] + "</span></button>";
+    }).join("");
+  }
+  function renderStory() {
+    var d = D();
+    var role = d.role ? '<span class="rc ' + d.role + '">' + ROLE_LABEL[d.role] + "の視点</span>" : "";
+    $("#story").innerHTML = '<p class="story-time">' + d.time + "<small>" + d.timeSub + "</small></p><h1>" + role + d.title + '</h1><p class="story-text">' + d.text + "</p>" +
+      '<p class="story-tags">' + d.tags.filter(function (t) { return !/の視点$/.test(t); }).map(function (t) { return "<span>" + t + "</span>"; }).join("") + "</p>";
+  }
+  function renderStage() {
+    var st = $("#stage"), d = D(), c = C();
+    if (S.ch === SUMMARY) { st.innerHTML = summaryHTML(); return; }
+    st.innerHTML = '<div class="window"><div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>' + winTitle(c) + "</span></div>" +
+      '<div class="dt has-overlay' + (c.app === "intra" ? " intra" : "") + '">' +
+      '<div class="dt-app">' + spTop(c) + appBar(c) + '<div class="dt-page">' + pageHTML(c) + "</div></div>" +
+      '<aside class="overlay' + (d.kind === "hub" ? " hub" : d.kind === "note" ? " note" : "") + '" aria-label="テックタッチのガイド">' + panelHTML() + "</aside>" +
+      (d.modal ? d.modal(c) : "") + "</div></div>";
+  }
+  function render() {
+    var active = document.activeElement, focusId = active && active.id;
+    renderJourney();
+    renderStory();
+    renderStage();
+    $("#ask").hidden = S.ch === SUMMARY;
+    $("#ask-text").textContent = D().ask;
+    $$("#notes [data-for]").forEach(function (ul) { ul.hidden = ul.getAttribute("data-for") !== String(S.ch); });
+    var t = guideTarget(), el = t && $(t.sel);
+    if (el) point(el, t.tip, t.warn, t.sub);
+    $$(".tt-tip").forEach(function (tt) { keepInside(tt, "l"); });
+    if (focusId) { var f = document.getElementById(focusId); if (f && f !== document.activeElement) { try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); } } }
+    if (pendingTop) { window.scrollTo(0, 0); pendingTop = false; }
+    try { history.replaceState(null, "", "#s" + S.ch); } catch (e) { /* 表示には影響なし */ }
+  }
+
+  /* ---------- 入力 ---------- */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("[data-act]");
+    if (a) { if (!a.disabled) act(a.getAttribute("data-act"), a.getAttribute("data-arg")); return; }
+    var q = e.target.closest("[data-tip]");
+    if (q) { act("tip", q.getAttribute("data-tip")); return; }
+    var el = e.target.closest("[data-id]");
+    if (!el || el.disabled || el.tagName === "SELECT" || el.tagName === "INPUT" || el.tagName === "TEXTAREA") return;
+    act("click", el.getAttribute("data-id"));
+  });
+  document.addEventListener("change", function (e) {
+    var el = e.target.closest("select[data-id], input[data-id], textarea[data-id]");
+    if (!el) return;
+    act("pick", el.getAttribute("data-id"), el.value);
+  });
+  // 文字入力は Enter でも確定する
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && e.target && e.target.matches && e.target.matches("input[data-id]")) { e.preventDefault(); e.target.blur(); }
+  });
+  function toggleNotes() {
+    var n = $("#notes"), btn = $("#notes-btn");
+    n.hidden = !n.hidden;
+    btn.setAttribute("aria-pressed", String(!n.hidden));
+  }
+  $("#notes-btn").addEventListener("click", toggleNotes);
+  $("#reset-btn").addEventListener("click", function () { goChapter(S.ch); });
+
+  var THEME_KEY = "sp-tt-siem-demo-theme";
+  var themes = ["", "light", "dark"], labels = { "": "自動", light: "ライト", dark: "ダーク" };
+  var theme = "";
+  function applyTheme(t, persist) {
+    theme = t;
+    if (t) document.documentElement.setAttribute("data-theme", t);
+    else if (persist) document.documentElement.removeAttribute("data-theme");
+    $("#theme-btn").textContent = "表示：" + labels[t];
+    if (persist) { try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* 保存できなくても表示は切り替わる */ } }
+  }
+  try { var saved = localStorage.getItem(THEME_KEY); if (saved === "light" || saved === "dark") applyTheme(saved, false); } catch (e) { /* 既定のまま */ }
+  $("#theme-btn").addEventListener("click", function () { applyTheme(themes[(themes.indexOf(theme) + 1) % themes.length], true); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var tag = (e.target && e.target.tagName || "").toLowerCase();
+    if (tag === "select" || tag === "input" || tag === "textarea") return;
+    if (e.key === "ArrowRight") { act("next"); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { act("back"); e.preventDefault(); }
+    else if (e.key >= "1" && e.key <= "9") goChapter(+e.key);
+    else if (e.key === "0") goChapter(SUMMARY);
+    else if (e.key === "n" || e.key === "N") toggleNotes();
+    else if (e.key === "r" || e.key === "R") goChapter(S.ch);
+  });
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 150); });
+
+  var m = /^#s([1-9]|10)$/.exec(location.hash || "");
+  goChapter(m ? +m[1] : 1);
+
+})();
+</script>
+</body>
+</html>
