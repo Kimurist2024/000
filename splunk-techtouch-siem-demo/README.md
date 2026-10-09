@@ -42,6 +42,22 @@ Q0〜Q4と「不十分な例」の期待値が、CSVと一致することを確�
 
 `mock/SOC_demo_clickthrough.html` は、GPT版1.0をシナリオ1.1に合わせて修正した簡易モックです。画面のデザインはSplunk Webを踏襲していません。
 
+## 動画版
+
+`demo/video/splunk-techtouch-siem-demo.mp4`（1920×1080、H.264、音声なし）。PowerPointに埋め込んで再生できます。長さは下の「版」を参照。
+
+- 構成：表紙 → デモの流れ（全体像）→ S0〜S8（各場面の最後に「伺いたいこと」）→ 振り返り → クロージング・最初の一歩。
+- 画面下の字幕に、操作の説明と「イメージデモ｜画面・人物・企業名・手順・数値は架空で…」の注記を常に表示します。
+- 字幕の文面と操作の順番は `demo/video/record.js` の「台本」にあります。デモや字幕を直したら、次の手順で作り直せます。
+
+```sh
+cd demo/video
+npm install                      # 撮影用フォント（Noto Sans JP、Roboto）
+NODE_PATH="$(npm root -g)" FFMPEG=/path/to/ffmpeg node record.js
+```
+
+必要なもの：Playwright（Chromium）、libx264 を含む ffmpeg。撮影時は中国語の字形が混ざらないよう、日本語フォントを Noto Sans JP に固定しています（HTMLを会議で開く場合は游ゴシック／ヒラギノで表示されます）。
+
 ## セキュリティ
 
 - ログ内の接続元IPは、文書・例示用に予約されたアドレス（RFC 5737）です。ユーザー名・企業名は架空です。
