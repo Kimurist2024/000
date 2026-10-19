@@ -307,6 +307,23 @@ table{border-collapse:collapse;width:100%}
 .spl .lti{border:1px solid #dfe3e8;border-radius:4px}.spl .lti b{font-weight:600}
 .spl .sect{color:#3c444d;font-weight:600}
 .spl .chat{border-radius:6px}
+/* ---- AI Hub chat panel (concept image) ---- */
+.aih{position:absolute;right:22px;top:16px;width:520px;background:#fff;border:1px solid #d6dbe2;border-radius:12px;box-shadow:0 10px 28px rgba(40,30,90,.18);z-index:4;overflow:hidden;font-family:"Noto Sans JP",sans-serif;color:#1f2430}
+.wbody.spl-on>.aih{top:66px}
+.aihh{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,#5a3ea6,#3f6fd8);color:#fff;padding:12px 16px}
+.aihl{font-weight:700;font-size:18px;letter-spacing:.3px}.aihs{font-size:13px;opacity:.9}
+.aihc{margin-left:auto;font-size:12.5px;background:rgba(255,255,255,.2);border-radius:12px;padding:2px 10px}
+.aihb{padding:14px 16px;background:#f7f7fb;min-height:300px}
+.mu{margin-left:auto;max-width:82%;width:fit-content;background:#e6ecfa;border-radius:12px 12px 2px 12px;padding:9px 14px;font-size:15.5px;line-height:1.6;margin-bottom:12px}
+.ma{display:flex;gap:10px;align-items:flex-start}
+.ma .av{flex:none;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5a3ea6,#3f6fd8);color:#fff;font:700 13px Roboto,sans-serif;display:grid;place-items:center}
+.ma .bub{background:#fff;border:1px solid #e1def0;border-radius:2px 12px 12px 12px;padding:10px 14px;font-size:15px;line-height:1.7;white-space:pre-line;min-height:46px;flex:1}
+.ma .refs,.ma .mab{display:none}.ma.done .refs,.ma.done .mab{display:flex}
+.refs{flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12.5px;color:#5a3ea6;align-items:center}
+.refs span{background:#efeaf9;border-radius:4px;padding:2px 8px}
+.mab{gap:8px;margin-top:10px}.mab span{border:1px solid #c9c2e6;border-radius:6px;padding:4px 12px;font-size:13.5px;color:#3c2c6e;background:#fff}
+.aihf{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e6e3f0;padding:10px 16px;color:#9a97ad;font-size:14px}
+.aihf b{width:30px;height:30px;border-radius:50%;background:#5a3ea6;color:#fff;display:grid;place-items:center}
 </style>
 </head>
 <body>
@@ -315,7 +332,7 @@ table{border-collapse:collapse;width:100%}
 <script>
 const NOTE='構想デモ｜画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。';
 const NOTE_PROOF='Splunk Cloud・テックタッチの実画面（デモ環境）｜ログ・人物・サービス名は架空です。';
-const NOTE_REAL='Splunk Cloud・テックタッチの実画面（デモ環境）｜ログ・サービス名・人物は架空です。AI Hub欄は例文（構想）です。';
+const NOTE_REAL='Splunk Cloud・テックタッチの実画面（デモ環境）｜ログ・サービス名・人物は架空です。AI Hub は構想の画面イメージです（デモ環境には未導入）。';
 const SEVC={critical:'#B50101',high:'#F26A35',medium:'#FCB64E',low:'#FFE98C',normal:'#99D18B',info:'#AED3E5'};
 const SPKC={critical:'#B50101',high:'#F26A35',medium:'#e09a1f',low:'#c9a800',normal:'#5aa147',info:'#5c9fc4'};
 const SEVT={critical:'#fff',high:'#fff',medium:'#21262a',low:'#21262a',normal:'#21262a',info:'#21262a'};
@@ -379,12 +396,12 @@ function splNav(st){
  const on=n=>n[2]===1||(n[2]==='s'&&st.sv!=='reports')||(n[2]==='r'&&st.sv==='reports');
  return `<aside class="snav"><div class="hb">☰</div><div class="sapp"><span class="aic" style="background:${A.bg}">${A.g}</span>${A.name}</div>${A.nav.map(n=>n[0]==='GRP'?`<div class="sgrp">${n[1]}</div>`:`<div class="sni ${on(n)?'on':''}" ${n[3]?`data-k="${n[3]}"`:''}>${svgI(ICON[n[1]])}${n[0]}</div>`).join('')}</aside>`;}
 function win(st){
- if(st.view==='shot'){const sz=IMGSZ[st.shot]||{w:1280,h:800},H=720,W=Math.min(1810,Math.round(sz.w*H/sz.h)),L=st.tt||st.chat||st.chat2?24:Math.round((1858-W)/2);
+ if(st.view==='shot'){const sz=IMGSZ[st.shot]||{w:1280,h:800},H=720,W=Math.min(1810,Math.round(sz.w*H/sz.h)),L=st.tt||st.aih||st.chat||st.chat2?24:Math.round((1858-W)/2);
   const bx=Object.entries(REAL_BOXES[st.shot]||{}).map(([k,b])=>`<div class="bx" data-k="${k}" style="left:${b[0]/sz.w*W}px;top:${b[1]/sz.h*H}px;width:${b[2]/sz.w*W}px;height:${b[3]/sz.h*H}px"></div>`).join('');
   return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>${st.wtitle||'Splunk Cloud Platform 実画面（デモ環境・架空データ）　テックタッチ（実機・公開中のガイドを再生）'}</span></div>
-  <div class="wbody" style="top:40px"><div class="shotc" style="left:${L}px;width:${W}px;height:${H}px"><img src="${SHOTDIR}${st.shot}" style="width:${W}px;height:${H}px">${bx}</div>${st.chat||st.chat2?`<div class="shotchat">${chat(CHATS[st.chat||st.chat2])}</div>`:''}${tt(st.tt)}</div></div>`;}
+  <div class="wbody" style="top:40px"><div class="shotc" style="left:${L}px;width:${W}px;height:${H}px"><img src="${SHOTDIR}${st.shot}" style="width:${W}px;height:${H}px">${bx}</div>${st.chat||st.chat2?`<div class="shotchat">${chat(CHATS[st.chat||st.chat2])}</div>`:''}${tt(st.tt)}${aih(st.aih)}</div></div>`;}
  return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>監視画面（架空）　Splunk Cloud の画面イメージを踏襲</span></div>
- <div class="wbody spl-on" style="top:40px"><div class="spl">${splTop()}<div class="sbd">${splNav(st)}<div class="smain">${VIEWS[st.view](st)}</div></div></div>${st.pop?'<div class="dim"></div>'+POPS[st.pop]():''}${tt(st.tt)}</div></div>`;}
+ <div class="wbody spl-on" style="top:40px"><div class="spl">${splTop()}<div class="sbd">${splNav(st)}<div class="smain">${VIEWS[st.view](st)}</div></div></div>${st.pop?'<div class="dim"></div>'+POPS[st.pop]():''}${tt(st.tt)}${aih(st.aih)}</div></div>`;}
 function chat(c){return `<div class="chat" data-k="chat"><div class="av">${c.a}</div><div><div class="hd"><b>${c.who}</b>${c.tm}</div><p>${c.t}</p><small>社内チャット（架空）の通知</small></div><span class="cl">閉じる</span></div>`;}
 const CHATS={
  biz:{a:'業',who:'業務部門（架空）',tm:'10:16',t:'10時過ぎから、契約照会の画面が遅いという声が出ています。状況を確認してもらえますか？'},
@@ -480,6 +497,20 @@ search(st){
  return h;}
 };
 
+/* ---------- AI Hub (concept image: not installed in the demo tenant) ---------- */
+const KBN='（架空）';
+const AIH={
+ contact:{q:'このエピソードの一次連絡文を、社内手順で作ってください。',a:'【障害一次連絡】E-0412 契約照会サービスの応答時間の悪化（対応中）\n・開始：10:02\n・影響：契約照会サービス、代理店ポータルの照会の一部\n・優先度：中（一部の利用者に影響）\n・関連：ctr-db-01 の接続数が上限付近（09:58〜。原因は未確定）\n・連絡先：システム運用チーム、業務部門の窓口\n・次の連絡：原因を確認したあと',refs:['一次連絡の手順','優先度の基準'],btns:['コピー','連絡ツールに貼り付け']},
+ spl:{q:'このSPLを、1行ずつ説明してください。',a:'1行目：契約照会サービス（contract_inquiry）の ERROR ログに絞ります。\n2行目：message に「connection」を含む、接続まわりのエラーに絞ります。\n3行目：5分ごとの件数を、エラーの種類（error_code）別に数えます。\nこのひな型は傾向を見るためのもので、原因の特定には使いません。',refs:['アプリログ辞書','承認済みSPLひな型']},
+ read:{q:'この結果を、どう読めばよいですか？',a:'・10:00台から DB_CONN_TIMEOUT が増え、5分あたり約80〜100件になっています。\n・10:05 以降は POOL_EXHAUSTED も、5分あたり約50〜70件出ています。\n・社内基準では、5分あたり50件を超えたら専門チーム（DB）に確認を依頼します。今回は依頼が必要です。\n・原因（DBか、接続プールの設定か）は、この結果だけでは断定できません。',refs:['判断基準と連絡','アプリログ辞書']},
+ draft:{q:'専門チームへの確認依頼文を作ってください。',a:'件名：【確認依頼】契約照会サービス 接続エラーの増加\n事象：DB_CONN_TIMEOUT と POOL_EXHAUSTED が増加\n時間帯：10:00〜（POOL_EXHAUSTED は 10:05〜）\n件数：5分あたり DB_CONN_TIMEOUT 約80〜100件、POOL_EXHAUSTED 約50〜70件\n添付：検索結果のリンク\n依頼：接続プールの設定と ctr-db-01 の状態の確認\n※原因は未確定です。',refs:['判断基準と連絡'],btns:['コピー','チャットに貼り付け']}};
+function aih(a){
+ if(!a)return '';
+ return `<div class="aih" data-k="aih"><div class="aihh"><span class="aihl">AI Hub</span><span class="aihs">テックタッチ</span><span class="aihc">構想・画面イメージ</span></div>
+ <div class="aihb"><div class="mu">${a.q}</div><div class="ma"><span class="av">AI</span><div style="flex:1"><div class="bub mat" data-full="${encodeURIComponent(a.a)}"></div>
+ <div class="refs">参照したナレッジ${KBN}：${a.refs.map(r=>`<span>${r}</span>`).join('')}</div>${a.btns?`<div class="mab">${a.btns.map(b=>`<span>${b}</span>`).join('')}</div>`:''}</div></div></div>
+ <div class="aihf"><span>AI Hub に質問する…</span><b>↑</b></div></div>`;}
+
 /* ---------- techtouch panel ---------- */
 function tt(t){
  if(!t)return '';
@@ -519,8 +550,8 @@ const POPS={
 function card(c){
  if(c.type==='title') return `<div class="cardbg"></div><div class="card" style="top:250px"><div class="sm">構想デモ</div><h1>Splunk × テックタッチ</h1><h2>運用担当者の一日（架空）：問い合わせから、ログ分析まで</h2>
   <p>観測は Splunk（ITSI・IT Essentials Work・Search & Reporting）。利用者が迷う画面での介入はテックタッチ。</p>
-  <div class="lg"><span><i style="border:1.5px solid #8a919c"></i>監視画面（Splunk の画面イメージ・架空）</span><span><i style="background:var(--tt)"></i>テックタッチ ガイド（案）</span><span><i style="background:var(--ai)"></i>AI Hub 理解支援（構想）</span><span><i style="background:#2b3038"></i>実機の画面（デモ環境）</span></div>
-  <div class="fn">${NOTE}<br>監視画面は Splunk の画面イメージを踏襲した架空画面です（ITSI・IT Essentials Work の画面名は公開ドキュメントを参考）。第3章は、Splunk Cloud（デモ環境）とテックタッチの実画面です。登場する人物・部署・手順・ログは架空です。</div></div>`;
+  <div class="lg"><span><i style="border:1.5px solid #8a919c"></i>監視画面（Splunk の画面イメージ・架空）</span><span><i style="background:var(--tt)"></i>テックタッチ ガイド（案）</span><span><i style="background:var(--ai)"></i>AI Hub（構想・画面イメージ）</span><span><i style="background:#2b3038"></i>実機の画面（デモ環境）</span></div>
+  <div class="fn">${NOTE}<br>監視画面は Splunk の画面イメージを踏襲した架空画面です（ITSI・IT Essentials Work の画面名は公開ドキュメントを参考）。第3章は、Splunk Cloud（デモ環境）とテックタッチの実画面です。AI Hub は構想の画面イメージです（デモ環境には未導入）。登場する人物・部署・手順・ログは架空です。</div></div>`;
  if(c.type==='agenda') return `<div class="cardbg"></div><div class="card" style="top:250px"><div class="sm">今日の業務の流れ（架空）</div><h1 style="font-size:40px">一つの問い合わせを、業務の流れに沿って進める</h1>
   <div class="ag"><div><b>10:16</b><strong>第1章　問い合わせを受けて、健全性を確認</strong><span>デモ①・仮説1　Service Analyzer</span></div><div><b>10:18</b><strong>第2章　障害の一次確認と連絡</strong><span>デモ②・仮説4・5　Episode Review／Entity Overview</span></div><div><b>10:30</b><strong>第3章　ログを調べて、専門チームに渡す</strong><span>デモ③・仮説3　Splunk Cloud 実画面＋テックタッチ（実機）</span></div><div><b>まとめ</b><strong>振り返り</strong><span>本日伺いたいこと・最初の一歩</span></div></div>
   <div class="fn">担当者が Splunk を使うのは月に数回、という想定の人物像です。</div></div>`;
@@ -530,10 +561,10 @@ function card(c){
   <div class="sbox"><h5>今日の業務の流れ（架空）</h5><div class="tlx">
    <div><em>10:16</em><p>業務部門から問い合わせ<span>「10時過ぎから契約照会の画面が遅い」</span></p></div>
    <div><em>10:17</em><p>第1章　担当サービスの健全性を確認<span>ガイド6ステップ。健全性スコア38、応答時間とDB接続待ちの悪化を確認</span></p></div>
-   <div><em>10:18</em><p>第2章　障害の一次確認と連絡<span>ガイド4ステップ。影響範囲から優先度「中」と判断し、社内手順どおりに連絡</span></p></div>
-   <div><em>10:30</em><p>第3章　ログをひな型から調べる<span>テックタッチ（実機）のガイド7ステップ。接続エラーの推移を確認し、専門チームの確認を受けて共有</span></p></div>
+   <div><em>10:18</em><p>第2章　障害の一次確認と連絡<span>ガイド4ステップ。影響範囲から優先度「中」と判断し、AI Hubの下書きで社内手順どおりに連絡</span></p></div>
+   <div><em>10:30</em><p>第3章　ログをひな型から調べる<span>テックタッチ（実機）のガイド7ステップ。AI HubがSPLと結果を説明し、確認依頼文を下書き</span></p></div>
    <div><em>実機</em><p>ガイドの作り方（実機）<span>Splunk Cloud の実画面の上で吹き出しを置き、管理画面で公開（ログは架空・823件）</span></p></div></div></div>
-  <div class="sbox"><h5>このデモで、テックタッチが手当てした場面</h5><div class="cnt"><div><b>17</b><span>ガイドで進めたステップ</span></div><div><b>2</b><span>選び直し・順番の案内</span></div><div><b>4</b><span>基準・社内手順の表示</span></div><div><b>3</b><span>AI Hub欄の説明（例文）</span></div></div>
+  <div class="sbox"><h5>このデモで、テックタッチが手当てした場面</h5><div class="cnt"><div><b>17</b><span>ガイドで進めたステップ</span></div><div><b>2</b><span>選び直し・順番の案内</span></div><div><b>4</b><span>基準・社内手順の表示</span></div><div><b>4</b><span>AI Hub の支援（構想）</span></div></div>
    <div class="sfn">このデモを操作した回数です。効果の数値ではありません。</div></div>
   <div class="sbox"><h5>確かめ方（案）</h5><div class="ul"><div>自力完了率：依頼せずに作業を終えられた割合</div><div>所要時間：作業の開始から完了まで</div><div>依頼件数：専門チームへの問い合わせの件数</div><div>再実行：同じ作業を、次回も自力でできるか</div></div><div class="sfn">数値の目標は、現状を伺ってから設定します。ガイドの完了率だけでは判断せず、作業の結果で確かめます。</div></div>
   <div class="sbox"><h5>本日伺いたいこと</h5><div class="ul"><div>画面の探し方、時間範囲の指定、サービスの選び分けのどこで迷いますか？</div><div>障害時の一次確認で、人によって手順がばらつくのはどこですか？</div><div>ひな型選び、時間範囲の指定、結果の読み方のどこで手が止まりますか？</div><div>対象者・止まる場面・現在の解決方法・既存の支援・自走の判断基準</div></div></div></div>`;
@@ -558,21 +589,21 @@ const REAL_BOXES={
 const IMGSZ={};
 const aiOnly=(t,o={})=>Object.assign({kind:'ai',mode:'aionly',lbl:'構想',title:'AI Hub欄（例文）',ai:t},o);
 function realCh3(){
- S(5,{card:{type:'chapter',ai:1,sm:'第3章・デモ③・仮説3　作成・修正で止まる',h:'10:30　ログを調べて、原因の手がかりを専門チームに渡す',sup:'支援：テックタッチ（実機）のガイド＋AI Hub（構想）',fn:'第3章は Splunk Cloud（デモ環境）とテックタッチの実画面です。ログはデモ用に生成した架空データです。AI Hub欄は例文（構想）です。'}});
- S(7.5,{card:null,ch:2,view:'shot',shot:'r01.jpg',chat:'exp',tt:null,hl:'guideLink',c1:'専門チーム（架空）の依頼を受け、ガイド一覧から「ログをひな型から調べる」を選びます。'});
+ S(5,{card:{type:'chapter',ai:1,sm:'第3章・デモ③・仮説3　作成・修正で止まる',h:'10:30　ログを調べて、原因の手がかりを専門チームに渡す',sup:'支援：テックタッチ（実機）のガイド＋AI Hub（構想）',fn:'Splunk Cloud とテックタッチは実画面（デモ環境）です。AI Hub は構想の画面イメージです（デモ環境には未導入）。ログはデモ用に生成した架空データです。'}});
+ S(7.5,{card:null,ch:2,view:'shot',shot:'r01.jpg',chat:'exp',tt:null,aih:null,hl:'guideLink',c1:'専門チーム（架空）の依頼を受け、ガイド一覧から「ログをひな型から調べる」を選びます。'});
  S(6.5,{shot:'r02.jpg',chat:null,c1:'① 吹き出しが「レポート」を指します。SPLを一から書かずに、ひな型を使います。'});
- S(8,{shot:'r03.jpg',tt:aiOnly('ひな型の意図：「接続エラーの推移（標準）」は、指定したサービスの接続エラーを5分ごとに数え、エラーの種類別に推移を見るためのひな型です。'),c1:'② 確認済みのひな型を、サーチで開きます。AI Hub欄が、ひな型の意図を説明します（例文）。'});
- S(8.5,{shot:'r04.jpg',tt:aiOnly('1行目：契約照会サービスの ERROR ログに絞ります。\n2行目：メッセージに「connection」を含むものに絞ります。\n3行目：5分ごとの件数を、エラーの種類（error_code）別に数えます。'),c1:'③ 検索の中身（SPL）を確認します。AI Hub欄が1行ずつ説明します（例文）。'});
- S(6.5,{shot:'r05.jpg',tt:null,c1:'④ 時間範囲が、障害の開始（10:02）を含む 09:30〜10:30 かを確認します。'});
- S(8.5,{shot:'r06.jpg',tt:aiOnly('結果の見方：10:00台から DB_CONN_TIMEOUT が増え、10:05 以降は POOL_EXHAUSTED も出ています。第2章で確認した接続数の増加（09:58〜）と、時間帯が合っています。',{note:'原因は、この画面だけでは特定できません。'}),c1:'⑤ 10時台から接続エラーが増えています。第2章で見た時間帯と合っているかを確かめます。',note:'原因はこの画面だけでは特定できません。'});
- S(6.5,{shot:'r07.jpg',tt:null,c1:'⑥ 結果を共有して、専門チームに確認を依頼します。',note:null});
- S(6,{chat2:'rep',c1:'専門チームから返信が届きました。'});
+ S(6.5,{shot:'r03.jpg',c1:'② 確認済みのひな型を、サーチで開きます。'});
+ S(10.5,{shot:'r04.jpg',aih:AIH.spl,aihType:true,c1:'③ 検索の中身（SPL）を AI Hub に聞きます。社内ナレッジを参照して1行ずつ説明します。'});
+ S(6.5,{shot:'r05.jpg',aih:null,c1:'④ 時間範囲が、障害の開始（10:02）を含む 09:30〜10:30 かを確認します。'});
+ S(12,{shot:'r06.jpg',aih:AIH.read,aihType:true,c1:'⑤ 結果の読み方を AI Hub に聞きます。社内基準に照らすと、専門チームへの確認依頼が必要です。',note:'原因はこの画面だけでは特定できません。'});
+ S(12,{shot:'r07.jpg',aih:AIH.draft,aihType:true,c1:'⑥ AI Hub が、社内の連絡の形で確認依頼文を下書きします。担当者が確かめてから送ります。',note:null});
+ S(6,{aih:null,chat2:'rep',c1:'専門チームから返信が届きました。'});
  S(6.5,{shot:'r08.jpg',chat2:null,c1:'⑦ レポートとして保存し、運用チームに共有します。'});
- S(7.5,{shot:'r09.jpg',tt:aiOnly('',{title:'このあと',ai:null,note:'デモのため、保存先と共有範囲は実環境で確認します。',asst:'SPLの作成・説明が必要な場合：利用条件を満たす Splunk AI Assistant の活用を含めて確認します。'}),c1:'ガイドが終了しました。保存したレポートを、次回の確認や再発時の比較に使います。'});
+ S(7,{shot:'r09.jpg',c1:'ガイドが終了しました。保存したレポートを、次回の確認や再発時の比較に使います。',note:'SPLの作成・説明には、利用条件を満たせば Splunk AI Assistant も併用できます（デモ環境では未使用）。'});
  S(4.5,{q:{t:'ひな型選び、時間範囲の確認、結果の読み方のどこで手が止まりますか？',ai:1}});
 }
 const STEPS=[];
-const TRANS={hl:null,bal:null,tip:null,q:null,click:false,cur:null,drop:null,note:null,wtitle:null};
+const TRANS={hl:null,bal:null,tip:null,q:null,click:false,cur:null,drop:null,note:null,wtitle:null,aihType:false};
 function S(d,s){STEPS.push({d,s});}
 const G1=['IT Service Intelligence を開く','時間範囲を選ぶ','担当サービスを選ぶ','健全性スコアの意味を確認する','悪化しているKPIを確認する','エピソードを開く'];
 const G2=['エピソードの概要を確認する','影響範囲を確認する','関連エンティティを確認する','社内手順に沿って連絡する'];
@@ -597,7 +628,7 @@ S(6.5,{tt:g1(4,{msg:'Severity が High のKPIを確認します。',why:'確認�
 S(6.5,{tt:g1(5,{msg:'同じ時間帯に、エピソード「E-0412」が発生しています。開きます。',why:'確認する理由：エピソードが発生している場合は、社内手順の一次確認に切り替えます。'}),hl:'epLink',bal:{t:'⑥ 同じ時間帯のエピソードを開きます',s:'障害の一次確認（社内手順）に切り替えます',p:'br'},cur:'epLink',click:true,c1:'⑥ 同じ時間帯にエピソードが発生しています。一次確認に切り替えます。'});
 S(4.5,{q:{t:'画面の探し方、時間範囲の指定、サービスの選び分けのどこで迷いますか？'}});
 // ---- chapter 2
-S(5,{card:{type:'chapter',sm:'第2章・デモ②・仮説4・5　実務で再現できない／学びを再利用できない',h:'10:18　障害の一次確認を、社内手順どおりに進めて連絡する',sup:'支援：テックタッチのガイド（ポップアップ・吹き出し）（案）',fn:'社内手順・連絡先は架空です。お客様の実際の手順に置き換える前提です。'}});
+S(5,{card:{type:'chapter',sm:'第2章・デモ②・仮説4・5　実務で再現できない／学びを再利用できない',h:'10:18　障害の一次確認を、社内手順どおりに進めて連絡する',sup:'支援：テックタッチのガイド（ポップアップ・吹き出し）（案）＋AI Hub（構想）',fn:'社内手順・連絡先は架空です。お客様の実際の手順に置き換える前提です。'}});
 S(7,{card:null,ch:1,view:'er',erTab:'impact',erStatus:'New',erOwner:'unassigned',tt:g2(null,{msg:'ポップアップの「ガイドを開始」から始めます。',btn:'ガイドを開始'}),pop:'start',hl:'popStart',cur:'popStart',click:true,c1:'エピソードを開くと、テックタッチのポップアップが社内手順（架空）の一次確認を案内します。'});
 S(6.5,{pop:null,tt:g2(0,{msg:'何が・いつから・どこで起きているかを確認します。',why:'確認する理由：連絡の最初に伝える内容です。以降の確認の起点になります。'}),hl:'epHead',bal:{t:'ステップ1/4：エピソードの概要を確認します',s:'何が・いつから・どこで起きているか',p:'b'},cur:[1100,560],c1:'ステップ1：何が・いつから・どこで起きているかを確認します。'});
 S(7,{tt:g2(0,{msg:'「Acknowledge」を押して、自分が対応することを示します。',why:'確認する理由：状態が In Progress になり、自分が担当者になります。対応の重複を防ぎます。'}),hl:'ackBtn',bal:{t:'ステップ1/4：「Acknowledge」を押します',s:'状態が In Progress になり、担当者が自分になります',p:'b'},cur:'ackBtn',click:true,c1:'ステップ1：Acknowledge で、誰が対応しているかを明確にします。'});
@@ -606,9 +637,9 @@ S(7,{erTab:'events',tt:g2(1,{warn:'社内手順では、イベントの前に影
 S(7.5,{erTab:'impact',tt:g2(1,{msg:'影響の範囲を社内の基準に当てはめて、優先度を決めます。',why:'確認する理由：優先度で、連絡先と連絡の急ぎ方が変わります（社内手順・架空）。'}),tip:{k:'impQ',p:'r',h:'テックタッチ ツールチップ（案）：優先度の基準（社内・架空）',t:'全利用者に影響 → 高／一部の利用者に影響 → 中／影響なし → 低。今回は「代理店ポータルの照会の一部」のため「中」です。'},cur:'impQ',c1:'「?」で社内の優先度の基準（架空）を表示します。一部に影響しているため、優先度は「中」です。'});
 S(6,{tt:g2(2,{msg:'関連エンティティ「ctr-db-01」の状態を確認します。',why:'確認する理由：関係するサーバーの状態を、連絡に含めるためです。'}),hl:'entLink',bal:{t:'ステップ3/4：関連エンティティの状態を確認します',s:'Entity Overview（IT Essentials Work の機能）を開きます',p:'t'},cur:'entLink',click:true,c1:'ステップ3：関連エンティティを、Entity Overview で確認します。'});
 S(7.5,{view:'ite',tt:g2(2,{msg:'接続数が上限（500・架空）に近づいています。増え始めたのは、エピソードの少し前（09:58）です。',why:'確認する理由：関係するサーバーの状態を、連絡に含めるためです。原因は、この段階では確定しません。'}),hl:'vConn',bal:{t:'DB接続数が上限に近づいています',s:'09:58 から増加（架空）',p:'b'},cur:[1150,720],c1:'接続数が上限に近いことを確認します。原因はこの段階では確定しません。'});
-S(6,{tt:g2(3,{msg:'社内手順の連絡内容の例を表示します。',why:'確認する理由：連絡の宛先と内容を、人によってばらつかせないためです。',btn:'連絡内容の例を表示'}),hl:'ttBtn',cur:'ttBtn',click:true,c1:'ステップ4：社内手順に沿って、連絡内容の例を確認します。'});
-S(8,{pop:'contact',hl:'popOk',cur:'popOk',click:true,c1:'ステップ4：優先度・連絡先・伝える内容の例を確認します。'});
-S(7,{pop:null,tt:g2(4,{mode:'done',msg:'一次確認の4ステップが完了しました。',rec:[['10:18','概要を確認（E-0412 応答時間の悪化・In Progress）'],['10:19','影響範囲を確認（代理店ポータルの照会の一部 → 優先度「中」）'],['10:21','関連エンティティを確認（ctr-db-01 の接続数が上限付近。原因は未確定）'],['10:22','社内手順に沿って連絡（システム運用チーム・業務部門の窓口）']],note:'時刻・記録はすべて架空です。',btn:'第3章へ進む'}),cur:[1180,760],c1:'一次確認の4ステップが完了しました。パネルに、確認した内容の記録（例）を表示します。'});
+S(6,{tt:g2(3,{msg:'画面の情報と社内手順から、AI Hub が一次連絡文を下書きします。',why:'確認する理由：連絡の宛先と内容を、人によってばらつかせないためです。',btn:'AI Hub で連絡文を作る'}),hl:'ttBtn',cur:'ttBtn',click:true,c1:'ステップ4：社内手順に沿った一次連絡を、AI Hub で下書きします。'});
+S(11,{tt:null,aih:AIH.contact,aihType:true,cur:[1000,760],c1:'AI Hub が、画面の情報と社内手順から一次連絡文を下書きします。担当者が確かめて送ります。',note:'AI Hub は構想の画面イメージです（デモ環境には未導入）。'});
+S(7,{pop:null,aih:null,tt:g2(4,{mode:'done',msg:'一次確認の4ステップが完了しました。',rec:[['10:18','概要を確認（E-0412 応答時間の悪化・In Progress）'],['10:19','影響範囲を確認（代理店ポータルの照会の一部 → 優先度「中」）'],['10:21','関連エンティティを確認（ctr-db-01 の接続数が上限付近。原因は未確定）'],['10:22','社内手順に沿って連絡（システム運用チーム・業務部門の窓口）']],note:'時刻・記録はすべて架空です。',btn:'第3章へ進む'}),cur:[1180,760],c1:'一次確認の4ステップが完了しました。パネルに、確認した内容の記録（例）を表示します。'});
 S(4.5,{q:{t:'障害時の一次確認で、人によって手順がばらつくのはどこですか？'}});
 // ---- chapter 3
 if(!REAL){
@@ -695,7 +726,10 @@ function seek(t){
  cursor.style.display=hide?'none':'block';cursor.style.transform=`translate(${x-3}px,${y-2}px)`;
  let rp=0;if(st.click&&!hide){rp=cl((lt-1.35)/0.45);}
  if(rp>0&&rp<1){const R=10+38*rp;rip.style.display='block';rip.style.left=(to[0]-R)+'px';rip.style.top=(to[1]-R)+'px';rip.style.width=rip.style.height=2*R+'px';rip.style.opacity=1-rp;rip.style.borderColor=st.ring==='ai'||st.bal&&st.bal.ai?'var(--ai)':'var(--tt)';}else rip.style.display='none';
- return `${i}|${x.toFixed(0)},${y.toFixed(0)}|${a.toFixed(2)}|${cardA.toFixed(2)}|${qv.style.opacity}|${rp>0&&rp<1?rp.toFixed(2):0}`;}
+ let tw=0;const mt=scene.querySelector('.mat');
+ if(mt){const full=decodeURIComponent(mt.dataset.full),n=st.aihType?Math.max(0,Math.min(full.length,Math.floor((lt-0.9)*32))):full.length;
+  if(mt.dataset.n!==String(n)){mt.textContent=full.slice(0,n);mt.dataset.n=n;mt.parentNode.parentNode.classList.toggle('done',n>=full.length);}tw=n;}
+ return `${i}|${x.toFixed(0)},${y.toFixed(0)}|${a.toFixed(2)}|${cardA.toFixed(2)}|${qv.style.opacity}|${rp>0&&rp<1?rp.toFixed(2):0}|${tw}`;}
 window.DEMO={init,seek,get total(){return TOTAL},get starts(){return STARTS}};
 </script>
 </body></html>
