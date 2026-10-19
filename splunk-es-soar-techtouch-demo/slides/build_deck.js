@@ -1,13 +1,15 @@
 // 事前説明資料（PowerPoint）を作る。架空のシナリオ・イメージデモの説明で、お客様固有の内容は入れない。
 // 使い方（このフォルダで）:
 //   npm install pptxgenjs@3.12.0
-//   node build_deck.js            → M365乗っ取り対応デモ_事前説明.pptx
+//   node build_deck.js            → M365乗っ取り対応デモ_事前説明.pptx（16枚）
+//   node build_deck.js --short    → M365乗っ取り対応デモ_事前説明_短縮版.pptx（4枚。デモの直前に使う）
 // 体裁はテックタッチの資料に合わせる：青 055BB8／0876E8、淡い青の要点帯 EEF7FD、文字 1F2A37、枠線 D6DDE5、
 // 強調の橙 C86A00、書体 Yu Gothic、角の無い四角、左上の小見出し・題名・要点帯・青い見出し帯の付いた枠。
 const path = require("path");
 const pptxgen = require("pptxgenjs");
 
-const OUT = process.env.OUT || path.join(__dirname, "M365乗っ取り対応デモ_事前説明.pptx");
+const SHORT = process.argv.includes("--short");
+const OUT = process.env.OUT || path.join(__dirname, SHORT ? "M365乗っ取り対応デモ_事前説明_短縮版.pptx" : "M365乗っ取り対応デモ_事前説明.pptx");
 const IMG = (n) => path.join(__dirname, "img", n);
 const APPLY_THEME = process.env.APPLY_THEME; // pptx スキルの scripts/apply_theme.js（無ければテーマ色の書き込みを省く）
 
@@ -33,7 +35,7 @@ const GRAYHEAD = "8A96A6"; // 範囲外の見出し
 const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE"; // 13.333 x 7.5 in
 pres.theme = { headFontFace: THEME.headFontFace, bodyFontFace: THEME.bodyFontFace };
-pres.title = "M365アカウント乗っ取り対応デモ 事前説明";
+pres.title = "M365アカウント乗っ取り対応デモ 事前説明" + (SHORT ? "（短縮版）" : "");
 pres.subject = "Splunk ES＋UEBA＋SOAR × テックタッチ（DAP＋AI Hub）イメージデモの事前説明";
 pres.author = "テックタッチ";
 pres.company = "テックタッチ株式会社";
@@ -106,7 +108,7 @@ async function setJapaneseFont(file, face) {
   fs.writeFileSync(file, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
 }
 
-(async () => {
+async function buildFull() {
   /* ===== 1. 表紙 ===== */
   pres.addSection({ title: "はじめに" });
   {
@@ -450,6 +452,123 @@ async function setJapaneseFont(file, face) {
     s.addNotes("最後に、次の一歩です。事前の6項目を伺い、デモで5つの問いを一緒に確かめ、最初に測る作業を一つ決めます。");
   }
 
+}
+
+/* ==================== 短縮版（4枚）：デモの直前の説明 ==================== */
+async function buildShort() {
+  /* ----- 1. 表紙 ----- */
+  {
+    const s = pres.addSlide({ masterName: "TITLE" });
+    s.addText("M365アカウント\n乗っ取り対応デモ\nのご説明", { placeholder: "title" });
+    s.addText("Splunk ES＋UEBA＋SOAR ×\nテックタッチ（DAP＋AI Hub）", { placeholder: "body" });
+    text(s, "入っているSplunkを、社内の人が\n判断・承認・記録まで使い切る", { x: 5.75, y: 2.45, w: 7.1, h: 1.05, fontSize: 22, bold: true, color: C.accent1, objectName: "headline" });
+    text(s, bullets(["架空のA社を舞台にした、一般的なSOC事案の型（M365アカウントの乗っ取り）", "デモは9場面（36分）＋振り返り（1分）"]), { x: 5.75, y: 3.75, w: 7.1, h: 0.9, fontSize: 15, objectName: "headline-points" });
+    text(s, "テックタッチ株式会社\n2026年10月\n架空のシナリオ・イメージデモです。特定の企業や事案を題材にしたものではありません。", { x: 5.75, y: 5.5, w: 7.1, h: 0.9, fontSize: 12, color: C.accent5, objectName: "meta" });
+    s.addNotes("デモの前に、3枚で前提をご説明します。架空のA社を舞台にした、一般的なSOC事案の型のシナリオです。");
+  }
+
+  /* ----- 2. お見せすること ----- */
+  {
+    const s = content("デモの前に", "このデモでお見せすること", "製品を足す話ではない。入っているES・UEBA・SOARを、社内の人がノータブルの後の判断・承認・記録まで使い切る姿を見せる");
+    const steps = [["① フィッシング", "取引先を装ったリンク"], ["② セッション奪取", "AiTM型の想定"], ["③ 不審なサインイン", "深夜・国外・ASN"], ["④ 外部転送ルール", "受信トレイのルール"], ["⑤ 大量ダウンロード", "SharePointから1,200件"], ["⑥ 社内へ拡散", "380名へリンク付きメール"]];
+    const gap = 0.26, sw = (CW - 5 * gap) / 6;
+    text(s, "題材：M365アカウントの乗っ取り（架空のA社）", { x: M, y: 2.12, w: CW, h: 0.3, fontSize: 13, bold: true, objectName: "theme-head" });
+    steps.forEach((st, i) => {
+      const x = M + i * (sw + gap);
+      card(s, x, 2.48, sw, 0.9, st[0], "step-" + i, i < 2 ? GRAYHEAD : C.accent2);
+      text(s, st[1], { x: x + 0.1, y: 2.9, w: sw - 0.2, h: 0.42, fontSize: 12, valign: "middle", objectName: "step-body-" + i });
+      if (i < steps.length - 1) s.addShape(pres.shapes.CHEVRON, { x: x + sw + 0.07, y: 2.78, w: 0.12, h: 0.3, fill: { color: C.accent6 }, line: { type: "none" }, objectName: "step-arrow-" + i });
+    });
+    sq(s, M, 3.48, 2 * sw + gap, 0.4, C.background2, null, "scope-out");
+    text(s, "範囲外（入口の防止）", { x: M, y: 3.48, w: 2 * sw + gap, h: 0.4, fontSize: 12, color: C.accent5, align: "center", valign: "middle", objectName: "scope-out-text" });
+    sq(s, M + 2 * (sw + gap), 3.48, 4 * sw + 3 * gap, 0.4, C.accent1, null, "scope-in");
+    text(s, "デモの範囲：速く気づき、社内で止め、範囲を確定し、記録する", { x: M + 2 * (sw + gap), y: 3.48, w: 4 * sw + 3 * gap, h: 0.4, fontSize: 13, bold: true, color: C.background1, align: "center", valign: "middle", objectName: "scope-in-text" });
+    const cards = [
+      ["①　ノータブルの後を、社内で進める", "「本人の利用か」を本人と上長に確かめ、チェックリストが埋まるまで封じ込めに進まない"],
+      ["②　承認段階を決めて、SOARを動かす", "①②は担当者が即時、③はSOC責任者、④はCSIRT責任者。承認番号をプレイブックに残す"],
+      ["③　範囲・記録・改善を、社内に残す", "乗っ取られた間の操作と他アカウントを確定し、検知条件・承認段階・記録をナレッジにする"]
+    ];
+    const cw = (CW - 2 * 0.2) / 3;
+    cards.forEach((c, i) => {
+      const x = M + i * (cw + 0.2);
+      card(s, x, 4.12, cw, 1.75, c[0], "point-" + i);
+      text(s, c[1], { x: x + 0.12, y: 4.6, w: cw - 0.24, h: 1.15, fontSize: 13, objectName: "point-body-" + i });
+    });
+    text(s, "デモが置く仮説（確認必要）：ノータブルは出たが、本人確認の手順と承認者が社内に無く、委託先待ちで一次対応が4時間止まる", { x: M, y: 6.0, w: CW, h: 0.45, fontSize: 13, bold: true, color: C.accent4, valign: "middle", objectName: "hypo" });
+    foot(s, "委託先の夜間監視・高度な分析・フォレンジックは、これまでどおりです。件数・時刻はデモ用の架空の値です。");
+    s.addNotes("製品を足す提案ではありません。入っているES・UEBA・SOARを、社内の人が判断・承認・記録まで使い切る提案です。入口のフィッシングを防ぐ話はしません。委託先の仕事を取り上げる話でもありません。");
+  }
+
+  /* ----- 3. 流れと見どころ ----- */
+  {
+    const s = content("デモの前に", "デモの流れと見どころ", "SOC担当者の山田さん（架空）が、9場面で検知から記録・改善までを一人で進める。見せ場はS5の一次対応とS6の封じ込め");
+    const sc = [
+      ["S0　現場の問題", "2分", "依頼カードと5つの成果物"], ["S1　Before", "3分", "ノータブルが4時間未割当"], ["S2　要件整理", "4分", "日本語の依頼をAI Hubが整理"],
+      ["S3　相関検索案・照合", "5分", "Assistantの案をD-02と照合"], ["S4　検証・保存", "5分", "テストログで検証して保存"], ["S5　一次対応", "5分", "本人・上長に確認し、チェックリスト"],
+      ["S6　封じ込め", "4分", "承認段階どおりにSOARを実行"], ["S7　範囲の確定・記録", "5分", "操作と他アカウントを確定し記録"], ["S8　改善", "3分", "ナレッジと役割分担を更新"]
+    ];
+    const lw = 8.05, cw = (lw - 2 * 0.15) / 3, ch = 1.38;
+    sc.forEach((c, i) => {
+      const x = M + (i % 3) * (cw + 0.15), y = 2.25 + Math.floor(i / 3) * (ch + 0.14);
+      const key = /^S[56]/.test(c[0]), hub = /^S[238]/.test(c[0]);
+      card(s, x, y, cw, ch, c[0], "scene-" + i, key ? C.accent1 : hub ? HUB : C.accent2);
+      text(s, c[1], { x: x + cw - 0.75, y, w: 0.65, h: 0.38, fontSize: 12, bold: true, color: C.background1, align: "right", valign: "middle", objectName: "scene-time-" + i });
+      text(s, c[2], { x: x + 0.12, y: y + 0.48, w: cw - 0.24, h: 0.55, fontSize: 12, objectName: "scene-desc-" + i });
+      if (key) text(s, "見せ場", { x: x + 0.12, y: y + ch - 0.36, w: cw - 0.24, h: 0.28, fontSize: 11, bold: true, color: C.accent4, objectName: "scene-key-" + i });
+    });
+    const rx = M + lw + 0.25, rw = W - M - rx;
+    card(s, rx, 2.25, rw, 4.42, "画面に残す5つの成果物", "goals", C.accent1);
+    const goals = ["社内基準D-02の相関検索", "一次対応のチェックリスト", "封じ込めの承認段階", "範囲の確定と記録", "ナレッジと役割分担"];
+    goals.forEach((g, i) => {
+      const y = 2.72 + i * 0.66;
+      sq(s, rx + 0.18, y, 0.5, 0.5, C.accent3, null, "goal-num-bg-" + i);
+      text(s, "①②③④⑤"[i], { x: rx + 0.18, y, w: 0.5, h: 0.5, fontSize: 15, bold: true, color: C.accent1, align: "center", valign: "middle", objectName: "goal-num-" + i });
+      text(s, g, { x: rx + 0.82, y, w: rw - 1.0, h: 0.5, fontSize: 14, bold: true, valign: "middle", objectName: "goal-name-" + i });
+    });
+    text(s, "デモの成否は、この5つが画面に残るかで判断します。", { x: rx + 0.18, y: 6.08, w: rw - 0.36, h: 0.45, fontSize: 12, color: C.accent5, objectName: "goals-note" });
+    foot(s, "見出しが淡い青の場面（S2・S3・S8）はAI Hubが中心、濃い青の場面（S5・S6）が見せ場です。");
+    s.addNotes("各場面の終わりに「伺いたいこと」を一つ出します。時間が限られる場合は、S1・S5・S6を中心に短くできます。");
+  }
+
+  /* ----- 4. ご覧いただく前に ----- */
+  {
+    const s = content("デモの前に", "ご覧いただく前に", "画面・人物・数値はすべて架空です。デモの中で、右の問いを御社に当てはめてご覧ください");
+    const lw = 5.9, rx = M + lw + 0.25, rw = W - M - rx;
+    card(s, M, 2.25, lw, 4.42, "デモの前提", "premise");
+    const pre = [
+      ["架空のシナリオ", "特定の企業や事案を題材にしていません"],
+      ["画面はイメージ", "ES・SOARの実画面ではありません。画面名は版で異なる場合あり"],
+      ["AIの回答は準備した例", "Assistantは参考画面、AI Hubは構想と例文です"],
+      ["ガイドは案", "ガイド・入力チェックは、御社の手順に合わせて作ります"],
+      ["数値の約束はしない", "効果は、封じ込めまでの時間などの4つの指標で確かめます"]
+    ];
+    pre.forEach((p, i) => {
+      const y = 2.72 + i * 0.78;
+      if (i > 0) s.addShape(pres.shapes.LINE, { x: M + 0.15, y: y - 0.08, w: lw - 0.3, h: 0, line: { color: C.accent6, width: 0.75 }, objectName: "premise-sep-" + i });
+      text(s, p[0], { x: M + 0.18, y, w: lw - 0.36, h: 0.3, fontSize: 13, bold: true, color: C.accent1, objectName: "premise-head-" + i });
+      text(s, p[1], { x: M + 0.18, y: y + 0.3, w: lw - 0.36, h: 0.36, fontSize: 12, objectName: "premise-body-" + i });
+    });
+    card(s, rx, 2.25, rw, 4.42, "デモの中で考えていただきたい問い", "questions", C.accent1);
+    const qs = [
+      "ノータブルの後の一次対応は、委託先のチケットを待つ形ですか",
+      "検知ルールや閾値を変えるとき、委託先の見積もりと改修を待ちますか",
+      "SOARが「いつ・何を・誰の承認で」動くかを、社内で説明できますか",
+      "過去の事案の調査記録と判断理由は、社内が読める場所にありますか",
+      "直近の事案の発見は、自社の検知でしたか、外部からでしたか"
+    ];
+    qs.forEach((q, i) => {
+      const y = 2.75 + i * 0.78;
+      sq(s, rx + 0.18, y + 0.04, 0.6, 0.55, C.accent1, null, "q-num-bg-" + i);
+      text(s, "Q" + (i + 1), { x: rx + 0.18, y: y + 0.04, w: 0.6, h: 0.55, fontSize: 13, bold: true, color: C.background1, align: "center", valign: "middle", objectName: "q-num-" + i });
+      text(s, q, { x: rx + 0.92, y: y + 0.04, w: rw - 1.1, h: 0.55, fontSize: 13, valign: "middle", objectName: "q-text-" + i });
+    });
+    foot(s, "答えにくい問いが、デモで一緒に確かめたいところです。場面の終わりごとに伺います。");
+    s.addNotes("デモの前提です。画面はイメージで、実画面ではありません。数字や人物はすべて架空です。デモの中で、この5つの問いを御社に当てはめてご覧ください。");
+  }
+}
+
+(async () => {
+  if (SHORT) await buildShort(); else await buildFull();
   await pres.writeFile({ fileName: OUT });
   if (APPLY_THEME) {
     const { applyTheme } = require(APPLY_THEME);
