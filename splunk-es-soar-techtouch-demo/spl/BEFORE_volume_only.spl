@@ -1,0 +1,5 @@
+| inputlookup demo_m365_audit.csv
+| where action="download"
+| stats sum(record_count) AS downloads BY user
+| where downloads>=500
+| sort - downloads

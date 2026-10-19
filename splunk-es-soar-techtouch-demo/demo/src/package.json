@@ -1,0 +1,22 @@
+{
+  "name": "splunk-techtouch-siem-demo-ui",
+  "private": true,
+  "description": "Splunk公式UIツールキット（Apache-2.0）でイメージデモの画面を組み、1ファイルのHTMLにまとめる",
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "node test_demo.js"
+  },
+  "dependencies": {
+    "@splunk/react-icons": "5.16.0",
+    "@splunk/react-ui": "5.17.0",
+    "@splunk/themes": "1.13.0",
+    "@splunk/visualization-context": "28.9.1",
+    "@splunk/visualizations": "28.9.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "styled-components": "5.3.11"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2"
+  }
+}

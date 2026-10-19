@@ -1,0 +1,9 @@
+| inputlookup demo_m365_audit.csv
+| eval epoch=strptime(event_time,"%Y-%m-%d %H:%M:%S"), request_id=if(request_id="",null(),request_id)
+| lookup demo_m365_baseline.csv user OUTPUT usual_geo usual_asn
+| sort 0 user epoch
+| eval odd_signin=if(action="signin" AND (geo!=usual_geo OR asn!=usual_asn), epoch, null())
+| streamstats latest(odd_signin) AS last_odd BY user
+| where action IN ("inbox_rule","download","send_mail") AND isnotnull(last_odd) AND epoch-last_odd<=3600
+| stats sum(eval(if(action="download",record_count,0))) AS downloads count(eval(action="inbox_rule" AND scope="external")) AS external_rules sum(eval(if(action="send_mail",record_count,0))) AS sent_mails values(request_id) AS request_id min(event_time) AS first_access max(event_time) AS last_access BY user src
+| where downloads>=500 AND external_rules>=1 AND isnull(request_id)

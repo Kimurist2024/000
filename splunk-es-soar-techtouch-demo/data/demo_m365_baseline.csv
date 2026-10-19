@@ -1,0 +1,8 @@
+user,usual_geo,usual_asn,role,dept
+r.ito,国内,AS64496,一般,経理部
+y.kato,国内,AS64496,一般,総務部
+h.mori,国内,AS64496,一般,企画部
+s.tanaka,国内,AS64496,一般,営業部
+m.suzuki,国内,AS64496,一般,営業部
+it_admin01,国内,AS64496,管理者,情報システム部
+ext_mig02,国内,AS64496,委託先（移行作業）,委託先

@@ -2,7 +2,7 @@
 """Splunk公式UI部品版のイメージデモを1ファイルのHTMLに組み立てる。
 使い方: cd demo/src && npm install && python3 build.py   → ../index.html を書き出す
 公開してはいけない文言は DEMO_FORBID（カンマ区切り）で確かめる。"""
-import os, subprocess, sys
+import os, re, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = HERE
 DIST = os.path.join(HERE, "dist")
@@ -17,8 +17,10 @@ html = ("<!DOCTYPE html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\n"
         "<title>Splunk Cloud×テックタッチ SIEM/SOC活用デモ（イメージ）</title>\n<style>\n" + css + "\n</style>\n</head>\n<body>\n" +
         rd(os.path.join(SRC, "body.html")).strip("\n") + "\n\n<script>\n" + js + "\n</script>\n</body>\n</html>\n")
+# 同梱したJavaScriptでは日本語が \uXXXX の形に変換されるため、元の文字に戻してから調べる
+plain = re.sub(r"\\u([0-9a-fA-F]{4})", lambda m: chr(int(m.group(1), 16)), html)
 for bad in [b for b in os.environ.get("DEMO_FORBID", "").split(",") if b]:
-    assert bad not in html, bad
+    assert bad not in plain, bad
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 open(OUT, "w", encoding="utf-8").write(html)
 print("ok", len(html.encode("utf-8")), "->", OUT)

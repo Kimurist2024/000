@@ -1,0 +1,51 @@
+# Splunk ES＋UEBA＋SOAR × テックタッチ（DAP＋AI Hub）M365アカウント乗っ取り対応デモ：シナリオと素材
+
+架空のA社のSOCが、Microsoft 365 アカウントの乗っ取り（AiTM型フィッシングの想定）を、入っているSplunk（Enterprise Security・UEBA・SOAR）と、Splunk AI Assistant・テックタッチ（DAP＋AI Hub）で、検知から一次対応・封じ込め・範囲の確定・記録・改善まで社内で回すシナリオとイメージデモです。
+
+- どの組織でも起きうる一般的なSOC事案の型を題材にした架空のものです。特定の企業や事案を題材にしたものではありません。画面・人物・企業名・手順・数値はすべて架空です。
+- 製品を足す提案ではなく、入っているES・UEBA・SOARを社内の人が判断・承認・記録まで使い切る提案です。委託先を外す話ではありません。
+- 既存の「Splunk Cloud＋SSE版」（`../splunk-techtouch-siem-demo/`）のS2〜S4・S7〜S8の型を流用し、画面をES・UEBA・SOARに差し替えています。
+
+## 使う順番
+
+1. `scenario.md` の0章（結論）と1章（事案の型と仮説）を読む。
+2. 4章（デモ台本）と `demo/index.html` を並べて、場面ごとの見せ場と合格判定を確かめる。
+3. 6章のSPLと検算（`verify/simulate_spl.py`）で、期待値が一致することを確かめる。
+4. 9章（先に確かめること）を、お客様との最初の面談の前に埋める。
+5. 10章（言ってはいけないこと）を、話し手全員で共有する。
+
+## イメージデモ
+
+`demo/index.html` をブラウザで開くだけで動きます（1ファイル、外部通信なし）。S0〜S8の9場面と振り返り。画面の部品はSplunk公式のUIツールキット（npm `@splunk/react-ui`・`@splunk/visualizations` ほか、Apache-2.0）で組んでいますが、ES（Incident Review、Content Management）・UEBA・SOARの実画面を写したものではなく、公開されている画面構成を手本にした「風」の再現です。
+
+- キー操作：→ 次へ／← 戻る／1〜9 場面の切り替え／0 振り返り／N 進行メモ（発表者用）／R この場面を最初から。
+- 右側のパネルがテックタッチのガイド（案）、紫の枠がAI Hub（構想・例文）、右の縦長パネルがSplunk AI Assistant（参考画面）です。
+- 作り直し方：`cd demo/src && npm install && python3 build.py`（Node 18以上、Python 3）。動作確認：`node test_demo.js`（PlaywrightとChromiumが要る。`PLAYWRIGHT_MODULE` でモジュールの場所を指定できる）。
+- 公開してはいけない文言は、環境変数 `DEMO_FORBID`（カンマ区切り）で `build.py` が検査します。一覧はリポジトリに置きません。
+
+## 動画版
+
+`demo/video/splunk-es-soar-techtouch-demo.mp4`（1920×1080、H.264）。イメージデモを台本どおりに自動操作して撮影したものです。表紙、仮説、流れ、S0〜S8、振り返り、言わないこと、クロージングの順で、各場面の終わりに「伺いたいこと」を出します。
+
+- 作り直し方：`cd demo/video && npm install` のあと、`NODE_PATH="$(npm root -g)" FFMPEG=/path/to/ffmpeg node record.js`（PlaywrightとChromium、libx264を含むffmpegが要る）。
+- 確認だけなら `CHECK=1` を付けて実行すると、動画を作らずに要所の画像を `demo/video/checks/` に保存します（1分ほど）。
+- 字幕と操作の順番は `demo/video/record.js` 末尾の「台本」で直します。日本語は Noto Sans JP に固定しています（中国語の字形が混ざらないため）。
+
+## 検算
+
+```
+python3 -I verify/make_data.py      # data/ のCSVを決め打ちで再生成（架空）
+python3 -I verify/simulate_spl.py   # Q0〜Q4b と不十分な例の期待値をPythonで計算（ALL OK が出る）
+```
+
+Splunk実機での実行結果ではありません。実機での確認（M365の監査ログの実際の操作名、CSVルックアップの空値の扱い、相関検索の作成画面、SOARのプレイブック）は構築時にSEが行います。
+
+## セキュリティ
+
+- ログ内の接続元IPは文書用の予約アドレス（RFC 5737）、ASNは文書用の番号（RFC 5398）です。アカウント名・企業名・申請番号・チケット番号は架空です。
+- お客様の環境・データ・事案は使いません。お客様固有の内容はこのリポジトリに置きません。
+- AI Hubは外部のAIサービスを利用します。調査記録には個人情報が含まれうるため、渡す情報の範囲はお客様の方針で先に決めます。デモは架空データだけです。
+
+## 版
+
+- 1.1（2026年10月19日）：題材を一般的なSOC事案の型（M365アカウントの乗っ取り）にしたシナリオ、固定テストログ、SPLと検算、AI Hubのナレッジ（KB01〜KB08、P1〜P8）、Splunk公式UI部品版のイメージデモ、動画版。
