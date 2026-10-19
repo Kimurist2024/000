@@ -25,7 +25,7 @@
 
 ## 動画版
 
-`demo/video/splunk-es-soar-techtouch-demo.mp4`（1920×1080、H.264、約9分50秒）。イメージデモを台本どおりに自動操作して撮影したものです。表紙、仮説、流れ、S0〜S8、振り返り、言わないこと、クロージングの順で、各場面の終わりに「伺いたいこと」を出します。
+`demo/video/splunk-es-soar-techtouch-demo.mp4`（1920×1080、H.264、9分52秒、約43MB）。イメージデモを台本どおりに自動操作して撮影したものです。表紙、仮説、流れ、S0〜S8、振り返り、言わないこと、クロージングの順で、各場面の終わりに「伺いたいこと」を出します。
 
 - 作り直し方：`cd demo/video && npm install` のあと、`NODE_PATH="$(npm root -g)" FFMPEG=/path/to/ffmpeg node record.js`（PlaywrightとChromium、libx264を含むffmpegが要る）。
 - 確認だけなら `CHECK=1` を付けて実行すると、動画を作らずに要所の画像を `demo/video/checks/` に保存します（1分ほど）。

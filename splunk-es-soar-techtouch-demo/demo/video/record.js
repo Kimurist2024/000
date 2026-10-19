@@ -722,7 +722,7 @@ async function main() {
     "-y", "-hide_banner", "-loglevel", "error",
     "-f", "concat", "-safe", "0", "-i", listFile,
     "-vf", "fps=" + FPS + ",format=yuv420p",
-    "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-tune", "stillimage",
+    "-c:v", "libx264", "-preset", "slow", "-crf", "21", "-tune", "stillimage",
     "-movflags", "+faststart", OUT
   ], { stdio: "inherit" });
   console.log("frames:", frames.length, "->", OUT);
