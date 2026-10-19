@@ -310,5 +310,6 @@ M365アカウントの乗っ取りの一般的な流れ（1.1）は、特定の�
 | `demo/index.html` | イメージデモ（1ファイル。Splunk公式UI部品版） |
 | `demo/src/` | デモのソース（`npm install` → `python3 build.py`、`node test_demo.js`） |
 | `demo/video/` | 動画版と撮影スクリプト |
+| `slides/` | 事前説明資料（PowerPoint、16枚）と作成スクリプト |
 
 既存の「Splunk Cloud＋SSE版」との関係：S2（AI Hubの要件整理）、S3（Assistantの照合）、S4（テストログでの検証）、S7（一次調査）、S8（記録・改善）の型を流用し、画面をES（Incident Review、Content Management）・UEBA・SOARに差し替えました。既存シナリオの付録B「ESをお使いのお客様向けの差し替え」を、この版で具体化しています。
