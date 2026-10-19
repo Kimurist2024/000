@@ -9,7 +9,8 @@ const path = require('path');
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
   page.on('pageerror', e => console.log('pageerror:', e.message));
-  await page.goto('file://' + path.resolve(html));
+  const [file, query] = html.split('?');
+  await page.goto('file://' + path.resolve(file) + (query ? '?' + query : ''));
   const total = await page.evaluate(() => window.DEMO.init());
   const n = Math.round(total * fps);
   const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'png', '-i', '-',
@@ -21,7 +22,7 @@ const path = require('path');
   for (let i = 0; i < n; i++) {
     const sig = await page.evaluate(t => window.DEMO.seek(t), i / fps);
     if (sig !== lastSig) {
-      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(() => Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode().catch(() => 0))]));
       lastBuf = await page.screenshot({ type: 'png' });
       lastSig = sig; shots++;
     }

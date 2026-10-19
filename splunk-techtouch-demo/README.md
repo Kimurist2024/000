@@ -23,3 +23,14 @@ node record.js demo.html splunk-techtouch-demo.mp4 30
 ```
 
 台本は `demo.html` の `/* storyboard */` 部分（`S(秒数, {...})`）を編集します。
+
+## 実画面版（第3章）
+
+第3章だけを、Splunk Cloud の実画面と実機のテックタッチで撮り直せます。第1・2章（ITSI・IT Essentials Work）はデモ環境にないため、架空画面のままです。
+
+1. `real/CLAUDE_FOR_CHROME.md` の「貼り付ける指示」を、Splunk Cloud のタブの Claude for Chrome に貼る（サンプルログの投入、ひな型レポートの保存、テックタッチのガイド作成、撮影する場面の表示まで）。
+2. 撮影した `r01.png`〜`r09.png` を `real/shots/` に置く。
+3. `demo.html` の `REAL_BOXES` に、カーソルを当てる要素の位置（画像上のピクセル）を入れる。
+4. `node record.js "demo.html?real" splunk-techtouch-demo-real.mp4 30` で書き出す。
+
+サンプルログは `makeresults` と `collect` で作る架空データです。生成の条件は Python で再現して、10:00 から DB_CONN_TIMEOUT、10:05 から POOL_EXHAUSTED が増えることを確認しています（Splunk 実機での実行結果ではありません）。

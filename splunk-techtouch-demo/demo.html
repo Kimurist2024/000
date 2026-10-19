@@ -16,6 +16,7 @@ body{font-family:"Noto Sans JP","IPAGothic",sans-serif;color:var(--ink);-webkit-
 #stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:#f6f7f9}
 #scene,#q,#ov{position:absolute;inset:0}
 #ov{z-index:10}#q{z-index:15}
+.shotc{position:absolute;left:24px;top:12px;border:1px solid #d0d5dc;border-radius:6px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);background:#fff}.shotc img{display:block}.shotc .bx{position:absolute}
 .mono{font-family:"JetBrains Mono","Noto Sans JP",monospace}
 
 /* chapter bar + header */
@@ -239,6 +240,7 @@ table{border-collapse:collapse;width:100%}
 <svg id="cursor" viewBox="0 0 30 30"><path d="M3,2 L3,25 L9,19.5 L13,28 L16.6,26.4 L12.7,18 L20.5,18 Z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
 <script>
 const NOTE='構想デモ｜画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。';
+const NOTE_REAL='Splunk Cloud の実画面（デモ環境）｜ログ・サービス名・人物は架空です。AI Hub欄は例文（構想）です。';
 const SEVC={critical:'var(--critical)',high:'var(--high)',medium:'var(--medium)',low:'var(--low)',normal:'var(--normal)',info:'var(--info)'};
 const SEVN={critical:'Critical',high:'High',medium:'Medium',low:'Low',normal:'Normal',info:'Info'};
 const sev=s=>`<span class="sev" style="background:${SEVC[s]}">${SEVN[s]}</span>`;
@@ -277,6 +279,10 @@ function abar(st){
  else{an='Search & Reporting';nav=[['Search',st.sv!=='reports'],['Analytics'],['Datasets'],['Reports',st.sv==='reports','navReports'],['Alerts'],['Dashboards']];}
  return `<div class="abar">${nav.map(n=>`<span class="nv ${n[1]?'on':''}" ${n[2]?`data-k="${n[2]}"`:''}>${n[0]}</span>`).join('')}<span class="an">${an}</span></div>`;}
 function win(st){
+ if(st.view==='shot'){const sz=IMGSZ[st.shot]||{w:1280,h:800},H=720,W=Math.round(sz.w*H/sz.h);
+  const bx=Object.entries(REAL_BOXES[st.shot]||{}).map(([k,b])=>`<div class="bx" data-k="${k}" style="left:${b[0]/sz.w*W}px;top:${b[1]/sz.h*H}px;width:${b[2]/sz.w*W}px;height:${b[3]/sz.h*H}px"></div>`).join('');
+  return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>Splunk Cloud Platform 実画面（デモ環境・架空データ）　テックタッチ（実機）</span></div>
+  <div class="wbody" style="top:40px"><div class="shotc" style="width:${W}px;height:${H}px"><img src="${SHOTDIR}${st.shot}" style="width:${W}px;height:${H}px">${bx}${st.chat?`<div style="position:absolute;left:20px;right:20px;top:70px">${chat(CHATS[st.chat])}</div>`:''}</div>${tt(st.tt)}</div></div>`;}
  const top=st.view==='launcher'?86:130;
  return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>監視画面（架空）　Splunk の画面イメージを踏襲</span></div>
  <div class="sbar"><div class="slogo">Splunk Cloud Platform<small>画面イメージ</small></div><span class="it">Apps ▾</span><div class="rt"><span>Messages ▾</span><span>Settings ▾</span><span>Activity ▾</span><span>Help ▾</span><span class="find">Find</span></div></div>
@@ -381,7 +387,8 @@ function tt(t){
  if(!t)return '';
  const ai=t.kind==='ai';
  let h=`<div class="ttp ${ai?'ai':''}" data-k="ttp"><span class="chip">${ai?'テックタッチ＋AI Hub':'テックタッチ'}</span><span class="lbl">${t.lbl||'ガイド（案）'}</span><h3>${t.title}</h3>`;
- if(t.mode==='list'){h+=`<div class="dsc">${t.dsc}</div>${t.items.map((it,i)=>`<div class="git ${i===0?'on':''}"><b>${it[0]}</b><span>${it[1]}</span></div>`).join('')}`;}
+ if(t.mode==='aionly'){if(t.ai)h+=`<div class="aibox"><b>AI Hub（例文）</b>${t.ai}</div>`;if(t.asst)h+=`<div class="asst">${t.asst}</div>`;}
+ else if(t.mode==='list'){h+=`<div class="dsc">${t.dsc}</div>${t.items.map((it,i)=>`<div class="git ${i===0?'on':''}"><b>${it[0]}</b><span>${it[1]}</span></div>`).join('')}`;}
  else{
   h+=`<ul class="steps">${t.steps.map((s,i)=>`<li class="${t.cur==null||i<t.cur||t.mode==='done'?(t.cur==null&&t.mode!=='done'?'':'ok'):i===t.cur?'cur':''}"><span class="d">${(t.cur!=null&&i<t.cur)||t.mode==='done'?'✓':i+1}</span>${s}</li>`).join('')}</ul>`;
   if(t.msg)h+=`<div class="msg">${t.msg}</div>`;
@@ -394,7 +401,7 @@ function tt(t){
   if(t.asst)h+=`<div class="asst">${t.asst}</div>`;
  }
  if(t.note)h+=`<div class="note">${t.note}</div>`;
- h+=`<div class="btns"><span class="btn2">戻る</span><span class="btn1" data-k="ttBtn">${t.btn}</span></div></div>`;
+ h+=t.btn?`<div class="btns"><span class="btn2">戻る</span><span class="btn1" data-k="ttBtn">${t.btn}</span></div></div>`:'</div>';
  return h;}
 
 /* ---------- popups ---------- */
@@ -435,6 +442,28 @@ function card(c){
 function qhtml(q){return `<div class="qbg"></div><div class="qcard"><span class="chip" style="${q.ai?'background:var(--ai)':''}">伺いたいこと</span><h1>${q.t}</h1></div>`;}
 
 /* ---------- storyboard ---------- */
+
+/* ---------- real-screen chapter 3 (demo.html?real) ---------- */
+const REAL=new URLSearchParams(location.search).has('real');
+const SHOTDIR='real/'+(new URLSearchParams(location.search).get('real')||'shots')+'/';
+// Element boxes per screenshot, in screenshot pixels [x,y,w,h]. Filled in after the real screenshots arrive.
+const REAL_BOXES={};
+const IMGSZ={};
+const aiOnly=(t,o={})=>Object.assign({kind:'ai',mode:'aionly',lbl:'構想',title:'AI Hub欄（例文）',ai:t},o);
+function realCh3(){
+ S(5,{card:{type:'chapter',ai:1,sm:'第3章・デモ③・仮説3　作成・修正で止まる',h:'10:30　ログを調べて、原因の手がかりを専門チームに渡す',sup:'支援：テックタッチ（実機）＋AI Hub（構想）',fn:'第3章は Splunk Cloud Platform の実画面（デモ環境）です。ログはデモ用に生成した架空データです。'}});
+ S(7,{card:null,ch:2,view:'shot',shot:'r01.png',chat:'exp',tt:null,cur:'guideStart',c1:'専門チーム（架空）から、接続エラーの推移をログで確認するよう依頼がありました。'});
+ S(6,{shot:'r02.png',chat:null,cur:'reports',click:true,c1:'① SPLを一から書かずに、専門チームが保存したひな型（レポート）を使います。',note:null});
+ S(7,{shot:'r03.png',cur:'openInSearch',click:true,c1:'② 確認済みのひな型を、検索画面で開きます。'});
+ S(8.5,{shot:'r04.png',tt:aiOnly('1行目：契約照会サービスの ERROR ログに絞ります。\n2行目：メッセージに「connection」を含むものに絞ります。\n3行目：5分ごとの件数を、エラーの種類（error_code）別に数えます。'),cur:'spl',c1:'③ 検索の中身（SPL）を確認します。AI Hub欄が1行ずつ説明します（例文）。'});
+ S(6.5,{shot:'r05.png',tt:null,cur:'timepicker',click:true,c1:'④ 時間範囲を、障害の開始（10:02）を含む 09:30〜10:30 にします。'});
+ S(8.5,{shot:'r06.png',tt:aiOnly('結果の見方：10:00台から DB_CONN_TIMEOUT が増え、10:05 以降は POOL_EXHAUSTED も出ています。第2章で確認した接続数の増加（09:58〜）と、時間帯が合っています。',{note:'原因は、この画面だけでは特定できません。'}),cur:'chart',c1:'⑤ 10時台から接続エラーが増えています。第2章で見た時間帯と合っているかを確かめます。',note:'原因はこの画面だけでは特定できません。'});
+ S(6.5,{shot:'r07.png',tt:null,cur:'share',click:true,c1:'⑥ 結果を共有して、専門チームに確認を依頼します。',note:null});
+ S(6,{chat2:'rep',c1:'専門チームから返信が届きました。'});
+ S(6.5,{shot:'r08.png',chat2:null,cur:'saveAs',click:true,c1:'⑦ レポートとして保存し、運用チームに共有します。'});
+ S(7.5,{shot:'r09.png',tt:aiOnly('',{title:'このあと',ai:null,note:'デモのため、保存先と共有範囲は実環境で確認します。',asst:'SPLの作成・説明が必要な場合：利用条件を満たす Splunk AI Assistant の活用を含めて確認します。'}),c1:'保存したレポートを、次回の確認や再発時の比較に使います。'});
+ S(4.5,{q:{t:'ひな型選び、時間範囲の指定、結果の読み方のどこで手が止まりますか？',ai:1}});
+}
 const STEPS=[];
 const TRANS={hl:null,bal:null,tip:null,q:null,click:false,cur:null,drop:null,note:null};
 function S(d,s){STEPS.push({d,s});}
@@ -475,6 +504,7 @@ S(8,{pop:'contact',hl:'popOk',cur:'popOk',click:true,c1:'ステップ4：優先�
 S(7,{pop:null,tt:g2(4,{mode:'done',msg:'一次確認の4ステップが完了しました。',rec:[['10:18','概要を確認（E-0412 応答時間の悪化・In Progress）'],['10:19','影響範囲を確認（代理店ポータルの照会の一部 → 優先度「中」）'],['10:21','関連エンティティを確認（ctr-db-01 の接続数が上限付近。原因は未確定）'],['10:22','社内手順に沿って連絡（システム運用チーム・業務部門の窓口）']],note:'時刻・記録はすべて架空です。',btn:'第3章へ進む'}),cur:[1180,760],c1:'一次確認の4ステップが完了しました。パネルに、確認した内容の記録（例）を表示します。'});
 S(4.5,{q:{t:'障害時の一次確認で、人によって手順がばらつくのはどこですか？'}});
 // ---- chapter 3
+if(!REAL){
 S(5,{card:{type:'chapter',ai:1,sm:'第3章・デモ③・仮説3　作成・修正で止まる',h:'10:30　ログを調べて、原因の手がかりを専門チームに渡す',sup:'支援：テックタッチ＋AI Hub（案・構想）',fn:'AI Hub欄は事前に作成した例文です。'}});
 S(7,{card:null,ch:2,view:'search',sv:'home',tp:'Last 24 hours',chat:'exp',tt:{kind:'ai',mode:'list',lbl:'支援（構想）',title:'おすすめのガイド',dsc:'専門チームの依頼に合ったガイドを、ひな型の説明付きで表示します。',items:[['ログをひな型から調べる','7ステップ・目安5分（架空）'],['エラーの内訳を調べる','5ステップ・目安3分（架空）']],btn:'ガイドを開始'},hl:'ttBtn',ring:'ai',cur:'ttBtn',click:true,c1:'専門チーム（架空）から、接続エラーの推移をログで確認するよう依頼がありました。'});
 S(6,{tt:g3(0,{ttg:'助言のあった「接続エラーの推移（標準）」は、Reports に保存されています。'}),hl:'navReports',ring:'ai',bal:{t:'①「Reports」を開きます',s:'専門チームが作成したSPLのひな型が保存されています',p:'b',ai:1},cur:'navReports',click:true,c1:'① SPLを一から書かずに、専門チームが保存したひな型（Reports）を使います。'});
@@ -489,6 +519,7 @@ S(6,{chat2:'rep',tt:g3(6,{ttg:'専門チームから返信が届きました。'
 S(6.5,{chat2:null,tt:g3(6,{ttg:'「Save As」から、レポートとして保存します。次回は同じ条件ですぐに確認できます。'}),hl:'saveAs',ring:'ai',bal:{t:'⑦「Save As」から、レポートとして保存します',s:'保存して、運用チームに共有します',p:'l',ai:1},cur:'saveAs',click:true,c1:'⑦ レポートとして保存し、運用チームに共有します。'});
 S(7.5,{tt:g3(7,{mode:'done',msg:'保存して、運用チーム（架空）に共有しました。',note:'デモのため実際には保存していません。実環境では保存先と共有範囲を確認します。',asst:'SPLの作成・説明が必要な場合：利用条件を満たす Splunk AI Assistant の活用を含めて確認します。',btn:'振り返りへ'}),cur:[1100,800],c1:'保存したレポートを、次回の確認や再発時の比較に使います。'});
 S(4.5,{q:{t:'ひな型選び、時間範囲の指定、結果の読み方のどこで手が止まりますか？',ai:1}});
+}else realCh3();
 // ---- summary
 S(12,{card:{type:'summary'},cur:[1500,820],c1:'振り返り：問い合わせからログ分析までを、一つの業務の流れとして見ました。'});
 S(7,{c1:'回数はこのデモを操作した回数で、効果の数値ではありません。',note:'確かめ方は、自力完了率・所要時間・依頼件数・再実行です。'});
@@ -503,10 +534,10 @@ function buildStates(){let c={cur:null};STATES=[];STARTS=[];let t=0;
 function renderScene(st){
  if(st.card){scene.innerHTML=card(st.card);}
  else{let h=chbar(st.ch)+hdr(st.ch)+win(st);scene.innerHTML=h;
-  if(st.chat2){const m=scene.querySelector('.main');m.insertAdjacentHTML('beforeend',`<div style="position:absolute;left:26px;right:26px;top:70px;z-index:6">${chat(CHATS[st.chat2])}</div>`);}}
+  if(st.chat2){const m=scene.querySelector('.main')||scene.querySelector('.shotc');m.insertAdjacentHTML('beforeend',`<div style="position:absolute;left:26px;right:26px;top:70px;z-index:6">${chat(CHATS[st.chat2])}</div>`);}}
  qv.innerHTML=st.q?qhtml(st.q):'';
  const c1=capEl.querySelector('.c1'),c2=capEl.querySelector('.c2');
- if(st.c1&&(!st.card||st.card.type==='summary')){capEl.style.display='block';c1.textContent=st.c1;c2.textContent=(st.note?st.note+'　':'')+NOTE;}else capEl.style.display='none';
+ if(st.c1&&(!st.card||st.card.type==='summary')){capEl.style.display='block';c1.textContent=st.c1;c2.textContent=(st.note?st.note+'　':'')+(st.view==='shot'?NOTE_REAL:NOTE);}else capEl.style.display='none';
  if(st.q)capEl.style.display='none';
 }
 function rectOf(k){if(k==='kpiBad'){const a=rectOf('kpiBad1'),b=rectOf('kpiBad2');return a&&b?{left:a.left,top:a.top,right:a.right,bottom:b.bottom,width:a.width,height:b.bottom-a.top}:null;}
@@ -535,6 +566,8 @@ function drawOv(st,L){
 const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,cl=x=>Math.max(0,Math.min(1,x));
 async function init(){
  buildStates();await document.fonts.ready;
+ const shots=[...new Set(STATES.filter(s=>s.view==='shot').map(s=>s.shot))];
+ await Promise.all(shots.map(f=>new Promise(res=>{const im=new Image();im.onload=()=>{IMGSZ[f]={w:im.naturalWidth,h:im.naturalHeight};res();};im.onerror=()=>{console.log('missing screenshot: '+f);res();};im.src=SHOTDIR+f;})));
  for(let pass=0;pass<2;pass++){LAY=[];POS=[];let p=[1500,900];
   for(let i=0;i<STATES.length;i++){renderScene(STATES[i]);const L=layout(STATES[i]);LAY.push(L);if(L.cur)p=L.cur;POS.push(p);}
   await document.fonts.ready;await new Promise(r=>setTimeout(r,300));}
