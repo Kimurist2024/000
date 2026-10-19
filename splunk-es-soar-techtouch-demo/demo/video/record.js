@@ -398,7 +398,7 @@ async function main() {
   await sceneEnd("ノータブルやアラートの後の一次対応は、いまは委託先のチケットを待つ形になっていますか？", NOTE);
 
   // ---------- S1
-  await sceneCard("S1・Before・仮説1　ノータブルの後の判断が社内に無い", "UEBAの異常は出ている。しかし本人確認の手順も封じ込めの承認も、社内に無い", "画面：ES Incident Review → 委託先チケット → 検索（いずれも画面イメージ・架空）", "件数だけの検索は意図的に条件を省いた教材で、Splunk AI Assistantの実際の出力ではありません。", NOTE);
+  await sceneCard("S1・Before・仮説1　ノータブルの後の判断が社内に無い", "UEBAの異常は出ている。しかし本人確認の手順も封じ込めの承認も、社内に無い", "画面：ES Incident Review → 社内ポータルの委託先チケット → ESの検索（いずれも画面イメージ・架空）", "件数だけの検索は意図的に条件を省いた教材で、Splunk AI Assistantの実際の出力ではありません。", NOTE);
   await caption("ESのIncident Review。02:20にUEBAのノータブルが出ていますが、06:30まで担当者は未割当のままです（架空）。");
   await click("#g-start", { maxHalf: 120 });
   await hold(4);
@@ -409,9 +409,11 @@ async function main() {
   await hold(7);
   await click("#panel-next", { maxHalf: 80 });
   await caption("夜間の委託先は「出張中の可能性あり。A社の確認待ち」とチケットを起票。封じ込めは何もされていません。", "委託先は悪くありません。「本人の利用か」を確かめる手順と「止める承認」が、社内に無いことが問題です。");
-  await hold(7);
-  await click("#panel-next", { maxHalf: 80 });
-  await caption("担当者は、ダウンロードが500件以上のアカウントを数えるだけの検索で確かめようとします（教材）。");
+  await hold(5);
+  await caption("チケットは社内ポータル（Splunkとは別のシステム・架空）にあります。「Splunk ESで開く」でSplunkに戻ります。");
+  await hold(2.5);
+  await click("#i-open-es", { maxHalf: 80 });
+  await caption("Splunk ESの検索画面。担当者は、ダウンロードが500件以上のアカウントを数えるだけの検索で確かめようとします（教材）。");
   await hold(4);
   await click("#sp-run", { maxHalf: 20 });
   await moveTo(560, 560, 500);
@@ -512,29 +514,29 @@ async function main() {
   await moveTo(560, 560, 500);
   await caption("Q3：外部転送ルールあり・500件以上・申請なし。Aだけが残ります。これを検知基準D-02の相関検索にします。");
   await hold(5.5);
-  await caption("Content Management ＞ 新規コンテンツの作成 ＞ 相関検索（ESの機能）。");
+  await caption("Configure ＞ Content Management ＞ Create New Content ＞ Correlation Search（ESの相関検索の作成）。");
   await click("#nav-cm", { maxHalf: 60 });
   await hold(0.6);
   await click("#cm-new", { maxHalf: 90 });
-  await menu("相関検索");
+  await menu("Correlation Search");
   await hold(1);
-  await caption("名前の入力チェック（案）：命名規則「SOC_対象_用途」に合わないと、案内します。");
+  await caption("Search Name の入力チェック（案）：命名規則「SOC_対象_用途」に合わないと、案内します。");
   await typeText("cs-name", "乗っ取り検知");
   await hold(3.5);
   await typeText("cs-name", "SOC_M365_乗っ取り_D-02");
   await hold(1);
-  await caption("実行間隔でリアルタイムを選ぶと案内し、定期実行の15分ごとにします（社内基準・架空）。");
+  await caption("Cron Schedule でリアルタイムを選ぶと案内し、定期実行の「*/15 * * * *（15分ごと）」にします（社内基準・架空）。");
   await pick("cs-sched", "リアルタイム");
   await hold(3.5);
   await pick("cs-sched", "15分ごと");
   await hold(1);
-  await caption("リスクスコアはD-02の80（リスクオブジェクトは user）、ノータブルの緊急度は「高」。違う値なら案内します。");
-  await pick("cs-risk", "リスクスコア 50");
+  await caption("Risk Score はD-02の80（Risk Object は user）、Notable の Urgency は「High」。違う値なら案内します。");
+  await pick("cs-risk", "Risk Score 50");
   await hold(3.5);
-  await pick("cs-risk", "リスクスコア 80");
-  await pick("cs-urg", "緊急度：高");
+  await pick("cs-risk", "Risk Score 80");
+  await pick("cs-urg", "Urgency: High");
   await hold(1);
-  await caption("抑制が空なら案内します。同じ user で60分抑制して、保存します。");
+  await caption("Throttling が空なら案内します。「user / 60 min」（同じ user で60分抑制）にして、Save します。");
   await pick("cs-throttle", "抑制しない");
   await hold(3.5);
   await pick("cs-throttle", "同じ user で60分");
@@ -548,12 +550,12 @@ async function main() {
 
   // ---------- S5
   await sceneCard("S5・一次対応・仮説4　一次対応が委託先待ちで止まる", "ノータブルを自分の担当にし、AI Hubの手順で事実と未確認を分け、本人と上長に確かめる", "画面：ES Incident Review　支援：AI Hub（P3・KB04）＋社内チャット＋テックタッチのチェックリスト（案）", "侵害の範囲は推定しません。", HUB);
-  await caption("相関検索D-02がケースAで発火。UEBAの異常85と合わせて、リスクスコア165・緊急度「高」のノータブルになりました（架空）。");
+  await caption("相関検索D-02がケースAで発火。UEBAの異常85と合わせて、Risk Score 165・Urgency「High」のノータブルになりました（架空）。");
   await click("#g-start", { maxHalf: 120 });
   await hold(1);
   await click("#ir-row-d02", { maxHalf: 160 });
   await hold(4.5);
-  await caption("最初の一歩は「担当者を自分にする」。状態が「進行中」になり、誰が対応しているかが残ります。");
+  await caption("最初の一歩は「Edit Selected」で Owner を自分にすること。Status が In Progress（進行中）になり、誰が対応しているかが残ります。");
   await click("#ir-own", { maxHalf: 80 });
   await hold(3.5);
   await caption("AI Hub（P3）が、A社の一次調査手順（KB04：M365アカウント）に沿って、確認済み事実・追加の確認・本人と上長への確認文・判断の進め方に分けます。");
@@ -600,7 +602,7 @@ async function main() {
   await hold(4.5);
   await pick("pb-scope", "①〜③");
   await hold(1);
-  await caption("承認チケット番号が空のまま「実行」を押すと、止めます（入力チェック・案）。");
+  await caption("承認チケット番号が空のまま「Run」を押すと、止めます（入力チェック・案）。");
   await click("#pb-run", { maxHalf: 30 });
   await hold(4);
   await caption("③アカウント停止の、SOC責任者の承認チケット番号を入れます。承認の記録がプレイブックの入力に残ります。");
@@ -608,7 +610,7 @@ async function main() {
   await hold(2);
   await click('.tt-q[data-tip="auth"]', { maxHalf: 20 });
   await hold(4.5);
-  await caption("実行します。①②は即時に成功し、③は承認待ちになります。");
+  await caption("「Run」で実行します。①②は即時に成功し、③は PROMPT（SOC責任者の承認待ち）で止まります。");
   await click("#pb-run", { maxHalf: 30 });
   await hold(4);
   await caption("SOC責任者が承認します（デモでは同じ画面のボタンで代用）。③アカウント停止が実行され、攻撃者の操作が止まります。", "SOARがあっても「誰の承認で何を止めるか」が決まっていなければ動きません。その部分を社内に置きます。");

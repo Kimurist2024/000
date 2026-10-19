@@ -18,6 +18,10 @@
 
 `demo/index.html` をブラウザで開くだけで動きます（1ファイル、外部通信なし）。S0〜S8の9場面と振り返り。画面の部品はSplunk公式のUIツールキット（npm `@splunk/react-ui`・`@splunk/visualizations` ほか、Apache-2.0）で組んでいますが、ES（Incident Review、Content Management）・UEBA・SOARの実画面を写したものではなく、公開されている画面構成を手本にした「風」の再現です。
 
+- Splunkの画面：Splunk Webの枠（黒いSplunk bar、濃いグレーのアプリバーと緑のアプリアイコン、緑の検索ボタン、結果の上の行とタブ）は、公開されている Splunk 8.2.4 の Search 画面の写真に色と配置を合わせています。SOARはプレイブック図（暗い背景・緑のアクション・黄色の枠のフィルターと承認）を、公開されている図の配色に合わせています。項目名は英語表記です。出典は `scenario.md` 11章。
+- 社内ポータル：Splunkとは別のシステム（青の配色・架空）として描き分けています。チケットの「Splunk ESで開く」からSplunkへ移ります。
+- ブラウザ枠のアドレスは架空です（`splunk.a-corp.example`、`soar.a-corp.example`、`portal.a-corp.example`）。
+
 - キー操作：→ 次へ／← 戻る／1〜9 場面の切り替え／0 振り返り／N 進行メモ（発表者用）／R この場面を最初から。
 - 右側のパネルがテックタッチのガイド（案）、紫の枠がAI Hub（構想・例文）、右の縦長パネルがSplunk AI Assistant（参考画面）です。
 - 作り直し方：`cd demo/src && npm install && python3 build.py`（Node 18以上、Python 3）。動作確認：`node test_demo.js`（PlaywrightとChromiumが要る。`PLAYWRIGHT_MODULE` でモジュールの場所を指定できる）。
@@ -48,4 +52,5 @@ Splunk実機での実行結果ではありません。実機での確認（M365�
 
 ## 版
 
+- 1.2（2026年10月19日）：Splunkの画面を、公開されている画面写真の色と配置（Splunk bar、アプリバー、緑の検索ボタン、英語の項目名）に寄せ、SOARをプレイブック図の表示にしました。社内ポータルを別システムとして描き分け、「Splunk ESで開く」でSplunkへ移る流れにしました。動画を撮り直しました。
 - 1.1（2026年10月19日）：題材を一般的なSOC事案の型（M365アカウントの乗っ取り）にしたシナリオ、固定テストログ、SPLと検算、AI Hubのナレッジ（KB01〜KB08、P1〜P8）、Splunk公式UI部品版のイメージデモ、動画版。

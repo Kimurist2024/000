@@ -83,23 +83,24 @@ function ResultTable({ run }) {
   );
 }
 
-/* ---------- Splunk Web の枠（上部バー・ESのアプリバー） ---------- */
+/* ---------- Splunk Web の枠（上部バー・アプリバー）。公開されている Splunk Enterprise 8.2 の画面写真の配置と色に合わせ、ロゴはシナリオの前提（Splunk Cloud）に合わせる ---------- */
+function SplunkLogo({ product }) { return <span className="sp-logo" aria-label={"splunk>" + product}><b>splunk</b><i>&gt;{product}</i></span>; }
 function SplunkBar({ who }) {
   return (
     <div className="sp-bar">
-      <span className="sp-logo">Splunk Cloud Platform<small>画面イメージ・架空</small></span>
-      <span className="sp-menus"><span>メッセージ ▾</span><span>設定 ▾</span><span>アクティビティ ▾</span><span>ヘルプ ▾</span><span>検索</span><span className="user">{who} ▾</span></span>
+      <span className="sp-left"><SplunkLogo product="cloud" /><span className="sp-apps">Apps ▾</span></span>
+      <span className="sp-menus"><span className="user">{who} ▾</span><span>Messages ▾</span><span>Settings ▾</span><span>Activity ▾</span><span>Help ▾</span><span className="sp-find">Find<Magnifier /></span></span>
     </div>
   );
 }
 function AppBar({ app }) {
-  const items = [["", "Security Posture", false], ["ir", "Incident Review", app === "ir"], ["", "Investigations", false], ["", "Analytics ▾", false], ["search", "Search ▾", app === "search"], ["cm", "Content Management", app === "cm"]];
+  const items = [["", "Security Posture", false], ["ir", "Incident Review", app === "ir"], ["", "Investigations", false], ["", "Security Intelligence ▾", false], ["", "Security Domains ▾", false], ["", "Audit ▾", false], ["search", "Search ▾", app === "search"], ["cm", "Configure ▾", app === "cm"]];
   return (
     <div className="app-bar">
-      <span className="app-name">Enterprise Security</span>
       <nav className="app-nav">{items.map((it, i) => it[0]
         ? <button type="button" key={i} id={"nav-" + it[0]} data-id={"nav-" + it[0]} className={it[2] ? "active" : ""}>{it[1]}</button>
         : <span key={i} className={it[2] ? "active" : ""}>{it[1]}</span>)}</nav>
+      <span className="app-label"><span className="app-icon es" aria-hidden="true"><Shield /></span><span className="app-name">Enterprise Security</span></span>
     </div>
   );
 }
@@ -109,9 +110,9 @@ function SearchBar({ c }) {
   const spl = c.q ? SPL[c.q] : "";
   return (
     <div className="sp-searchbar">
-      <pre className={"spl-box" + (spl ? "" : " ph")}>{spl || "検索文字列を入力…"}</pre>
-      <span className="sp-time"><Button label="全時間" isMenu appearance="secondary" /></span>
-      <span className="sp-go"><Button id="sp-run" appearance="primary" icon={<Magnifier />} aria-label="検索を実行" onClick={click("sp-run")} /></span>
+      <pre className={"spl-box" + (spl ? "" : " ph")}>{spl || "enter search here..."}</pre>
+      <span className="sp-time"><button type="button" className="sp-tp">All time ▾</button></span>
+      <span className="sp-go"><button type="button" id="sp-run" data-id="sp-run" className="sp-go-btn" aria-label="Search"><Magnifier /></button></span>
     </div>
   );
 }
@@ -120,25 +121,22 @@ function Results({ c }) {
   const r = RESULTS[c.ran], n = r.rows.length;
   return (
     <div className="sp-results">
-      <p className="sp-summary"><span className="ok">✓</span> {n + " 件の結果"}　<small>2026/10/01 〜 2026/10/06（固定のテストログ・架空）</small></p>
-      <TabLayout activePanelId="stats">
-        <TabLayout.Panel label="イベント" panelId="events"><p className="sp-note">固定CSVのルックアップのため、イベント表示は省略します（架空）。</p></TabLayout.Panel>
-        <TabLayout.Panel label="パターン" panelId="patterns"><p className="sp-note">省略（架空）。</p></TabLayout.Panel>
-        <TabLayout.Panel label={"統計情報 (" + n + ")"} panelId="stats"><ResultTable run={c.ran} /></TabLayout.Panel>
-        <TabLayout.Panel label="視覚エフェクト" panelId="viz"><p className="sp-note">この結果は表で確認します（架空）。</p></TabLayout.Panel>
-      </TabLayout>
+      <div className="sp-status"><span className="sp-summary"><span className="ok">✓</span> <b>{n} results</b> (10/1/26 12:00:00.000 AM to 10/7/26 12:00:00.000 AM)<small>　固定のテストログ・架空</small></span><span className="sp-sampling">No Event Sampling ▾</span>
+        <span className="sp-job"><span>Job ▾</span><span>❚❚</span><span>■</span><span>↗</span><span>⎙</span><span>⤓</span><span className="mode">Smart Mode ▾</span></span></div>
+      <div className="sp-tabs"><span>Events</span><span>Patterns</span><span className="active">Statistics ({n})</span><span>Visualization</span></div>
+      <ResultTable run={c.ran} />
     </div>
   );
 }
 function SearchPage({ c, ch }) {
-  const title = c.q ? RUN_TITLE[c.q] : "新規検索";
+  const title = c.q ? RUN_TITLE[c.q] : "New Search";
   const main = (
     <div className="sp-search">
       <div className="sp-head"><Heading level={2}>{title}</Heading>
         <span className="row-actions">
           {c.chip && <button type="button" className="tt-chip" id="chip-soc" data-id="chip-soc"><StarSparklesDouble />SOC分析アシスト（テックタッチ）</button>}
           {ch === 8 && c.hub < 3 && <button type="button" className="hub-chip" id="hub-p6" data-id="hub-p6"><Shield />範囲確定の検索案（AI Hub）</button>}
-          <Button label="名前を付けて保存" isMenu appearance="secondary" />
+          <span className="sp-hlinks"><span>Save As ▾</span><span>Create Table View</span><span>Close</span></span>
         </span>
       </div>
       <SearchBar c={c} />
@@ -305,26 +303,27 @@ function HubP7({ c }) {
 function CMPage({ c }) {
   return (
     <div className="sp-page-body">
+      <p className="sp-crumb">Configure › Content › <b>Content Management</b></p>
       <div className="sp-head"><Heading level={2}>Content Management</Heading>
-        <Dropdown toggle={<Button id="cm-new" label="新規コンテンツの作成" isMenu appearance="primary" />} open={!!c.menu} retainFocus={false}
+        <Dropdown toggle={<Button id="cm-new" label="Create New Content" isMenu appearance="primary" />} open={!!c.menu} retainFocus={false}
           onRequestOpen={() => act("click", "cm-new")} onRequestClose={() => patch((x) => { x.menu = false; })}>
           <Menu>
-            <Menu.Item id="cm-corr" onClick={click("cm-corr")}>相関検索</Menu.Item>
-            <Menu.Item onClick={click("cm-saved")}>保存済み検索</Menu.Item>
-            <Menu.Item onClick={click("cm-lookup")}>ルックアップ</Menu.Item>
-            <Menu.Item onClick={click("cm-playbook")}>プレイブック（SOAR）</Menu.Item>
+            <Menu.Item id="cm-corr" onClick={click("cm-corr")}>Correlation Search</Menu.Item>
+            <Menu.Item onClick={click("cm-saved")}>Saved Search</Menu.Item>
+            <Menu.Item onClick={click("cm-lookup")}>Lookup</Menu.Item>
+            <Menu.Item onClick={click("cm-playbook")}>Playbook</Menu.Item>
           </Menu>
         </Dropdown>
       </div>
       <p className="dt-fine">ES の Content Management の画面イメージ（架空）。Q1〜Q4はSOCの承認済み検索（KB03）</p>
-      <Table stripeRows>
-        <Table.Head><Table.HeadCell>名前</Table.HeadCell><Table.HeadCell>種類</Table.HeadCell><Table.HeadCell>説明</Table.HeadCell><Table.HeadCell>所有者</Table.HeadCell><Table.HeadCell>版</Table.HeadCell></Table.Head>
+      <div className="cm-tbl"><Table stripeRows>
+        <Table.Head><Table.HeadCell width={290}>Name</Table.HeadCell><Table.HeadCell width={160}>Type</Table.HeadCell><Table.HeadCell>Description</Table.HeadCell><Table.HeadCell width={84}>Owner</Table.HeadCell><Table.HeadCell width={90}>Status</Table.HeadCell></Table.Head>
         <Table.Body>
-          {c.savedCS && <Table.Row key="cs"><Table.Cell><b>{c.vals["cs-name"]}</b></Table.Cell><Table.Cell>相関検索</Table.Cell><Table.Cell>D-02。15分ごと、リスク80、緊急度 高、抑制 user 60分</Table.Cell><Table.Cell>山田</Table.Cell><Table.Cell>v1.0</Table.Cell></Table.Row>}
-          {REPORTS.map((r) => <Table.Row key={r[0]}><Table.Cell><Link id={"rep-" + r[0]} onClick={click("rep-" + r[0])}>{r[1]}</Link></Table.Cell><Table.Cell>保存済み検索</Table.Cell><Table.Cell>{r[2]}</Table.Cell><Table.Cell>山田</Table.Cell><Table.Cell>{r[3]}</Table.Cell></Table.Row>)}
-          <Table.Row key="x"><Table.Cell><span className="dt-fine">UEBA_Anomalous_Data_Access（委託先・表示省略）</span></Table.Cell><Table.Cell>相関検索</Table.Cell><Table.Cell>委託先作成。社内で変更できない（架空）</Table.Cell><Table.Cell>委託先</Table.Cell><Table.Cell>—</Table.Cell></Table.Row>
+          {c.savedCS && <Table.Row key="cs"><Table.Cell><b>{c.vals["cs-name"]}</b></Table.Cell><Table.Cell>Correlation Search</Table.Cell><Table.Cell>D-02。15分ごと、リスク80、Urgency High、抑制 user 60分（v1.0）</Table.Cell><Table.Cell>山田</Table.Cell><Table.Cell>Enabled</Table.Cell></Table.Row>}
+          {REPORTS.map((r) => <Table.Row key={r[0]}><Table.Cell><Link id={"rep-" + r[0]} onClick={click("rep-" + r[0])}>{r[1]}</Link></Table.Cell><Table.Cell>Saved Search</Table.Cell><Table.Cell>{r[2]}（{r[3]}）</Table.Cell><Table.Cell>山田</Table.Cell><Table.Cell>Enabled</Table.Cell></Table.Row>)}
+          <Table.Row key="x"><Table.Cell><span className="dt-fine">UEBA_Anomalous_Signin（委託先・表示省略）</span></Table.Cell><Table.Cell>Correlation Search</Table.Cell><Table.Cell>委託先作成。社内で変更できない（架空）</Table.Cell><Table.Cell>委託先</Table.Cell><Table.Cell>Enabled</Table.Cell></Table.Row>
         </Table.Body>
-      </Table>
+      </Table></div>
       {c.dialog && <CorrDialog c={c} />}
     </div>
   );
@@ -341,28 +340,28 @@ function Dialog({ title, children, footer }) {
 function CorrDialog({ c }) {
   const v = c.vals;
   return (
-    <Dialog title="相関検索の作成（Content Management）" footer={<><Button appearance="secondary" label="キャンセル" onClick={() => patch((x) => { x.dialog = false; })} /><Button id="cs-save" appearance="primary" label="保存" onClick={click("cs-save")} /></>}>
-      <ControlGroup label="検索名" labelPosition="left" labelWidth={170}><span className="f-wrap" id="f-cs-name"><TextField id="cs-name" value={v["cs-name"]} placeholder="SOC_対象_用途" /></span></ControlGroup>
-      <ControlGroup label="アプリ" labelPosition="left" labelWidth={170}><Text value="SplunkEnterpriseSecuritySuite" disabled canClear={false} /></ControlGroup>
-      <ControlGroup label="説明" labelPosition="left" labelWidth={170}><Text value="検知基準 D-02：普段と違う接続元の後の、外部転送ルールと大量ダウンロード（Q3）" disabled canClear={false} /></ControlGroup>
-      <ControlGroup label="検索" labelPosition="left" labelWidth={170}><pre className="code small">{SPL.q3}</pre></ControlGroup>
-      <ControlGroup label="実行間隔（cron）" labelPosition="left" labelWidth={170}><Pick id="cs-sched" value={v["cs-sched"]} options={[["15m", "15分ごと（*/15 * * * *）"], ["1h", "1時間ごと"], ["rt", "リアルタイム"]]} /></ControlGroup>
-      <ControlGroup label="時間範囲" labelPosition="left" labelWidth={170}><Text value="過去24時間（Splunk Cloudのスケジュール時刻はUTC）" disabled canClear={false} /></ControlGroup>
-      <ControlGroup label="トリガー条件" labelPosition="left" labelWidth={170}><Text value="結果の数 が 0 より大きい" disabled canClear={false} /></ControlGroup>
-      <ControlGroup label="リスク分析（RBA）" labelPosition="left" labelWidth={170}><span className="row-actions"><Pick id="cs-risk" value={v["cs-risk"]} options={[["20", "リスクスコア 20"], ["50", "リスクスコア 50"], ["80", "リスクスコア 80"]]} /><span className="dt-fine">リスクオブジェクト：user</span></span></ControlGroup>
-      <ControlGroup label="ノータブル" labelPosition="left" labelWidth={170}><span className="row-actions"><Pick id="cs-urg" value={v["cs-urg"]} options={[["low", "緊急度：低"], ["medium", "緊急度：中"], ["high", "緊急度：高"]]} /><span className="dt-fine">タイトル：SOC_M365_乗っ取り_D-02: $user$ from $src$</span></span></ControlGroup>
-      <ControlGroup label="抑制（スロットル）" labelPosition="left" labelWidth={170}><Pick id="cs-throttle" value={v["cs-throttle"]} options={[["none", "抑制しない"], ["60user", "同じ user で60分"]]} /></ControlGroup>
-      <p className="dt-fine">ESの相関検索の作成画面を手本にした画面イメージ（架空）。項目名と配置は実機で確かめます。</p>
+    <Dialog title="Correlation Search Editor" footer={<><Button appearance="secondary" label="Cancel" onClick={() => patch((x) => { x.dialog = false; })} /><Button id="cs-save" appearance="primary" label="Save" onClick={click("cs-save")} /></>}>
+      <ControlGroup label="Search Name" labelPosition="left" labelWidth={170}><span className="f-wrap" id="f-cs-name"><TextField id="cs-name" value={v["cs-name"]} placeholder="SOC_対象_用途" /></span></ControlGroup>
+      <ControlGroup label="App" labelPosition="left" labelWidth={170}><Text value="SplunkEnterpriseSecuritySuite" disabled canClear={false} /></ControlGroup>
+      <ControlGroup label="Description" labelPosition="left" labelWidth={170}><Text value="検知基準 D-02：普段と違う接続元の後の、外部転送ルールと大量ダウンロード（Q3）" disabled canClear={false} /></ControlGroup>
+      <ControlGroup label="Search" labelPosition="left" labelWidth={170}><pre className="code small">{SPL.q3}</pre></ControlGroup>
+      <ControlGroup label="Cron Schedule" labelPosition="left" labelWidth={170}><Pick id="cs-sched" value={v["cs-sched"]} options={[["15m", "*/15 * * * *（15分ごと）"], ["1h", "0 * * * *（1時間ごと）"], ["rt", "Real-time（リアルタイム）"]]} /></ControlGroup>
+      <ControlGroup label="Time Range" labelPosition="left" labelWidth={170}><Text value="Last 24 hours（Splunk Cloudのスケジュール時刻はUTC）" disabled canClear={false} /></ControlGroup>
+      <ControlGroup label="Trigger Conditions" labelPosition="left" labelWidth={170}><Text value="Number of Results is greater than 0" disabled canClear={false} /></ControlGroup>
+      <ControlGroup label="Risk Analysis" labelPosition="left" labelWidth={170}><span className="row-actions"><Pick id="cs-risk" value={v["cs-risk"]} options={[["20", "Risk Score 20"], ["50", "Risk Score 50"], ["80", "Risk Score 80"]]} /><span className="dt-fine">Risk Object: user</span></span></ControlGroup>
+      <ControlGroup label="Notable" labelPosition="left" labelWidth={170}><span className="row-actions"><Pick id="cs-urg" value={v["cs-urg"]} options={[["low", "Urgency: Low"], ["medium", "Urgency: Medium"], ["high", "Urgency: High"]]} /><span className="dt-fine">Title: SOC_M365_乗っ取り_D-02: $user$ from $src$</span></span></ControlGroup>
+      <ControlGroup label="Throttling" labelPosition="left" labelWidth={170}><Pick id="cs-throttle" value={v["cs-throttle"]} options={[["none", "None（抑制しない）"], ["60user", "user / 60 min（同じ user で60分）"]]} /></ControlGroup>
+      <p className="dt-fine">ESの相関検索の編集画面を手本にした画面イメージ（架空）。項目名と配置は実機で確かめます。</p>
     </Dialog>
   );
 }
 
 /* ---------- Incident Review（ノータブル） ---------- */
-function Urgency({ u }) { return <span className={"urg " + (u === "高" ? "high" : u === "中" ? "mid" : "low")}>{u}</span>; }
+function Urgency({ u }) { return <span className={"urg " + (u === "High" ? "high" : u === "Medium" ? "mid" : "low")}>{u}</span>; }
 function NotableRow({ n, onOpen, owner, status }) {
   return (
     <Table.Row key={n.id}>
-      <Table.Cell>{n.time}</Table.Cell><Table.Cell>{n.domain}</Table.Cell>
+      <Table.Cell><span className="ir-i">›</span></Table.Cell><Table.Cell>{n.time}</Table.Cell><Table.Cell>{n.domain}</Table.Cell>
       <Table.Cell><Link id={"ir-row-" + n.id.slice(2)} onClick={onOpen}>{n.title}</Link></Table.Cell>
       <Table.Cell><Urgency u={n.urgency} /></Table.Cell><Table.Cell>{status || n.status}</Table.Cell><Table.Cell>{owner || n.owner}</Table.Cell><Table.Cell>{n.risk}</Table.Cell>
     </Table.Row>
@@ -374,15 +373,15 @@ function IRPage({ c, ch, tip }) {
     return (
       <div className="sp-page-body">
         <div className="sp-head"><Heading level={2}>Incident Review</Heading><span className="dt-fine">ESの画面イメージ（架空）。{before ? "2026-10-06 06:30 時点" : "2026-10-06 時点"}</span></div>
-        <div className="ir-filter"><Chip>状態：すべて</Chip><Chip>緊急度：すべて</Chip><Chip>担当者：すべて</Chip><Chip>過去24時間</Chip></div>
+        <div className="ir-filter"><span>Urgency<b>All ▾</b></span><span>Status<b>All ▾</b></span><span>Owner<b>All ▾</b></span><span>Security Domain<b>All ▾</b></span><span>Time<b>Last 24 hours ▾</b></span><span className="sub">Submit</span></div>
         <Table stripeRows>
-          <Table.Head><Table.HeadCell>時刻</Table.HeadCell><Table.HeadCell>セキュリティドメイン</Table.HeadCell><Table.HeadCell>タイトル</Table.HeadCell><Table.HeadCell>緊急度</Table.HeadCell><Table.HeadCell>状態</Table.HeadCell><Table.HeadCell>担当者</Table.HeadCell><Table.HeadCell>リスクスコア</Table.HeadCell></Table.Head>
+          <Table.Head><Table.HeadCell width={30}>i</Table.HeadCell><Table.HeadCell>Time</Table.HeadCell><Table.HeadCell>Security Domain</Table.HeadCell><Table.HeadCell>Title</Table.HeadCell><Table.HeadCell>Urgency</Table.HeadCell><Table.HeadCell>Status</Table.HeadCell><Table.HeadCell>Owner</Table.HeadCell><Table.HeadCell>Risk Score</Table.HeadCell></Table.Head>
           <Table.Body>
-            {!before && <NotableRow n={NOTABLES.d02} onOpen={click("ir-row-d02")} owner={c.owner ? "山田" : undefined} status={c.owner ? "進行中" : undefined} />}
+            {!before && <NotableRow n={NOTABLES.d02} onOpen={click("ir-row-d02")} owner={c.owner ? "山田" : undefined} status={c.owner ? "In Progress" : undefined} />}
             <NotableRow n={NOTABLES.ueba} onOpen={click("ir-row-ueba")} />
           </Table.Body>
         </Table>
-        {before && <p className="dt-fine">02:20 に発生したノータブルが、06:30 まで未割当のままです（架空）。</p>}
+        {before && <p className="dt-fine">02:20 に発生したノータブルが、06:30 まで unassigned（未割当）のままです（架空）。</p>}
       </div>
     );
   }
@@ -392,26 +391,26 @@ function IRPage({ c, ch, tip }) {
       <Breadcrumbs><Breadcrumbs.Item label="Incident Review" onClick={go((x) => { x.view = "list"; })} /><Breadcrumbs.Item label={n.title} isCurrent /></Breadcrumbs>
       <div className="sp-head"><span className="sp-title-row"><Heading level={2}>{n.title}</Heading><Urgency u={n.urgency} /></span>
         <span className="row-actions">
-          {!before && <Button id="ir-own" appearance={c.owner ? "secondary" : "primary"} label={c.owner ? "担当者：山田（進行中）" : "担当者を自分にする"} disabled={c.owner} onClick={click("ir-own")} />}
+          {!before && <Button id="ir-own" appearance={c.owner ? "secondary" : "primary"} label={c.owner ? "Owner: 山田 / Status: In Progress" : "Edit Selected（Owner: me）"} disabled={c.owner} onClick={click("ir-own")} />}
           {!before && c.owner && c.hub < 3 && <button type="button" className="hub-chip" id="hub-p3" data-id="hub-p3"><Shield />一次調査の整理（AI Hub）</button>}
-          {before && <Button appearance="secondary" label="担当者：未割当" disabled />}
+          {before && <Button appearance="secondary" label="Owner: unassigned" disabled />}
         </span>
       </div>
       <div className="ir-grid">
-        <Card style={{ width: "100%" }}><Card.Header title="ノータブルの概要" /><Card.Body>
-          <dl className="kv"><dt>発生</dt><dd>{n.time}</dd><dt>状態</dt><dd>{!before && c.owner ? "進行中" : n.status}</dd><dt>リスクオブジェクト</dt><dd>user: s.tanaka</dd><dt>接続元</dt><dd>198.51.100.77（国外1／AS64500）</dd>
-            {!before && <><dt>相関検索</dt><dd>SOC_M365_乗っ取り_D-02（15分ごと）</dd><dt>結果</dt><dd>downloads 1,200／external_rules 1／sent_mails 380／request_id なし（02:18〜02:41）</dd></>}</dl>
+        <Card style={{ width: "100%" }}><Card.Header title="Notable Event" /><Card.Body>
+          <dl className="kv"><dt>Time</dt><dd>{n.time}</dd><dt>Status</dt><dd>{!before && c.owner ? "In Progress" : n.status}</dd><dt>Risk Object</dt><dd>user: s.tanaka</dd><dt>Source</dt><dd>198.51.100.77（国外1／AS64500）</dd>
+            {!before && <><dt>Correlation Search</dt><dd>SOC_M365_乗っ取り_D-02（*/15 * * * *）</dd><dt>Results</dt><dd>downloads 1,200／external_rules 1／sent_mails 380／request_id なし（02:18〜02:41）</dd></>}</dl>
         </Card.Body></Card>
-        <Card style={{ width: "100%" }}><Card.Header title="リスクスコア（RBA）" subtitle={before ? "UEBAの異常のみ" : "UEBA 85 ＋ 相関検索 80"} /><Card.Body>
+        <Card style={{ width: "100%" }}><Card.Header title="Risk Score" subtitle={before ? "UEBAの異常のみ" : "UEBA 85 ＋ 相関検索 80"} /><Card.Body>
           <div className="viz-single" style={{ height: 250 }}><SingleValue dataSources={before ? ds(["risk_score"], [[85]]) : DS.risk} options={{ majorColor: "#dc4e41", showSparklineAreaGraph: false }} /></div>
         </Card.Body></Card>
-        <Card style={{ width: "100%" }} id="ir-anom"><Card.Header title="UEBAの異常（内訳）" subtitle="ESに統合されたUEBAの画面イメージ（架空）" /><Card.Body>
-          <table className="hub-tbl"><thead><tr><th>時刻</th><th>異常</th><th>スコア</th></tr></thead><tbody>{ANOMALIES.map((a) => <tr key={a[1]}><td>{a[0]}</td><td>{a[1]}</td><td>{a[2]}</td></tr>)}</tbody></table>
-          {!before && <table className="hub-tbl"><thead><tr><th>時刻</th><th>リスクイベント</th><th>スコア</th></tr></thead><tbody>{RISK_EVENTS.map((a) => <tr key={a[1]}><td>{a[0]}</td><td>{a[1]}</td><td>{a[2]}</td></tr>)}</tbody></table>}
-          <div style={{ height: 200 }}><Column dataSources={DS.anom} options={{ legendDisplay: "off", xAxisTitleText: "anomaly", yAxisTitleText: "score" }} /></div>
+        <Card style={{ width: "100%" }} id="ir-anom"><Card.Header title="Anomalies（UEBA）" subtitle="ESに統合されたUEBAの画面イメージ（架空）" /><Card.Body>
+          <table className="hub-tbl sp-tbl"><thead><tr><th>Time</th><th>Anomaly</th><th>Score</th></tr></thead><tbody>{ANOMALIES.map((a) => <tr key={a[1]}><td>{a[0]}</td><td>{a[1]}</td><td>{a[2]}</td></tr>)}</tbody></table>
+          {!before && <table className="hub-tbl sp-tbl"><thead><tr><th>Time</th><th>Risk Event</th><th>Score</th></tr></thead><tbody>{RISK_EVENTS.map((a) => <tr key={a[1]}><td>{a[0]}</td><td>{a[1]}</td><td>{a[2]}</td></tr>)}</tbody></table>}
+          <div style={{ height: 200 }}><Column dataSources={DS.anom} options={{ legendDisplay: "off", xAxisTitleText: "anomaly", yAxisTitleText: "score", seriesColors: ["#6daf65"] }} /></div>
         </Card.Body></Card>
       </div>
-      {before && <Card style={{ width: "100%" }}><Card.Header title="コメント（架空）" /><Card.Body><p className="dt-fine">02:35 委託先（夜間SOC）：出張中の可能性あり。A社の確認待ち。チケット SOC-2061 を起票。</p><p className="dt-fine">06:30 （コメントなし。担当者未割当のまま）</p></Card.Body></Card>}
+      {before && <Card style={{ width: "100%" }}><Card.Header title="Comments（架空）" /><Card.Body><p className="dt-fine">02:35 委託先（夜間SOC）：出張中の可能性あり。A社の確認待ち。チケット SOC-2061 を起票。</p><p className="dt-fine">06:30 （コメントなし。Owner は unassigned のまま）</p></Card.Body></Card>}
       {!before && <HubP3 c={c} />}
       {!before && c.replied && <Checklist c={c} tip={tip} />}
       {!before && c.escalated && <Message appearance="fill" type="success">判定「要対応」で封じ込めへ進みます（確認済み・未確認を分けたまま）。記録はS7で残します。</Message>}
@@ -433,39 +432,67 @@ function Checklist({ c, tip }) {
   );
 }
 
-/* ---------- SOAR（プレイブックの実行・画面イメージ） ---------- */
+/* ---------- SOAR（プレイブックの実行・画面イメージ）。公開されている Splunk SOAR のプレイブック図の配色に合わせる ---------- */
+function PbNode({ kind, title, sub, state }) {
+  const icon = kind === "start" ? "⚑" : kind === "filter" ? "▽" : kind === "prompt" ? "?" : kind === "end" ? "■" : "∿";
+  return (
+    <div className={"pb-node " + kind + (state ? " " + state : "")}>
+      <span className="pb-ic" aria-hidden="true">{icon}</span>
+      <span className="pb-tx"><small>{kind === "action" ? "ACTION" : kind === "prompt" ? "PROMPT" : kind === "filter" ? "FILTER" : kind === "end" ? "END" : ""}</small><b>{title}</b>{sub && <em>{sub}</em>}</span>
+      {state === "ok" && <span className="pb-st ok">✓</span>}{state === "wait" && <span className="pb-st wait">…</span>}
+    </div>
+  );
+}
 function SOARPage({ c, tip }) {
   const v = c.vals, scope = v["pb-scope"];
   const stateOf = (i) => {
     if (!c.ran) return ["—", ""];
-    if (i < 2) return ["成功", "ok"];
-    if (i === 2) return c.approved ? ["成功（承認 " + APPROVAL_TICKET + "）", "ok"] : ["承認待ち（SOC責任者）", "wait"];
-    return ["対象外（CSIRT責任者の判断）", ""];
+    if (i < 2) return ["success", "ok"];
+    if (i === 2) return c.approved ? ["success（承認 " + APPROVAL_TICKET + "）", "ok"] : ["waiting（SOC責任者の承認待ち）", "wait"];
+    return ["not run（CSIRT責任者の判断）", ""];
   };
+  const ns = (i) => (stateOf(i)[1] || "");
   return (
     <div className="sp-page-body soar-page">
-      <Breadcrumbs><Breadcrumbs.Item label="Playbooks" /><Breadcrumbs.Item label={PLAYBOOK.name} isCurrent /></Breadcrumbs>
-      <div className="sp-head"><span className="sp-title-row"><Heading level={2}>{PLAYBOOK.name}</Heading><Chip>コンテナ #2061：s.tanaka</Chip></span>
+      <p className="sp-crumb dark">Playbooks › <b>{PLAYBOOK.name}</b></p>
+      <div className="sp-head"><span className="sp-title-row"><Heading level={2}>{PLAYBOOK.name}</Heading><Chip>Container #2061：s.tanaka</Chip></span>
         {c.hub < 3 && <button type="button" className="hub-chip" id="hub-p5" data-id="hub-p5"><Shield />承認段階の照合（AI Hub・KB06）</button>}
       </div>
       <HubP5 c={c} />
-      <div className="ir-grid two">
-        <Card style={{ width: "100%" }}><Card.Header title="入力" subtitle="テックタッチの入力チェック付き（案）" /><Card.Body>
-          <ControlGroup label="対象アカウント" labelPosition="left" labelWidth={150}><Text value="s.tanaka" disabled canClear={false} /></ControlGroup>
-          <ControlGroup label="接続元" labelPosition="left" labelWidth={150}><Text value="198.51.100.77" disabled canClear={false} /></ControlGroup>
-          <ControlGroup label="実行範囲" labelPosition="left" labelWidth={150}><Pick id="pb-scope" value={scope} options={[["12", "①〜②（即時のみ）"], ["123", "①〜③（アカウント停止まで）"], ["1234", "①〜④（外部接続遮断まで）"]]} /></ControlGroup>
-          <ControlGroup label="③の承認チケット" labelPosition="left" labelWidth={150}><span className="row-actions"><span className="f-wrap" id="f-pb-ticket"><TextField id="pb-ticket" value={v["pb-ticket"]} placeholder="APV-…" /></span><button type="button" className="dt-emph" id="pb-ticket-fill" data-id="pb-ticket-fill">例を入れる</button></span></ControlGroup>
-          <div className="tt-note"><TipWrap id="tw-auth" label="承認段階 KB06" tipKey="auth" tip={tip} /></div>
-          <div className="row-actions"><Button id="pb-run" appearance="primary" label={c.ran ? "実行済み" : "実行"} disabled={c.ran} onClick={click("pb-run")} /></div>
-        </Card.Body></Card>
-        <Card style={{ width: "100%" }}><Card.Header title="アクションの状態" subtitle="プレイブックの実行結果（架空）" /><Card.Body>
-          <table className="hub-tbl"><thead><tr><th>アクション</th><th>承認者</th><th>状態</th></tr></thead>
-            <tbody>{PLAYBOOK.steps.map((s, i) => { const st = stateOf(i); return <tr key={s[0]}><td><b>{s[0]} {s[1]}</b></td><td>{s[2]}</td><td><span className={"st " + st[1]}>{st[0]}</span></td></tr>; })}</tbody></table>
-          {c.ran && !c.approved && <div className="row-actions"><Button id="pb-approve" appearance="primary" label="SOC責任者が承認する（デモ）" onClick={click("pb-approve")} /></div>}
-          {c.approved && <Message appearance="fill" type="success">③アカウント停止を実行しました。攻撃者の操作は止まっています。④はCSIRT責任者へ範囲の確定（S7）を渡して判断を仰ぎます。</Message>}
-        </Card.Body></Card>
+      <div className="soar-grid">
+        <div className="pb-canvas" aria-label="プレイブック図（画面イメージ・架空）">
+          <PbNode kind="start" title="Start" />
+          <span className="pb-wire" />
+          <PbNode kind="filter" title="例外アカウントか（KB06）" sub="it_admin01・exec_* なら責任者へ" />
+          <span className="pb-wire"><i className="pb-pill">no：続行</i></span>
+          <PbNode kind="action" title={"① " + PLAYBOOK.steps[0][1]} sub="revoke sessions" state={ns(0)} />
+          <span className="pb-wire" />
+          <PbNode kind="action" title={"② " + PLAYBOOK.steps[1][1]} sub="disable inbox rule / reset password" state={ns(1)} />
+          <span className="pb-wire" />
+          <PbNode kind="prompt" title="③の承認（SOC責任者）" sub={c.approved ? APPROVAL_TICKET : c.ran ? "waiting" : "prompt"} state={c.approved ? "ok" : c.ran ? "wait" : ""} />
+          <span className="pb-wire" />
+          <PbNode kind="action" title={"③ " + PLAYBOOK.steps[2][1]} sub="disable user" state={c.approved ? "ok" : ""} />
+          <span className="pb-wire dim" />
+          <PbNode kind="end" title="④ はCSIRT責任者の判断" sub="このプレイブックでは実行しない" />
+        </div>
+        <div className="soar-side">
+          <Card style={{ width: "100%" }}><Card.Header title="Run Playbook" subtitle="テックタッチの入力チェック付き（案）" /><Card.Body>
+            <ControlGroup label="Target user" labelPosition="left" labelWidth={140}><Text value="s.tanaka" disabled canClear={false} /></ControlGroup>
+            <ControlGroup label="Source IP" labelPosition="left" labelWidth={140}><Text value="198.51.100.77" disabled canClear={false} /></ControlGroup>
+            <ControlGroup label="実行範囲" labelPosition="left" labelWidth={140}><Pick id="pb-scope" value={scope} options={[["12", "①〜②（即時のみ）"], ["123", "①〜③（アカウント停止まで）"], ["1234", "①〜④（テナント全体の設定変更まで）"]]} /></ControlGroup>
+            <ControlGroup label="③の承認チケット" labelPosition="left" labelWidth={140}><span className="row-actions"><span className="f-wrap" id="f-pb-ticket"><TextField id="pb-ticket" value={v["pb-ticket"]} placeholder="APV-…" /></span><button type="button" className="dt-emph" id="pb-ticket-fill" data-id="pb-ticket-fill">例を入れる</button></span></ControlGroup>
+            <div className="tt-note"><TipWrap id="tw-auth" label="承認段階 KB06" tipKey="auth" tip={tip} /></div>
+            <div className="row-actions"><Button id="pb-run" appearance="primary" label={c.ran ? "Running…" : "Run"} disabled={c.ran} onClick={click("pb-run")} /></div>
+          </Card.Body></Card>
+          <Card style={{ width: "100%" }}><Card.Header title="Action Status" subtitle="プレイブックの実行結果（架空）" /><Card.Body>
+            <table className="hub-tbl sp-dark-tbl"><thead><tr><th>Action</th><th>Approver</th><th>Status</th></tr></thead>
+              <tbody>{PLAYBOOK.steps.map((s, i) => { const st = stateOf(i); return <tr key={s[0]}><td><b>{s[0]} {s[1]}</b></td><td>{s[2]}</td><td><span className={"st " + st[1]}>{st[0]}</span></td></tr>; })}</tbody></table>
+            {c.ran && !c.approved && <div className="row-actions"><Button id="pb-approve" appearance="primary" label="Approve（SOC責任者・デモ）" onClick={click("pb-approve")} /></div>}
+            {c.approved && <Message appearance="fill" type="success">③アカウント停止を実行しました。攻撃者の操作は止まっています。④はCSIRT責任者へ範囲の確定（S7）を渡して判断を仰ぎます。</Message>}
+          </Card.Body></Card>
+        </div>
       </div>
-      <p className="dt-fine">Splunk SOAR の画面を手本にした画面イメージ（架空）。公式UI部品で組んでおり、SOARの実画面ではありません。</p>
+      <p className="dt-fine">Splunk SOAR のプレイブック図の配色を手本にした画面イメージ（架空）。公式UI部品で組んでおり、SOARの実画面ではありません。</p>
     </div>
   );
 }
@@ -495,7 +522,8 @@ function IntraPage({ c }) {
   if (v === "ticket") return (
     <div className="i-card" id="i-ticket"><p className="lab">委託先チケット　SOC-2061（架空）</p><p><b>起票：</b>委託先（夜間SOC）02:35　<b>状態：</b><span className="status active">A社の確認待ち（06:30 時点、4時間経過）</span></p>
       <p><b>内容：</b>UEBAのノータブル（s.tanaka の普段と違うサインインと外部転送ルールの作成）。出張中の可能性があるため、A社にて本人への確認をお願いします。封じ込めは未実施。</p>
-      <p className="dt-fine">委託先の判断は妥当です。「本人の利用か」を確かめる手順と「止める承認」が社内に無いため、ここで止まります。</p></div>
+      <p className="dt-fine">委託先の判断は妥当です。「本人の利用か」を確かめる手順と「止める承認」が社内に無いため、ここで止まります。</p>
+      <div className="row-actions"><button type="button" className="pt-link" id="i-open-es" data-id="i-open-es">Splunk ESで開く ↗</button></div></div>
   );
   if (v === "improve0") return (
     <>
@@ -548,12 +576,13 @@ function IntraPage({ c }) {
 
 /* ---------- 全体 ---------- */
 function Stage({ ch, c, tip, who }) {
-  const theme = "light";
   if (c.app === "intra") {
     return (
-      <SplunkThemeProvider family="enterprise" colorScheme={theme} density="comfortable">
+      <SplunkThemeProvider family="enterprise" colorScheme="light" density="comfortable">
         <div className="dt-app intra-app">
-          <div className="sp-bar intra"><span className="sp-logo">A社 社内ポータル<small>架空</small></span><span className="sp-menus"><span>チケット</span><span>チャット</span><span>ナレッジ</span><span className="user">{who} ▾</span></span></div>
+          <div className="pt-bar"><span className="pt-logo"><i>A</i>A社 ポータル<small>架空</small></span>
+            <nav className="pt-nav"><span>ホーム</span><span className={c.view === "card" || c.view === "flow" || c.view === "goal" ? "active" : ""}>依頼</span><span className={c.view === "ticket" || c.view === "record" ? "active" : ""}>チケット</span><span>チャット</span><span className={c.view === "improve0" || c.view === "improve" ? "active" : ""}>ナレッジ</span></nav>
+            <span className="pt-user">{who}</span></div>
           <div className="dt-page intra-page"><IntraPage c={c} /></div>
         </div>
       </SplunkThemeProvider>
@@ -561,9 +590,9 @@ function Stage({ ch, c, tip, who }) {
   }
   if (c.app === "soar") {
     return (
-      <SplunkThemeProvider family="enterprise" colorScheme={theme} density="comfortable">
-        <div className="dt-app">
-          <div className="sp-bar soar"><span className="sp-logo">Splunk SOAR<small>画面イメージ・架空</small></span><span className="sp-menus"><span>Home</span><span>Sources</span><span>Playbooks</span><span>Apps</span><span className="user">{who} ▾</span></span></div>
+      <SplunkThemeProvider family="enterprise" colorScheme="dark" density="comfortable">
+        <div className="dt-app soar-app">
+          <div className="sp-bar soar"><span className="sp-left"><SplunkLogo product="soar" /><span className="sp-apps">Home ▾</span></span><span className="sp-menus"><span className="user">{who} ▾</span><span>Help ▾</span></span></div>
           <div className="dt-page"><SOARPage c={c} tip={tip} /></div>
         </div>
       </SplunkThemeProvider>
@@ -574,7 +603,7 @@ function Stage({ ch, c, tip, who }) {
   else if (c.app === "cm") page = <CMPage c={c} />;
   else if (c.app === "ir") page = <IRPage c={c} ch={ch} tip={tip} />;
   return (
-    <SplunkThemeProvider family="enterprise" colorScheme={theme} density="comfortable">
+    <SplunkThemeProvider family="enterprise" colorScheme="light" density="comfortable">
       <div className={"dt-app" + (c.dialog ? " has-dialog" : "")}>
         <SplunkBar who={who} />
         <AppBar app={c.app} />

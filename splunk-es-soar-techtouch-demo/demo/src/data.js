@@ -83,8 +83,8 @@ export const JOURNEY = [
 ];
 /* ES・UEBA・SOAR の画面イメージ用（架空） */
 export const NOTABLES = {
-  ueba: { id: "n-ueba", time: "2026-10-06 02:20:31", domain: "Identity", title: "UEBA: Anomalous sign-in and mailbox rule by s.tanaka", urgency: "中", status: "新規", owner: "未割当", risk: 85 },
-  d02: { id: "n-d02", time: "2026-10-06 02:45:02", domain: "Identity", title: "SOC_M365_乗っ取り_D-02: s.tanaka from 198.51.100.77", urgency: "高", status: "新規", owner: "未割当", risk: 165 }
+  ueba: { id: "n-ueba", time: "2026-10-06 02:20:31", domain: "Identity", title: "UEBA: Anomalous sign-in and mailbox rule by s.tanaka", urgency: "Medium", status: "New", owner: "unassigned", risk: 85 },
+  d02: { id: "n-d02", time: "2026-10-06 02:45:02", domain: "Identity", title: "SOC_M365_乗っ取り_D-02: s.tanaka from 198.51.100.77", urgency: "High", status: "New", owner: "unassigned", risk: 165 }
 };
 export const ANOMALIES = [["02:14:10", "普段と違う国からのサインイン（30日の平常値：国内のみ）", 30], ["02:14:10", "普段と違う時間帯（平常：9〜18時）", 15], ["02:18:05", "外部への転送ルールの作成（このアカウントでは初めて）", 20], ["02:25:40", "ダウンロード量が平常の60倍超（平常：1日約20件）", 20]];
 export const RISK_EVENTS = [["02:20:31", "UEBA 異常スコア（上の4件の合計）", 85], ["02:45:02", "相関検索 SOC_M365_乗っ取り_D-02（15分ごと）", 80]];

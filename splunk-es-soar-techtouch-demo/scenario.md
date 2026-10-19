@@ -1,6 +1,6 @@
 # Splunk ES＋UEBA＋SOAR × テックタッチ（DAP＋AI Hub）M365アカウント乗っ取り対応シナリオ・デモ台本
 
-版：1.1｜基準日：2026年10月19日｜用途：社内でのシナリオ確定、デモ制作仕様、SEへの構築依頼
+版：1.2｜基準日：2026年10月19日｜用途：社内でのシナリオ確定、デモ制作仕様、SEへの構築依頼
 対象：Splunk Enterprise Security（ES）・UEBA・SOARを導入済みで、夜間監視や高度な分析を委託先（MSSP）と分担しているお客様
 
 > このシナリオは、どの組織でも起きうる一般的なSOC事案の型（Microsoft 365 アカウントの乗っ取り）を題材にした**架空のもの**です。特定の企業や事案を題材にしたものではありません。画面・人物・企業名・手順・数値はすべて架空です。
@@ -154,10 +154,11 @@ ES・UEBA・SOARは「入れれば守れる」製品ではなく、それぞれ�
 
 | 要素 | デモ（イメージ） | 本番デモ（実機）で要るもの |
 |---|---|---|
-| Splunk | 公式UIツールキット（Apache-2.0）で組んだ画面イメージ。ES・UEBA・SOARの実画面を写したものではない | 有償のSplunk Cloud＋ES（UEBA統合）＋SOAR。トライアル環境では足りない |
+| Splunk | 公式UIツールキット（Apache-2.0）で組んだ画面イメージ。ES・UEBA・SOARの実画面を写したものではない。Splunk Webの枠（黒いSplunk bar、濃いグレーのアプリバーと右端の緑のアプリアイコン、緑の検索ボタン、Search画面の部品の配置）は公開されている画面写真に、SOARのプレイブック図は公開されている図の配色に合わせた（11章）。項目名は英語表記。ロゴはシナリオの前提に合わせて「splunk>cloud」、アドレスは架空（.example） | 有償のSplunk Cloud＋ES（UEBA統合）＋SOAR。トライアル環境では足りない |
 | Splunk AI Assistant | 参考画面（準備した例） | 有償のSplunk Cloudの機能。トライアルでは使えない |
 | テックタッチ | ガイド・ツールチップ・入力チェックは案（HTMLで再現） | 拡張機能の配布。ES・SOARの画面要素を安定して指せるかの検証 |
 | AI Hub | 構想・例文（HTMLで再現） | ナレッジ登録（KB01〜KB08）。回答は本番前に検証 |
+| 社内ポータル | Splunkとは別のシステム（青の配色・架空）として描き分け、チケットから「Splunk ESで開く」でSplunkへ移る | お客様のチケット管理・チャットの実際の画面 |
 | データ | 固定CSV（`data/`、39件・架空） | M365の監査ログ（Entra ID のサインイン、Exchange Online、SharePoint／OneDrive）のインデックス化、平常値ルックアップ |
 
 ### 5.2 場面別の合格判定
@@ -246,7 +247,7 @@ AI Hubの回答はデモでは本番前に確かめた例文です。実環境�
 | 5 | ES・SOARの画面をテックタッチが安定して指せるか | S5・S6の見せ場の前提 | 検証環境で確かめる。有償のSplunk CloudとES・SOARが要る |
 | 6 | 相関検索の作成権限、スケジュール時刻（Splunk CloudはUTC） | S4の前提 | ESの管理者ロールを確認 |
 | 7 | AI Hubに渡す情報の範囲 | 調査記録には個人情報が含まれうる | お客様の方針を伺う。デモは架空データだけ |
-| 8 | 「風」の画面の扱い | デモの画面はES・SOARの実画面ではない | 冒頭で明示する。実画面での確認は構築の最初に行う |
+| 8 | 「風」の画面の扱いと、ESの版による画面の違い | デモの画面はES・SOARの実画面ではない。画面の構成はIncident Review・ノータブルを使うESの画面を手本にした。新しい版のESでは画面と用語（Incident Review、ノータブルなど）が変わっているとの情報があるが、本文は未読（確認必要） | 冒頭で明示する。お客様のESの版を伺い（#1）、その版のドキュメントと実画面で、画面名・項目名を確かめてから本番デモを作る |
 | 9 | CSVルックアップの空値の扱い（`request_id=""`） | Q2・Q3の例外除外の前提 | Splunk実機で確かめる |
 
 ---
@@ -283,6 +284,9 @@ AI Hubの回答はデモでは本番前に確かめた例文です。実環境�
 | Splunk「User and Entity Behavior Analytics」製品ページ（https://www.splunk.com/en_us/products/user-and-entity-behavior-analytics.html） | UEBAがESの機能として提供されること | 要約で確認 |
 | Splunk SOAR 製品ドキュメント（https://docs.splunk.com/Documentation/SOAR） | プレイブック、コンテナ、承認（Prompt）の考え方 | 本文未読。画面はSOARの実画面ではない |
 | Splunk UI Toolkit（npm `@splunk/react-ui` ほか、Apache-2.0） | デモの画面部品 | パッケージのLICENSEで確認 |
+| GitHub `splunk/splunk-connect-for-syslog` の `docs/resources/images/parser_dev_splunk_first_run.png`（Splunk 8.2.4 の Search 画面の写真） | デモのSplunk Webの枠の色と配置（Splunk bar、アプリバー、検索バー、結果の上の行、タブ） | 画像で確認（2026-10-19）。Splunk Enterprise の画面で、Splunk Cloud・ESの画面そのものではない |
+| GitHub `splunk/addonfactory-ucc-generator` の `docs/images/custom_search_command_output.png`（Search 画面） | 検索画面の部品の配置 | 画像で確認（2026-10-19） |
+| GitHub `splunk/security_content` の `playbooks/Azure_AD_Account_Locking.png`（SOARのプレイブック図） | デモのSOARのプレイブック図の配色（暗い背景、ノード、フィルターの枠、ラベル） | 画像で確認（2026-10-19）。SOARの実行画面そのものではない |
 | 既存シナリオ `../splunk-techtouch-siem-demo/scenario.md`（1.3 利用者の声、2章 役割分担、9章 先に確かめること、12章 出典台帳、付録B ES版の差し替え） | 2章、3章、9章 | 確認済み |
 | Gartner Peer Insights（Splunk Cloud Platform）、PeerSpot | 利用者の声（既存シナリオ経由） | 抜粋で確認 |
 | RFC 5737（文書用IPv4アドレス）、RFC 5398（文書用AS番号） | デモデータの接続元IP・ASN | 番号の範囲を確認 |

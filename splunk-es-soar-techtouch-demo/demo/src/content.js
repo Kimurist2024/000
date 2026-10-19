@@ -62,10 +62,10 @@ CH[2] = {
       now: "異常の内訳は、普段と違う国からのサインイン、普段と違う時間帯、初めての外部転送ルール、平常の60倍超のダウンロード、です。",
       why: "UEBAは「普段と違う」を出します。「出張中か」「本人の操作か」は、社内の人が確かめる仕事です。",
       btn: "委託先のチケットを見る", after: function (c) { c.app = "intra"; c.view = "ticket"; } },
-    { label: "委託先のチケットを見る", target: "#i-ticket", tip: "③ 「A社の確認待ち」で4時間（架空）", sub: "封じ込めは何もされていない",
+    { label: "委託先のチケットを見る", target: "#i-ticket", tip: "③ 「A社の確認待ち」で4時間（架空）", sub: "社内ポータルのチケット。「Splunk ESで開く」でSplunkに戻ります",
       now: "夜間の委託先は「出張中の可能性あり。A社の確認待ち」とチケットを起票しました。06:30、まだ回答待ちです。",
       why: "委託先は悪くありません。「本人の利用か」を確かめる手順と、止める承認が、社内に無いことが問題です。",
-      btn: "件数だけの検索を見る", after: function (c) { c.app = "search"; c.q = "before"; } },
+      btn: "Splunk ESで開く", handle: clickIs("i-open-es"), after: function (c) { c.app = "search"; c.q = "before"; } },
     { label: "件数だけの検索を実行する", target: "#sp-run", tip: "④ 件数だけの検索（教材）", sub: "申請済みの移行作業が混ざる",
       now: "ダウンロードの件数が500件以上のアカウントを数えるだけの検索を実行します。", why: "構文は通ります。しかし、申請済みのサイト移行（B）と委託先の移行作業（D）が混ざり、どれが脅威かを判断できません。",
       handle: clickIs("sp-run"), after: function (c) { c.ran = "before"; } }
@@ -206,10 +206,10 @@ function qStep(key, n) {
   return {
     label: Q_LABEL[key] + "を実行する",
     target: function (c) { var p = ph(c); return p === "nav" ? NAV("cm") : p === "open" ? "#rep-" + key : "#sp-run"; },
-    tip: function (c) { var p = ph(c); return p === "nav" ? n + " 「Content Management」を開きます" : p === "open" ? n + " 「" + REPORTS[idx][1] + "」を開きます" : n + " 実行します"; },
+    tip: function (c) { var p = ph(c); return p === "nav" ? n + " 「Configure ▸ Content Management」を開きます" : p === "open" ? n + " 「" + REPORTS[idx][1] + "」を開きます" : n + " 実行します"; },
     sub: function (c) { var p = ph(c); return p === "nav" ? "承認済みの保存済み検索（KB03）は、ここにあります" : p === "open" ? "期待：" + Q_EXPECT[key] : "結果を期待値と見比べます"; },
     redo: "ガイドの順に開き直します",
-    now: function (c) { var p = ph(c); return p === "nav" ? "上の「Content Management」から、保存済み検索の一覧を開きます。" : p === "open" ? "「" + REPORTS[idx][1] + "」を開きます。" : "検索を実行し、結果を期待値と見比べます。"; },
+    now: function (c) { var p = ph(c); return p === "nav" ? "アプリバーの「Configure」から「Content Management」を開き、保存済み検索の一覧を出します。" : p === "open" ? "「" + REPORTS[idx][1] + "」を開きます。" : "検索を実行し、結果を期待値と見比べます。"; },
     why: why,
     btn: function (c) { var p = ph(c); return p === "nav" ? "Content Managementを開く" : p === "open" ? "この検索を開く" : "実行する"; },
     handle: function (c, ev) {
@@ -248,26 +248,26 @@ CH[5] = {
   },
   steps: [qStep("q1", "①"), qStep("q2", "②"), qStep("q3", "③"),
     { label: "相関検索の作成を開く", target: function (c) { return c.app !== "cm" ? NAV("cm") : c.menu ? "#cm-corr" : "#cm-new"; },
-      tip: function (c) { return c.app !== "cm" ? "④ 「Content Management」を開きます" : c.menu ? "④ 「相関検索」を選びます" : "④ 「新規コンテンツの作成」を開きます"; },
-      sub: function (c) { return c.app !== "cm" ? "相関検索は Content Management から作ります（ESの機能）" : c.menu ? "Q3の検索が入った作成画面が開きます" : "Content Management ＞ 新規コンテンツの作成 ＞ 相関検索"; },
-      now: function (c) { return c.app !== "cm" ? "「Content Management」を開きます。" : c.menu ? "「相関検索」を選びます。" : "「新規コンテンツの作成」を開きます。"; },
+      tip: function (c) { return c.app !== "cm" ? "④ 「Configure ▸ Content Management」を開きます" : c.menu ? "④ 「Correlation Search」を選びます" : "④ 「Create New Content」を開きます"; },
+      sub: function (c) { return c.app !== "cm" ? "相関検索は Content Management から作ります（ESの機能）" : c.menu ? "Q3の検索が入った Correlation Search Editor が開きます" : "Create New Content ▸ Correlation Search"; },
+      now: function (c) { return c.app !== "cm" ? "「Configure」から「Content Management」を開きます。" : c.menu ? "「Correlation Search」（相関検索）を選びます。" : "「Create New Content」を開きます。"; },
       why: "相関検索の作成・編集はESの機能です。委託先に依頼せずに社内で足せるかは、権限（ESの管理者ロール）の確認が要ります。",
-      btn: function (c) { return c.app !== "cm" ? "Content Managementを開く" : c.menu ? "相関検索を選ぶ" : "メニューを開く"; },
+      btn: function (c) { return c.app !== "cm" ? "Content Managementを開く" : c.menu ? "Correlation Searchを選ぶ" : "メニューを開く"; },
       handle: function (c, ev) {
         if (ev.kind !== "click") return null;
         if (ev.id === "nav-cm" && c.app !== "cm") { c.app = "cm"; return "ok"; }
         if (ev.id === "cm-new" && !c.menu) { c.menu = true; return "ok"; }
         if (ev.id === "cm-corr" && c.menu) return "done";
-        if (/^cm-(saved|lookup|playbook)$/.test(ev.id)) return { wrong: "このデモでは「相関検索」を選びます。保存済み検索やルックアップは、別のガイドで扱います（架空）。" };
+        if (/^cm-(saved|lookup|playbook)$/.test(ev.id)) return { wrong: "このデモでは「Correlation Search」（相関検索）を選びます。Saved Search や Lookup は、別のガイドで扱います（架空）。" };
         return null;
       },
       auto: function (c) { if (c.app !== "cm") { c.app = "cm"; return "ok"; } if (!c.menu) { c.menu = true; return "ok"; } return "done"; },
       after: function (c) { c.menu = false; c.dialog = true; } },
     { label: "名前と実行間隔を決める", target: function (c) { return !NAME_RULE.test(c.vals["cs-name"]) ? "#f-cs-name" : "#f-cs-sched"; },
-      tip: function (c) { return !NAME_RULE.test(c.vals["cs-name"]) ? "⑤ 名前は「SOC_対象_用途」の形にします" : "⑤ 実行間隔は「15分ごと」にします"; },
+      tip: function (c) { return !NAME_RULE.test(c.vals["cs-name"]) ? "⑤ Search Name は「SOC_対象_用途」の形にします" : "⑤ Cron Schedule は「15分ごと」にします"; },
       sub: function (c) { return !NAME_RULE.test(c.vals["cs-name"]) ? "例：SOC_M365_乗っ取り_D-02（入力チェック・案）" : "リアルタイムは使いません（社内基準・架空）"; },
       redo: "直します",
-      now: function (c) { return !NAME_RULE.test(c.vals["cs-name"]) ? "名前を「SOC_M365_乗っ取り_D-02」の形で入力します。" : "実行間隔を「15分ごと（cron）」にします。"; },
+      now: function (c) { return !NAME_RULE.test(c.vals["cs-name"]) ? "Search Name に「SOC_M365_乗っ取り_D-02」の形で入力します。" : "Cron Schedule を「*/15 * * * *（15分ごと）」にします。"; },
       why: "名前の形をそろえると、委託先が作った相関検索と社内で作ったものを、一覧で見分けられます（社内ルール・架空）。Splunk Cloudのスケジュール時刻はUTCです。",
       btn: function (c) { return !NAME_RULE.test(c.vals["cs-name"]) ? "例の名前を入れる" : "15分ごとにする"; },
       handle: function (c, ev) {
@@ -283,10 +283,10 @@ CH[5] = {
       },
       auto: function (c) { if (!NAME_RULE.test(c.vals["cs-name"])) { c.vals["cs-name"] = "SOC_M365_乗っ取り_D-02"; return "ok"; } c.vals["cs-sched"] = "15m"; return "done"; } },
     { label: "リスク・緊急度・抑制を決めて保存する", target: function (c) { return c.vals["cs-risk"] !== "80" ? "#f-cs-risk" : c.vals["cs-urg"] !== "high" ? "#f-cs-urg" : c.vals["cs-throttle"] !== "60user" ? "#f-cs-throttle" : "#cs-save"; },
-      tip: function (c) { return c.vals["cs-risk"] !== "80" ? "⑥ リスクスコアは「80」（D-02）" : c.vals["cs-urg"] !== "high" ? "⑥ ノータブルの緊急度は「高」" : c.vals["cs-throttle"] !== "60user" ? "⑥ 抑制は「同じ user で60分」" : "⑥ 保存します"; },
+      tip: function (c) { return c.vals["cs-risk"] !== "80" ? "⑥ Risk Score は「80」（D-02）" : c.vals["cs-urg"] !== "high" ? "⑥ Notable の Urgency は「High」" : c.vals["cs-throttle"] !== "60user" ? "⑥ Throttling は「user / 60 min」" : "⑥ 保存します"; },
       sub: function (c) { return c.vals["cs-risk"] !== "80" ? "リスクオブジェクトは user（RBA）" : c.vals["cs-urg"] !== "high" ? "外部への転送ルールを含むため「高」（社内基準・架空）" : c.vals["cs-throttle"] !== "60user" ? "空のままだと、同じアカウントでノータブルが続きます（入力チェック・案）" : "Incident Reviewにノータブルが出ます"; },
       redo: "選び直します",
-      now: function (c) { return c.vals["cs-risk"] !== "80" ? "リスクスコアを「80」にします。" : c.vals["cs-urg"] !== "high" ? "ノータブルの緊急度を「高」にします。" : c.vals["cs-throttle"] !== "60user" ? "抑制を「同じ user で60分」にします。" : "「保存」を押します。"; },
+      now: function (c) { return c.vals["cs-risk"] !== "80" ? "Risk Analysis の Risk Score を「80」にします。" : c.vals["cs-urg"] !== "high" ? "Notable の Urgency を「High」（緊急度：高）にします。" : c.vals["cs-throttle"] !== "60user" ? "Throttling を「user / 60 min」（同じ user で60分）にします。" : "「Save」を押します。"; },
       why: "リスクスコア・緊急度・抑制はESの機能です。テックタッチは、A社が何を選ぶか（社内基準・架空）だけを案内します。",
       btn: function (c) { return c.vals["cs-risk"] !== "80" ? "リスクを選ぶ" : c.vals["cs-urg"] !== "high" ? "緊急度を選ぶ" : c.vals["cs-throttle"] !== "60user" ? "抑制を選ぶ" : "保存する"; },
       handle: function (c, ev) {
@@ -296,7 +296,7 @@ CH[5] = {
         }
         if (ev.kind === "pick" && ev.id === "cs-urg") {
           if (!ev.value) return null;
-          return ev.value === "high" ? "ok" : { wrong: "【入力チェック（案）】外部への転送ルールを含む操作は、緊急度「高」にします（社内基準・架空）。" };
+          return ev.value === "high" ? "ok" : { wrong: "【入力チェック（案）】外部への転送ルールを含む操作は、Urgency「High」（緊急度：高）にします（社内基準・架空）。" };
         }
         if (ev.kind === "pick" && ev.id === "cs-throttle") {
           if (!ev.value) return null;
@@ -349,8 +349,8 @@ CH[6] = {
     { label: "ノータブルを開く", target: "#ir-row-d02", tip: "① D-02のノータブル（緊急度：高）", sub: "UEBAの異常85＋相関検索80＝リスクスコア165（架空）",
       now: "Incident Reviewで「SOC_M365_乗っ取り_D-02: s.tanaka」を開きます。", hub: "ノータブルは、S4で保存した相関検索から出たものです。UEBAの異常スコアとRBAで合算されています（画面イメージ・架空）。",
       handle: clickIs("ir-row-d02"), after: function (c) { c.view = "detail"; } },
-    { label: "担当者を自分にする", target: "#ir-own", tip: "② 「担当者を自分にする」を押します", sub: "状態が「進行中」になり、誰が見ているかが残る",
-      now: "「担当者を自分にする」を押します。状態を「進行中」にして、誰が対応しているかを残します。", hub: "委託先待ちで止まらない最初の一歩は、社内の誰かが担当者になることです（社内ルール・架空）。",
+    { label: "担当者を自分にする", target: "#ir-own", tip: "② 「Edit Selected」で Owner を自分にします", sub: "Status が In Progress（進行中）になり、誰が見ているかが残る",
+      now: "「Edit Selected」で Owner を自分に、Status を In Progress（進行中）にして、誰が対応しているかを残します。", hub: "委託先待ちで止まらない最初の一歩は、社内の誰かが担当者になることです（社内ルール・架空）。",
       handle: clickIs("ir-own"), after: function (c) { c.owner = true; } },
     { label: "AI Hubで一次調査の整理をする", target: "#hub-p3", tip: "③ 「一次調査の整理」を開きます", sub: "KB04（M365アカウント）の手順に沿って、事実と未確認を分ける（P3）",
       now: "「一次調査の整理」を押します。AI Hubが、確認済み事実・追加の確認・本人と上長への確認文・判断の進め方に分けます。",
@@ -459,10 +459,10 @@ CH[7] = {
       },
       auto: function (c) { c.vals["pb-ticket"] = APPROVAL_TICKET; return "done"; } },
     { label: "プレイブックを実行する", target: "#pb-run", tip: "④ 実行します", sub: "①②は即時に成功、③は承認待ちになります",
-      now: "「実行」を押します。①セッション失効と②転送ルールの無効化・パスワードリセットは即時に実行され、③アカウント停止は承認待ちになります。",
+      now: "「Run」を押します。①セッション失効と②転送ルールの無効化・パスワードリセットは即時に実行され、③の承認（PROMPT）で止まります。",
       hub: "SOARの実行はSplunkの機能です。テックタッチは、入力（範囲・承認番号）が社内基準に合っているかだけを確かめます。",
       handle: clickIs("pb-run"), after: function (c) { c.ran = true; } },
-    { label: "SOC責任者の承認を受ける", target: "#pb-approve", tip: "⑤ SOC責任者が承認します（デモでは同じ画面で）", sub: "③アカウント停止が実行される",
+    { label: "SOC責任者の承認を受ける", target: "#pb-approve", tip: "⑤ SOC責任者が承認します（デモでは同じ画面で）", sub: "PROMPT が通り、③アカウント停止が実行される",
       now: "SOC責任者が承認します。デモでは同じ画面のボタンで代用します。③アカウント停止が実行され、攻撃者の操作が止まります。",
       hub: "Beforeでは、ここで承認者を探して止まっていました。承認段階が決まっていれば、承認待ちの時間は測れます。",
       handle: clickIs("pb-approve"), after: function (c) { c.approved = true; } }

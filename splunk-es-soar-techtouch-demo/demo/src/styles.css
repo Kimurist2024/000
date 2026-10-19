@@ -1196,3 +1196,148 @@ button.tpl { text-align: left; font: inherit; color: var(--dt-text); width: 100%
 
 /* 画面の下の方にある「?」は、枠の下で切れないよう上向きに開く */
 #tw-auth .tt-tip, #tw-disp .tt-tip { top: auto; bottom: calc(100% + 10px); }
+
+/* ==================== 実画面に寄せる（公開されている Splunk Enterprise 8.2 の画面写真と、Splunk SOAR のプレイブック図の色・配置） ==================== */
+/* Splunk bar（最上段・黒） */
+#sp-root .sp-bar { display: flex; border: 0; border-radius: 0; overflow: visible; min-height: 40px; padding: 0 16px; background: #161c23; color: #e1e6eb; font-size: 13px; flex-wrap: nowrap; }
+.sp-left { display: inline-flex; align-items: center; gap: 22px; min-width: 0; }
+.sp-logo { display: inline-flex; align-items: baseline; font-family: 'Splunk Platform Sans', 'Proxima Nova', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 17px; letter-spacing: -0.01em; line-height: 1; white-space: nowrap; }
+.sp-logo b { color: #fff; font-weight: 700; }
+.sp-logo i { color: #6daf65; font-style: normal; font-weight: 400; }
+.sp-apps { color: #e1e6eb; font-size: 13px; }
+#sp-root .sp-menus { display: flex; align-items: center; flex-wrap: nowrap; gap: 0 18px; opacity: 1; color: #e1e6eb; white-space: nowrap; }
+#sp-root .sp-menus .user { font-weight: 600; }
+.sp-find { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 120px; height: 26px; padding: 0 8px; border-radius: 3px; background: #2b3033; color: #9ba3ab; }
+.sp-find svg { width: 13px; height: 13px; }
+/* アプリバー（濃いグレー・右端に緑のアプリアイコン） */
+#sp-root .app-bar, :root[data-theme="dark"] #sp-root .app-bar { min-height: 42px; padding: 0 0 0 8px; background: #3d454f; border-bottom: 0; color: #fff; justify-content: space-between; flex-wrap: nowrap; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #sp-root .app-bar { background: #3d454f; border-bottom: 0; color: #fff; } }
+#sp-root .app-nav { flex-wrap: nowrap; overflow: hidden; min-width: 0; }
+#sp-root .app-nav button, #sp-root .app-nav span { padding: 11px 10px; font-size: 13.5px; color: #e1e6eb; white-space: nowrap; }
+#sp-root .app-nav button:hover { background: rgba(255, 255, 255, 0.08); }
+#sp-root .app-nav .active { color: #fff; font-weight: 600; }
+#sp-root .app-nav .active::after { left: 10px; right: 10px; height: 3px; background: #6daf65; }
+.app-label { display: inline-flex; align-items: center; gap: 10px; padding: 0 16px 0 12px; white-space: nowrap; }
+.app-icon { display: inline-grid; place-items: center; width: 30px; height: 30px; background: #6daf65; color: #fff; }
+.app-icon svg { width: 18px; height: 18px; }
+#sp-root .app-name { margin: 0; color: #fff; font-size: 15px; font-weight: 600; }
+/* ページ */
+#sp-root .dt-app, :root[data-theme="dark"] #sp-root .dt-app { background: #f3f4f6; color: #3c444d; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #sp-root .dt-app { background: #f3f4f6; color: #3c444d; } }
+#sp-root .dt-page { padding: 14px 18px 20px; }
+#sp-root .sp-head h2 { font-size: 24px; font-weight: 400; color: #3c444d; }
+.sp-hlinks { display: inline-flex; gap: 22px; color: #5c6773; font-size: 13.5px; white-space: nowrap; }
+.sp-crumb { margin: 0; font-size: 12.5px; color: #6b7785; }
+.sp-crumb b { color: #3c444d; font-weight: 600; }
+.sp-crumb.dark { color: #9ba3ab; }
+.sp-crumb.dark b { color: #e1e6eb; }
+/* 検索バー（白い入力欄・時間の範囲・緑の検索ボタン） */
+#sp-root .sp-searchbar { gap: 0; }
+#sp-root .sp-searchbar .spl-box { min-height: 40px; border: 2px solid #5e92bb; border-radius: 3px 0 0 3px; padding: 8px 10px; font-size: 13px; color: #1b2a37; }
+#sp-root .sp-searchbar .spl-box.ph { border-color: #c3cbd4; color: #9ba3ab; }
+.sp-tp { height: 100%; min-height: 40px; border: 1px solid #c3cbd4; border-left: 0; background: #f7f8fa; color: #3c444d; font: inherit; font-size: 13px; padding: 0 12px; white-space: nowrap; }
+.sp-go-btn { display: inline-grid; place-items: center; height: 100%; min-height: 40px; width: 46px; border: 0; border-radius: 0 3px 3px 0; background: #6daf65; color: #fff; cursor: pointer; }
+.sp-go-btn:hover { background: #5c9a55; }
+.sp-go-btn svg { width: 18px; height: 18px; }
+/* 結果の上の行（件数・Job・Smart Mode）とタブ */
+.sp-results { display: grid; gap: 0; min-width: 0; }
+.sp-status { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; padding: 2px 0 8px; font-size: 13px; color: #3c444d; }
+.sp-status .sp-summary { font-size: 13px; }
+.sp-status .sp-summary .ok { color: #3c444d; }
+.sp-sampling { color: #3c444d; }
+.sp-job { margin-left: auto; display: inline-flex; align-items: center; gap: 14px; color: #5c6773; white-space: nowrap; }
+.sp-job .mode { margin-left: 6px; color: #3c444d; }
+.sp-tabs { display: flex; gap: 26px; border-bottom: 1px solid #c3cbd4; margin: 0 -18px 10px; padding: 0 18px; font-size: 13.5px; color: #3c444d; }
+.sp-tabs span { padding: 8px 0 7px; border-bottom: 3px solid transparent; }
+.sp-tabs .active { border-bottom-color: #5e92bb; font-weight: 600; }
+/* 表（見出しの行はグレー） */
+#sp-root table th, #sp-root [role="columnheader"] { background-color: #e2e6eb; }
+.sp-tbl thead th { background: #e2e6eb; color: #3c444d; font-weight: 600; }
+.sp-empty { background: #fff; }
+/* Incident Review のフィルター */
+#sp-root .ir-filter { gap: 8px 10px; align-items: flex-end; padding: 10px 12px; background: #fff; border: 1px solid #e1e6eb; border-radius: 3px; }
+#sp-root .ir-filter span { display: inline-grid; gap: 2px; font-size: 12px; color: #6b7785; }
+#sp-root .ir-filter b { font-weight: 400; color: #3c444d; font-size: 13px; min-width: 110px; padding: 4px 8px; border: 1px solid #c3cbd4; border-radius: 3px; background: #f7f8fa; }
+#sp-root .ir-filter .sub { align-self: end; padding: 5px 14px; border-radius: 3px; background: #6daf65; color: #fff; font-size: 13px; font-weight: 600; }
+.ir-i { color: #6b7785; font-weight: 700; }
+
+/* ---------- Splunk SOAR（暗い画面・プレイブック図） ---------- */
+#sp-root .dt-app.soar-app, :root[data-theme="dark"] #sp-root .dt-app.soar-app { background: #111215; color: #e1e6eb; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #sp-root .dt-app.soar-app { background: #111215; color: #e1e6eb; } }
+#sp-root .sp-bar.soar { background: #1b1d21; border-bottom: 1px solid #2e3136; }
+.soar-app .sp-head h2 { color: #e1e6eb !important; }
+.soar-app .dt-fine { color: #9ba3ab; }
+.soar-grid { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.15fr); gap: 14px; align-items: start; }
+@media (max-width: 1240px) { .soar-grid { grid-template-columns: minmax(0, 1fr); } }
+.soar-side { display: grid; gap: 12px; min-width: 0; }
+.pb-canvas { display: flex; flex-direction: column; align-items: center; padding: 18px 12px; border-radius: 4px; background-color: #111215; background-image: radial-gradient(#3a3d44 1px, transparent 1.2px); background-size: 18px 18px; border: 1px solid #2e3136; min-width: 0; }
+.pb-node { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 12px; width: min(100%, 330px); padding: 9px 12px; border-radius: 6px; background: #27292e; border: 2px solid #27292e; color: #fff; font-family: 'Roboto Mono', Consolas, Menlo, 'Hiragino Sans', 'Yu Gothic', Meiryo, monospace; }
+.pb-ic { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 3px; background: #3a3d44; color: #e1e6eb; font-size: 18px; font-family: sans-serif; }
+.pb-node.action .pb-ic { background: #90ca86; color: #1b1d21; }
+.pb-node.filter, .pb-node.prompt { border-color: #f1c463; }
+.pb-node.filter .pb-ic, .pb-node.prompt .pb-ic { color: #f1c463; background: #1b1d21; }
+.pb-node.end .pb-ic { background: #3a3d44; }
+.pb-node.ok { border-color: #90ca86; }
+.pb-node.wait { border-color: #f1c463; box-shadow: 0 0 0 3px rgba(241, 196, 99, 0.25); }
+.pb-tx { display: grid; gap: 1px; min-width: 0; }
+.pb-tx small { font-size: 11px; letter-spacing: 0.06em; color: #b8bec6; font-weight: 700; }
+.pb-tx b { font-size: 13px; font-weight: 700; line-height: 1.35; }
+.pb-tx em { font-style: normal; font-size: 11.5px; color: #9ba3ab; }
+.pb-st { position: absolute; top: -9px; right: -9px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; font-weight: 700; }
+.pb-st.ok { background: #90ca86; color: #1b1d21; }
+.pb-st.wait { background: #f1c463; color: #1b1d21; }
+.pb-wire { position: relative; display: grid; place-items: center; width: 2px; height: 22px; background: #5c6067; }
+.pb-wire::before, .pb-wire::after { content: ""; position: absolute; left: 50%; width: 9px; height: 9px; border-radius: 50%; background: #fff; border: 2px solid #5c6067; transform: translateX(-50%); }
+.pb-wire::before { top: -5px; }
+.pb-wire::after { bottom: -5px; }
+.pb-wire.dim { opacity: 0.5; }
+.pb-wire:has(.pb-pill) { height: 40px; }
+.pb-pill { position: relative; z-index: 1; padding: 1px 10px; border-radius: 999px; background: #70d1bb; color: #1b1d21; font-style: normal; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.sp-dark-tbl { background: transparent; }
+.soar-app .sp-dark-tbl th, .soar-app .sp-dark-tbl td { border-bottom-color: #33373d; color: #e1e6eb; }
+.soar-app .sp-dark-tbl thead th { background: #1b1d21; color: #9ba3ab; }
+.soar-app .st { background: #33373d; color: #c3cbd4; }
+.soar-app .st.ok { background: #90ca86; color: #1b1d21; }
+.soar-app .st.wait { background: rgba(241, 196, 99, 0.15); color: #f1c463; border-color: #f1c463; }
+.soar-app .tt-note { background: var(--tt-soft); color: var(--dt-text); }
+.soar-app .hub-win { color: var(--dt-text); }
+
+/* ---------- 社内ポータル（Splunk とは別のシステム・架空） ---------- */
+.pt-bar { display: flex; align-items: center; gap: 10px 28px; flex-wrap: wrap; min-height: 48px; padding: 0 18px; background: #fff; border-bottom: 3px solid #2563a8; color: #1f2d3d; font-family: var(--font-demo); }
+.pt-logo { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; white-space: nowrap; }
+.pt-logo i { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; background: #2563a8; color: #fff; font-style: normal; font-size: 14px; }
+.pt-logo small { font-weight: 400; font-size: 11px; color: #6b7785; }
+.pt-nav { display: flex; gap: 2px; flex-wrap: wrap; font-size: 14px; }
+.pt-nav span { padding: 13px 12px 11px; color: #4a5a6a; border-bottom: 3px solid transparent; margin-bottom: -3px; }
+.pt-nav .active { color: #2563a8; font-weight: 700; border-bottom-color: #2563a8; }
+.pt-user { margin-left: auto; font-size: 13px; color: #4a5a6a; }
+.pt-link { border: 1px solid #2563a8; background: #fff; color: #2563a8; border-radius: 6px; padding: 6px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.pt-link:hover { background: #eef4fb; }
+#sp-root .intra-app { background: #eef1f4; }
+.intra-app .intra-page { background: #eef1f4; }
+
+/* ---------- ブラウザ枠のアドレス表示（架空のドメイン .example） ---------- */
+.win-url { display: inline-flex; align-items: center; gap: 6px; min-width: 0; flex: 1 1 auto; max-width: 760px; padding: 3px 12px; border-radius: 999px; background: var(--dt-surface); border: 1px solid var(--dt-border-sub); color: var(--dt-text); font-family: 'Roboto Mono', Consolas, Menlo, monospace; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.win-url .host { font-weight: 600; }
+.win-url .path { color: var(--dt-text-sub); overflow: hidden; text-overflow: ellipsis; }
+.win-note { margin-left: auto; font-size: 11.5px; color: var(--dt-text-sub); white-space: nowrap; }
+@media (max-width: 900px) { .win-note { display: none; } }
+.win-url svg { flex: none; color: var(--dt-text-sub); }
+@media (max-width: 760px) {
+  #sp-root .sp-bar, #sp-root .app-bar { flex-wrap: wrap; }
+  #sp-root .sp-menus { flex-wrap: wrap; white-space: normal; gap: 0 12px; }
+  .sp-find, .sp-job, .sp-hlinks { display: none; }
+  #sp-root .app-nav { flex-wrap: wrap; }
+  .app-label { padding: 6px 12px; }
+  .sp-tabs { gap: 14px; flex-wrap: wrap; }
+  .pt-user { margin-left: 0; }
+}
+#win-title { display: flex; align-items: center; gap: 12px; flex: 1 1 auto; min-width: 0; overflow: hidden; }
+/* ガイドのパネルは、Splunk bar とアプリバー（右端のアプリ名）を隠さない位置から始める */
+@media (min-width: 1081px) { .has-overlay .overlay { margin-top: 92px; } }
+/* 複数行の検索文でも、時間の範囲と検索ボタンは1行の高さで上にそろえる（実画面と同じ） */
+#sp-root .sp-searchbar { align-items: start; }
+#sp-root .sp-tp, #sp-root .sp-go-btn { height: 40px; }
+.soar-app .sp-dark-tbl { font-size: 12.5px; }
+.soar-app .sp-dark-tbl td:first-child { width: 46%; }
+.cm-tbl td:nth-child(2), .cm-tbl td:nth-child(4), .cm-tbl td:nth-child(5) { white-space: nowrap; }

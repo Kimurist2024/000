@@ -43,13 +43,13 @@ const URL = 'file://' + (process.env.DEMO_HTML || require('path').resolve(__dirn
   await next(p); s = await st(p); expect(s.next === 'S1へ進む（Before）', 's0 done ' + s.next);
   await next(p);
   // ---- S1
-  s = await st(p); expect(s.hash === '#s2', 's1 hash'); expect(s.app.includes('Enterprise Security'), 's1 app ' + s.app); expect(s.title.includes('Enterprise Security'), 's1 title ' + s.title);
+  s = await st(p); expect(s.hash === '#s2', 's1 hash'); expect(s.app.includes('Enterprise Security'), 's1 app ' + s.app); expect(s.title.includes('splunk.a-corp.example') && s.title.includes('incident_review'), 's1 title ' + s.title); expect(await p.evaluate(() => getComputedStyle(document.querySelector('.sp-go-btn') || document.querySelector('.app-icon')).backgroundColor) === 'rgb(109, 175, 101)', 's1 splunk green');
   await shot(p, 's1-0');
   await click(p, 'ir-row-ueba'); s = await st(p); expect(s.now.includes('ノータブルを開く'), 's1 step1 ' + s.now);
   await click(p, 'ir-row-ueba'); s = await st(p); expect(s.now.includes('UEBA'), 's1 step2 ' + s.now); expect(await p.isVisible('#ir-anom'), 's1 anomalies');
   await p.waitForTimeout(500); await shot(p, 's1-2');
   await next(p); s = await st(p); expect(s.now.includes('チケット'), 's1 step3'); expect(await p.isVisible('#i-ticket'), 's1 ticket');
-  await next(p); s = await st(p); expect(s.now.includes('件数だけ'), 's1 step4 ' + s.now);
+  await click(p, 'i-open-es'); s = await st(p); expect(s.now.includes('件数だけ'), 's1 step4 ' + s.now); expect(s.title.includes('/search'), 's1 back to splunk ' + s.title);
   await click(p, 'sp-run'); s = await st(p); expect(s.next === 'S2へ進む（要件整理）', 's1 done ' + s.next); expect(await p.isVisible('#res-row-B'), 's1 row B'); expect(await p.isVisible('#res-row-D'), 's1 row D');
   await shot(p, 's1-4');
   await next(p);
@@ -85,18 +85,18 @@ const URL = 'file://' + (process.env.DEMO_HTML || require('path').resolve(__dirn
   await shot(p, 's4-q1');
   for (const k of ['q2', 'q3']) { await click(p, 'nav-cm'); await click(p, 'rep-' + k); await click(p, 'sp-run'); }
   s = await st(p); expect(s.now.includes('相関検索の作成'), 's4 step4 ' + s.now); expect(await p.isVisible('#res-row-A'), 's4 q3 row A');
-  await click(p, 'nav-cm'); s = await st(p); expect(s.balloon.includes('新規コンテンツ'), 's4 cm ' + s.balloon);
-  await click(p, 'cm-new'); await p.waitForTimeout(150); expect(await p.locator('[role="menuitem"]').filter({ hasText: '相関検索' }).count() > 0, 's4 menu open');
-  await p.locator('[role="menuitem"]').filter({ hasText: '保存済み検索' }).first().click(); await p.waitForTimeout(100); s = await st(p); expect(s.alert.includes('相関検索'), 's4 wrong menu ' + s.alert);
-  await click(p, 'cm-new'); await p.waitForTimeout(150); await p.locator('[role="menuitem"]').filter({ hasText: '相関検索' }).first().click(); await p.waitForTimeout(150);
+  await click(p, 'nav-cm'); s = await st(p); expect(s.balloon.includes('Create New Content'), 's4 cm ' + s.balloon);
+  await click(p, 'cm-new'); await p.waitForTimeout(150); expect(await p.locator('[role="menuitem"]').filter({ hasText: 'Correlation Search' }).count() > 0, 's4 menu open');
+  await p.locator('[role="menuitem"]').filter({ hasText: 'Saved Search' }).first().click(); await p.waitForTimeout(100); s = await st(p); expect(s.alert.includes('相関検索'), 's4 wrong menu ' + s.alert);
+  await click(p, 'cm-new'); await p.waitForTimeout(150); await p.locator('[role="menuitem"]').filter({ hasText: 'Correlation Search' }).first().click(); await p.waitForTimeout(150);
   s = await st(p); expect(await p.isVisible('.sp-dialog'), 's4 dialog'); expect(s.now.includes('名前と実行間隔'), 's4 step5 ' + s.now);
   await type(p, 'cs-name', '異常参照'); s = await st(p); expect(s.alert.includes('SOC_対象_用途'), 's4 name check ' + s.alert);
   await type(p, 'cs-name', 'SOC_M365_乗っ取り_D-02'); await pick(p, 'cs-sched', 'リアルタイム'); s = await st(p); expect(s.alert.includes('リアルタイム'), 's4 rt check ' + s.alert);
   await shot(p, 's4-rtwrong');
   await pick(p, 'cs-sched', '15分ごと'); s = await st(p); expect(s.now.includes('リスク'), 's4 step6 ' + s.now);
-  await pick(p, 'cs-risk', 'リスクスコア 50'); s = await st(p); expect(s.alert.includes('80'), 's4 risk check ' + s.alert);
-  await pick(p, 'cs-risk', 'リスクスコア 80'); await pick(p, 'cs-urg', '緊急度：中'); s = await st(p); expect(s.alert.includes('高'), 's4 urg check ' + s.alert);
-  await pick(p, 'cs-urg', '緊急度：高'); await pick(p, 'cs-throttle', '抑制しない'); s = await st(p); expect(s.alert.includes('抑制が空'), 's4 throttle check ' + s.alert);
+  await pick(p, 'cs-risk', 'Risk Score 50'); s = await st(p); expect(s.alert.includes('80'), 's4 risk check ' + s.alert);
+  await pick(p, 'cs-risk', 'Risk Score 80'); await pick(p, 'cs-urg', 'Urgency: Medium'); s = await st(p); expect(s.alert.includes('高'), 's4 urg check ' + s.alert);
+  await pick(p, 'cs-urg', 'Urgency: High'); await pick(p, 'cs-throttle', '抑制しない'); s = await st(p); expect(s.alert.includes('抑制が空'), 's4 throttle check ' + s.alert);
   await pick(p, 'cs-throttle', '同じ user で60分'); s = await st(p); expect(s.balloon.includes('保存'), 's4 save balloon ' + s.balloon);
   await shot(p, 's4-dialog');
   await click(p, 'cs-save'); s = await st(p); expect(s.next === 'S5へ進む（一次対応）', 's4 done ' + s.next);
@@ -122,7 +122,7 @@ const URL = 'file://' + (process.env.DEMO_HTML || require('path').resolve(__dirn
   await click(p, 'ck-escalate'); s = await st(p); expect(s.next === 'S6へ進む（封じ込め）', 's5 done ' + s.next);
   await next(p);
   // ---- S6
-  s = await st(p); expect(s.hash === '#s7', 's6 hash'); expect(s.title.includes('SOAR'), 's6 title ' + s.title); await click(p, 'g-start'); s = await st(p); expect(s.balloon.includes('承認段階'), 's6 step1 ' + s.balloon);
+  s = await st(p); expect(s.hash === '#s7', 's6 hash'); expect(s.title.includes('soar.a-corp.example'), 's6 title ' + s.title); await click(p, 'g-start'); s = await st(p); expect(s.balloon.includes('承認段階'), 's6 step1 ' + s.balloon);
   await click(p, 'hub-p5'); s = await st(p); expect(s.now.includes('実行範囲'), 's6 step2 ' + s.now);
   await shot(p, 's6-1');
   await pick(p, 'pb-scope', '①〜②'); s = await st(p); expect(s.alert.includes('③アカウント停止'), 's6 scope12 ' + s.alert);

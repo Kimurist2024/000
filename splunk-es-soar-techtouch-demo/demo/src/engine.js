@@ -205,6 +205,14 @@ function renderStory() {
   $("#story").innerHTML = '<p class="story-time">' + d.time + "<small>" + d.timeSub + "</small></p><h1>" + role + d.title + '</h1><p class="story-text">' + d.text + "</p>" +
     '<p class="story-tags">' + d.tags.filter((t) => !/の視点$/.test(t)).map((t) => "<span>" + t + "</span>").join("") + "</p>";
 }
+// ブラウザ枠のアドレス表示。ドメインは文書用の予約名（.example）で、架空
+function winURL(c) {
+  const es = "/en-US/app/SplunkEnterpriseSecuritySuite/";
+  const [host, path] = c.app === "intra" ? ["portal.a-corp.example", c.view === "ticket" ? "/tickets/SOC-2061" : c.view === "record" ? "/tickets/SOC-2061-R" : c.view === "improve0" || c.view === "improve" ? "/knowledge" : "/requests/SOC-2070"]
+    : c.app === "soar" ? ["soar.a-corp.example", "/mission/2061/playbook"]
+    : ["splunk.a-corp.example", es + (c.app === "ir" ? "incident_review" : c.app === "cm" ? "ess_content_management" : "search")];
+  return '<span class="win-url" aria-label="アドレス（架空）"><svg aria-hidden="true" width="11" height="12" viewBox="0 0 11 12"><rect x="1" y="5" width="9" height="7" rx="1.5" fill="currentColor"/><path d="M3 5V3.5a2.5 2.5 0 0 1 5 0V5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="host">' + host + '</span><span class="path">' + path + "</span></span>";
+}
 export function render() {
   const active = document.activeElement, focusId = active && active.id;
   renderJourney();
@@ -217,7 +225,7 @@ export function render() {
   $$("#notes [data-for]").forEach((ul) => { ul.hidden = ul.getAttribute("data-for") !== String(S.ch); });
   if (summary) { $("#summary").innerHTML = summaryHTML(); guide = null; }
   else {
-    $("#win-title").textContent = c.app === "intra" ? "社内ポータル（架空）　チケット管理・チャットのイメージ" : c.app === "soar" ? "Splunk SOAR の画面イメージ（Splunk公式UI部品で組んだ「風」の再現・架空のデータ）" : "Splunk Enterprise Security の画面イメージ（Splunk公式UI部品で組んだ「風」の再現・架空のデータ）";
+    $("#win-title").innerHTML = winURL(c) + '<span class="win-note">' + (c.app === "intra" ? "社内ポータル（Splunkとは別のシステム・架空）" : "Splunk公式UI部品で組んだ画面イメージ・架空のデータ") + "</span>";
     const dt = $("#dt"); dt.classList.toggle("intra", c.app === "intra");
     const panel = $("#panel");
     panel.className = "overlay" + (d.kind === "hub" ? " hub" : d.kind === "note" ? " note" : "");
