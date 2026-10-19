@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Splunk × テックタッチ 構想デモ</title>
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-jp/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-jp/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-jp/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/400.css">
+<style>
+:root{--line:#e2e5ea;--ink:#1f2430;--sub:#5d6573;--mut:#8a919c;--tt:#1a7fc1;--ttd:#12608f;--tts:#e8f3fb;--ai:#5a3ea6;--ais:#f2eefa;--ok:#2c7a4b;--warn:#b5560f;--warns:#fdf1e6;
+--critical:#d1453b;--high:#ec7a2e;--medium:#d9a514;--low:#9bb52c;--normal:#3c9a5f;--info:#4a8fd6;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#f6f7f9}
+body{font-family:"Noto Sans JP","IPAGothic",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 0}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:#f6f7f9}
+#scene,#q,#ov{position:absolute;inset:0}
+#ov{z-index:10}#q{z-index:15}
+.mono{font-family:"JetBrains Mono","Noto Sans JP",monospace}
+
+/* chapter bar + header */
+.chbar{position:absolute;left:30px;top:12px;width:1860px;height:58px;display:flex;gap:10px}
+.chi{flex:1;border:1px solid var(--line);border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 14px;gap:12px}
+.chi .n{width:27px;height:27px;border-radius:50%;border:1.5px solid #9aa1ab;font-size:14px;display:grid;place-items:center;color:#5d6573;flex:none}
+.chi.cur{border:2px solid #2c3140}
+.chi.cur .n{background:#2c3140;color:#fff;border-color:#2c3140}
+.chi.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.chi b{font-size:16px;font-weight:700;display:block;line-height:1.3}.chi small{display:block;font-size:13px;color:var(--sub)}
+.hdr{position:absolute;left:30px;top:80px;width:1860px;height:82px;background:#fff;border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;padding:0 20px}
+.hdr .tm{width:124px;border-right:1px solid var(--line);margin-right:22px;flex:none}.hdr .tm b{font-size:30px;font-weight:700;display:block;line-height:1.15}.hdr .tm small{font-size:14px;color:var(--sub)}
+.hdr h2{font-size:24px;font-weight:700;line-height:1.3}.hdr p{font-size:16px;color:var(--sub);margin-top:3px}
+
+/* window */
+.win{position:absolute;left:30px;top:174px;width:1860px;height:940px;background:#fff;border:1px solid #d9dde3;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.wbar{height:40px;background:#f1f2f4;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;gap:8px;font-size:15px;color:#4a5160}
+.wbar i{width:12px;height:12px;border-radius:50%;background:#d3d6db}.wbar span{margin-left:14px}
+.sbar{height:46px;background:#16181d;color:#e8eaee;display:flex;align-items:center;padding:0 20px;font-size:15px}
+.slogo{font-weight:700;font-size:16px;margin-right:34px;color:#fff;letter-spacing:.2px}.slogo small{font-weight:400;color:#9aa0aa;margin-left:8px;font-size:13px}
+.sbar .it{margin-right:24px;color:#c9cdd4}
+.sbar .rt{margin-left:auto;display:flex;gap:24px;color:#c9cdd4;align-items:center}
+.sbar .find{border:1px solid #4a4f58;border-radius:4px;padding:3px 40px 3px 10px;color:#8f96a1}
+.abar{height:44px;background:#2b3038;color:#e9ebef;display:flex;align-items:center;padding:0 10px;font-size:15px}
+.abar .nv{padding:0 15px;height:44px;display:flex;align-items:center;color:#cfd4db;position:relative;white-space:nowrap}
+.abar .nv.on{color:#fff;font-weight:700}
+.abar .nv.on:after{content:"";position:absolute;left:15px;right:15px;bottom:0;height:3px;background:#5cb85c}
+.abar .an{margin-left:auto;font-size:17px;font-weight:700;color:#fff;padding-right:14px}
+.wbody{position:absolute;left:0;right:0;bottom:0;background:#f7f8fa}
+.main{position:absolute;left:0;top:0;width:1400px;bottom:0;padding:16px 26px}
+.crumb{font-size:14px;color:var(--sub)}
+.h1{font-size:26px;font-weight:700;margin:2px 0 12px;display:flex;align-items:baseline;gap:12px}.h1 small{font-size:16px;font-weight:400;color:var(--sub)}
+.box{background:#fff;border:1px solid var(--line);border-radius:8px}
+.empty{display:grid;place-items:center;color:var(--sub);font-size:16px;height:150px}
+
+/* chat card */
+.chat{display:flex;gap:14px;background:#fff;border:1px solid #d7dbe1;border-radius:10px;padding:14px 18px;box-shadow:0 3px 10px rgba(0,0,0,.06);margin-bottom:14px;position:relative}
+.chat .av{width:40px;height:40px;border-radius:50%;background:#e9ecf0;display:grid;place-items:center;font-weight:700;color:#4a5160;flex:none}
+.chat .hd{font-size:14px;color:var(--sub)}.chat .hd b{color:var(--ink);font-size:15px;margin-right:10px}
+.chat p{font-size:17px;margin-top:2px;line-height:1.55}.chat small{font-size:13px;color:var(--mut)}
+.chat .cl{position:absolute;right:16px;top:12px;font-size:13px;color:var(--sub)}
+
+/* launcher */
+.lhome{position:absolute;inset:0;display:flex}
+.lapps{width:300px;background:#fff;border-right:1px solid var(--line);padding:18px 16px}
+.lapps .lt{font-size:14px;color:var(--sub);margin-bottom:10px;font-weight:700}
+.la{display:flex;align-items:center;gap:10px;font-size:16px;padding:9px 10px;border-radius:6px}
+.ic{width:24px;height:24px;border-radius:6px;flex:none;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700}
+.lmain{flex:none;width:1100px;padding:16px 26px}
+.ltiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+.lti{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px;height:118px}
+.lti b{display:block;font-size:17px;margin-top:10px}.lti span{font-size:14px;color:var(--sub)}
+.sect{font-size:15px;color:var(--sub);font-weight:700;margin-top:6px}
+
+/* filters / dropdown */
+.filt{display:flex;gap:10px;margin-bottom:14px;position:relative}
+.fd{display:inline-flex;align-items:center;gap:10px;height:42px;border:1px solid #cfd4db;border-radius:6px;background:#fff;padding:0 14px;font-size:15px;color:var(--sub)}
+.fd b{color:var(--ink);font-weight:500}
+.dd{position:absolute;background:#fff;border:1px solid #cfd4db;border-radius:6px;box-shadow:0 8px 20px rgba(0,0,0,.12);padding:6px 0;z-index:5;width:260px}
+.dd div{padding:9px 16px;font-size:15px}.dd .cur{background:#f0f2f5;font-weight:700}
+
+/* SA tiles */
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+.tl{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 14px 16px;height:124px;position:relative;overflow:hidden}
+.tl .nm{font-size:15px;font-weight:700;line-height:1.3;height:40px}
+.tl .sc{font-size:36px;font-weight:700;line-height:1.1}
+.tl .lb{font-size:13px;color:var(--sub)}
+.tl .bar{position:absolute;left:0;right:0;bottom:0;height:6px}
+.tl.sel{outline:3px solid #2b3038;outline-offset:-2px}
+.epbar{display:flex;align-items:center;gap:14px;background:#fdf1e6;border:1px solid #f3d3b6;border-radius:8px;padding:10px 16px;font-size:16px;margin-bottom:14px}
+.epbar b{color:#a34b0c}
+.lnk{color:var(--tt);border:1.5px solid transparent;border-radius:6px;padding:2px 8px;font-weight:700}
+table{border-collapse:collapse;width:100%}
+.kt th{font-size:14px;color:var(--sub);font-weight:500;text-align:left;padding:8px 14px;border-bottom:1px solid var(--line)}
+.kt td{font-size:16px;padding:0 14px;height:46px;border-bottom:1px solid #eef0f3}
+.sev{display:inline-block;color:#fff;font-size:13px;font-weight:700;border-radius:12px;padding:2px 11px}
+.qm{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--tt);color:#fff;font-size:14px;font-weight:700;margin-left:6px;vertical-align:middle}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.ph b{font-size:17px}
+
+/* Episode review */
+.erw{display:flex;gap:16px}
+.elist{width:430px;flex:none}
+.ec{background:#fff;border:1px solid var(--line);border-left:6px solid;border-radius:8px;padding:10px 14px;margin-bottom:10px}
+.ec b{display:block;font-size:15px;line-height:1.45}.ec span{font-size:13.5px;color:var(--sub)}
+.ec.sel{outline:2.5px solid #2b3038;outline-offset:-1px}
+.edet{flex:1;background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 18px;min-height:560px}
+.eid{font-size:14px;color:var(--sub)}.etitle{font-size:21px;font-weight:700;margin:2px 0 4px}
+.emeta{font-size:14.5px;color:var(--sub)}
+.ectl{display:flex;gap:10px;align-items:center;margin:12px 0 10px;flex-wrap:nowrap}
+.sel2{display:inline-flex;align-items:center;gap:8px;border:1px solid #cfd4db;border-radius:6px;padding:0 12px;height:36px;font-size:14.5px;color:var(--sub);background:#fff}
+.sel2 b{color:var(--ink);font-weight:500}
+.abtn{height:36px;padding:0 16px;border-radius:6px;background:#2b3038;color:#fff;font-size:14.5px;display:inline-grid;place-items:center;font-weight:700}
+.abtn.g{background:#fff;color:var(--ink);border:1px solid #cfd4db;font-weight:500}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.tab{padding:8px 13px;font-size:15px;color:var(--sub);border-bottom:3px solid transparent}
+.tab.on{color:var(--ink);font-weight:700;border-color:#2b3038}
+.et td,.et th{padding:8px 10px;font-size:15px;border-bottom:1px solid #eef0f3;text-align:left}
+.et th{font-size:13.5px;color:var(--sub);font-weight:500}
+.chipe{display:inline-flex;align-items:center;gap:8px;background:#f0f2f5;border-radius:6px;padding:6px 12px;font-size:15px}
+
+/* ITE */
+.vit{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.vc{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 16px;border-top:5px solid var(--normal)}
+.vc span{font-size:14px;color:var(--sub)}.vc b{display:block;font-size:30px;font-weight:700;line-height:1.25}.vc small{font-size:13px;color:var(--sub)}
+
+/* search */
+.sbx{display:flex;gap:8px;align-items:stretch;margin-bottom:10px}
+.sin{flex:1;background:#fff;border:1.5px solid #b9c0ca;border-radius:6px;padding:10px 14px;font-size:16px;line-height:1.7;min-height:48px;color:#9aa0aa}
+.sin .ln{color:#1f2430;white-space:pre}
+.k1{color:#1a5fb4;font-weight:700}.k2{color:#8b3fb0}.k3{color:#b45309}.k4{color:#2f7d32}.pp{color:#9aa0aa}
+.tp{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #b9c0ca;border-radius:6px;padding:0 14px;font-size:15px;width:210px;justify-content:space-between}
+.sbtn{width:58px;background:#3c8a3f;border-radius:6px;display:grid;place-items:center}
+.jobl{display:flex;align-items:center;gap:16px;font-size:14.5px;color:var(--sub);margin:4px 0 8px}
+.jobl .ok{color:var(--ok);font-weight:700}
+.jobl .ja{margin-left:auto;display:flex;gap:8px}
+.jbt{border:1px solid #cfd4db;border-radius:5px;padding:3px 10px;background:#fff;color:var(--ink);font-size:14px}
+.titlerow{display:flex;align-items:center;justify-content:space-between}
+.titlerow .ra{display:flex;gap:8px}
+.rt2 td,.rt2 th{padding:11px 14px;font-size:15.5px;border-bottom:1px solid #eef0f3;text-align:left}
+.rt2 th{font-size:14px;color:var(--sub);font-weight:500}
+.tag{display:inline-block;font-size:12.5px;background:#eef6ee;color:#2f6b35;border-radius:4px;padding:1px 7px;margin-left:8px;font-weight:500}
+
+/* techtouch panel */
+.ttp{position:absolute;right:22px;top:16px;width:432px;background:#fff;border:1px solid #d6dbe2;border-top:5px solid var(--tt);border-radius:10px;box-shadow:0 6px 18px rgba(20,40,70,.12);padding:14px 18px 18px;z-index:3}
+.ttp.ai{border-top-color:var(--ai)}
+.chip{display:inline-block;background:var(--tt);color:#fff;font-size:14px;font-weight:700;border-radius:20px;padding:2px 12px}
+.ai .chip{background:var(--ai)}
+.ttp .lbl{font-size:14px;color:var(--sub);margin-left:8px}
+.ttp h3{font-size:21px;font-weight:700;margin:10px 0 8px;line-height:1.35}
+.ttp .dsc{font-size:15px;color:var(--sub);line-height:1.6;margin-bottom:10px}
+.git{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:8px}
+.git b{font-size:16px;display:block}.git span{font-size:13.5px;color:var(--sub)}
+.git.on{border:2px solid var(--tt);background:var(--tts)}
+.ai .git.on{border-color:var(--ai);background:var(--ais)}
+.steps li{list-style:none;display:flex;align-items:center;gap:10px;font-size:15.5px;color:#3a4150;padding:3px 8px;border-radius:6px;height:31px}
+.steps .d{width:23px;height:23px;border-radius:50%;border:1.5px solid #b5bbc4;display:grid;place-items:center;font-size:12.5px;color:#6b7280;flex:none}
+.steps li.ok .d{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps li.cur{background:var(--tts);color:var(--ttd);font-weight:700}
+.steps li.cur .d{background:var(--tt);border-color:var(--tt);color:#fff}
+.ai .steps li.cur{background:var(--ais);color:var(--ai)}.ai .steps li.cur .d{background:var(--ai);border-color:var(--ai)}
+.msg{font-size:16.5px;font-weight:700;line-height:1.6;margin:10px 0 8px}
+.why{background:var(--tts);border-radius:8px;padding:9px 14px;font-size:14.5px;line-height:1.65;color:#2f4a60;margin-top:6px}
+.warn{background:var(--warns);border:1.5px solid #f0b483;border-radius:8px;padding:9px 14px;font-size:15px;line-height:1.65;color:#8a4210;margin:6px 0}
+.aibox{background:var(--ais);border-radius:8px;padding:9px 14px;font-size:14.5px;line-height:1.7;color:#3c2c6e;margin-top:8px;white-space:pre-line}
+.aibox b{display:block;color:var(--ai);font-size:14px;margin-bottom:1px}
+.ttg{background:var(--tts);border-radius:8px;padding:9px 14px;font-size:14.5px;line-height:1.65;color:#2f4a60;margin-top:8px}
+.ttg b{display:flex;justify-content:space-between;color:var(--ttd);font-size:14px}
+.chk{font-size:14.5px;line-height:1.8;margin-top:8px;color:#2f3a48}
+.chk div:before{content:"✓ ";color:var(--ok);font-weight:700}
+.rec{border-left:2px solid var(--tts);margin:6px 0 4px 6px;padding-left:12px}
+.rec div{font-size:14px;line-height:1.55;margin-bottom:6px;color:#2f3a48}.rec div b{color:var(--ttd);margin-right:8px}
+.btns{display:flex;gap:10px;margin-top:14px}
+.btn2{border:1px solid #cdd2d9;border-radius:8px;height:46px;padding:0 18px;display:grid;place-items:center;font-size:16px;background:#fff}
+.btn1{flex:1;background:var(--tt);color:#fff;border-radius:8px;height:46px;display:grid;place-items:center;font-size:16px;font-weight:700}
+.ai .btn1{background:var(--ai)}
+.note{font-size:13.5px;color:var(--sub);margin-top:10px;line-height:1.6}
+.asst{border:1px dashed #b9c0ca;border-radius:8px;padding:8px 12px;font-size:13.5px;color:#3a4150;line-height:1.6;margin-top:8px}
+
+/* popup */
+.dim{position:absolute;left:0;top:0;width:1400px;bottom:0;background:rgba(30,35,45,.38);z-index:4}
+.pop{position:absolute;background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.25);border-top:5px solid var(--tt);padding:18px 22px 20px;z-index:6}
+.pop h4{font-size:21px;margin:8px 0 8px}
+.pop p{font-size:16px;line-height:1.7}
+.pop .tbox{background:#f4f6f8;border-radius:8px;padding:10px 14px;font-size:15px;line-height:1.75;margin:6px 0 4px}
+.pop ol{padding-left:0}.pop li{list-style:none;font-size:15.5px;line-height:1.65;margin-bottom:4px}
+
+/* overlays */
+.ring{position:absolute;border:3px solid var(--tt);border-radius:10px;box-shadow:0 0 0 5px rgba(26,127,193,.16);pointer-events:none}
+.ring.ai{border-color:var(--ai);box-shadow:0 0 0 5px rgba(90,62,166,.16)}
+.ring.w{border-color:#e07b2a;box-shadow:0 0 0 5px rgba(224,123,42,.18)}
+.bal{position:absolute;background:var(--tt);color:#fff;border-radius:8px;padding:9px 16px;font-size:16.5px;font-weight:700;line-height:1.45;box-shadow:0 6px 16px rgba(18,96,143,.3);white-space:nowrap}
+.bal.ai{background:var(--ai)}
+.bal small{display:block;font-weight:400;font-size:14px;opacity:.95}
+.bal:before{content:"";position:absolute;width:14px;height:14px;background:inherit;transform:rotate(45deg)}
+.bal.b:before{top:-6px;left:24px}.bal.br:before{top:-6px;right:24px}.bal.t:before{bottom:-6px;left:24px}.bal.l:before{right:-6px;top:16px}.bal.r:before{left:-6px;top:16px}
+.tip{position:absolute;background:#fff;border:2px solid var(--tt);border-radius:10px;padding:10px 16px 12px;width:440px;font-size:15.5px;line-height:1.7;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.tip b{display:block;color:var(--ttd);font-size:14px;margin-bottom:2px}
+#cap{position:absolute;left:30px;bottom:22px;width:1385px;background:#262a35;border-radius:10px;color:#fff;padding:18px 28px 14px;z-index:20}
+#cap .c1{font-size:25px;font-weight:700;line-height:1.45}
+#cap .c2{font-size:14px;color:#aab0bb;margin-top:6px}
+#cursor{position:absolute;left:0;top:0;width:30px;height:30px;z-index:40;pointer-events:none}
+#rip{position:absolute;border:3px solid var(--tt);border-radius:50%;z-index:39;pointer-events:none}
+
+/* cards */
+.cardbg{position:absolute;inset:0;background:#fafbfc}
+.card{position:absolute;left:260px;width:1400px;background:#fff;border:1px solid var(--line);border-left:7px solid var(--tt);border-radius:8px;padding:44px 52px;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.card.ai{border-left-color:var(--ai)}
+.card .sm{font-size:17px;color:var(--sub)}
+.card h1{font-size:48px;font-weight:700;margin:14px 0 14px;line-height:1.35}
+.card h2{font-size:28px;font-weight:500;margin-bottom:16px;color:#2c3140}
+.card p{font-size:20px;color:#3a4150;line-height:1.7}
+.card .lg{display:flex;gap:28px;font-size:17px;margin-top:20px;color:#3a4150}
+.card .lg span{display:inline-flex;align-items:center;gap:8px}
+.card .lg i{width:16px;height:16px;border-radius:3px;display:inline-block}
+.card .fn{border-top:1px solid var(--line);margin-top:24px;padding-top:16px;font-size:15px;color:var(--sub);line-height:1.75}
+.card .sup{font-size:24px;color:#2c3140;margin-top:4px}
+.ag{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+.ag div{border:1px solid var(--line);border-radius:8px;padding:16px 18px;min-height:150px}
+.ag b{font-size:30px;display:block}.ag strong{font-size:18px;display:block;line-height:1.5;margin-top:4px}.ag span{font-size:14.5px;color:var(--sub)}
+.qbg{position:absolute;inset:0;background:rgba(40,44,66,.5)}
+.qcard{position:absolute;left:270px;top:400px;width:1390px;background:#fff;border-radius:10px;padding:34px 48px 40px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.qcard .chip{font-size:16px;padding:3px 16px}
+.qcard h1{font-size:36px;font-weight:700;margin-top:18px;line-height:1.5}
+
+/* summary */
+.sumg{position:absolute;left:30px;top:174px;width:1860px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sbox{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px 24px}
+.sbox h5{font-size:20px;margin-bottom:12px}
+.tlx{position:relative;padding-left:4px}
+.tlx div{display:flex;gap:18px;margin-bottom:16px}.tlx em{font-style:normal;font-weight:700;width:62px;flex:none;font-size:18px}
+.tlx p{font-size:18px;line-height:1.5}.tlx p span{display:block;font-size:15.5px;color:var(--sub)}
+.cnt{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.cnt div{background:#f4f6f8;border-radius:8px;padding:12px 14px}.cnt b{font-size:44px;display:block;line-height:1.2}.cnt span{font-size:15.5px;color:var(--sub);line-height:1.45;display:block}
+.ul div{font-size:17.5px;line-height:1.9}.ul div:before{content:"・"}
+.sfn{font-size:15px;color:var(--sub);margin-top:8px;line-height:1.6}
+</style>
+</head>
+<body>
+<div id="stage"><div id="scene"></div><div id="ov"></div><div id="q"></div><div id="cap"><div class="c1"></div><div class="c2"></div></div><div id="rip"></div>
+<svg id="cursor" viewBox="0 0 30 30"><path d="M3,2 L3,25 L9,19.5 L13,28 L16.6,26.4 L12.7,18 L20.5,18 Z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+<script>
+const NOTE='構想デモ｜画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。';
+const SEVC={critical:'var(--critical)',high:'var(--high)',medium:'var(--medium)',low:'var(--low)',normal:'var(--normal)',info:'var(--info)'};
+const SEVN={critical:'Critical',high:'High',medium:'Medium',low:'Low',normal:'Normal',info:'Info'};
+const sev=s=>`<span class="sev" style="background:${SEVC[s]}">${SEVN[s]}</span>`;
+const CH=[['第1章　問い合わせ・状況確認','10:16　デモ①'],['第2章　一次確認・連絡','10:18　デモ②'],['第3章　ログを調べる','10:30　デモ③'],['振り返り','まとめ']];
+const HDR=[
+ {tm:'10:16',lb:'問い合わせ',t:'問い合わせを受けて、担当サービスの健全性を確認する',d:'業務部門から「10時過ぎから契約照会の画面が遅い」と連絡が入りました。担当者がSplunkを使うのは月に数回です（想定の人物像）。'},
+ {tm:'10:18',lb:'障害を確認',t:'障害の一次確認を、社内手順どおりに進めて連絡する',d:'同じ時間帯にエピソードが発生していました。人によって順番がばらつかないよう、社内手順（架空）に沿って確認し、関係者に連絡します。'},
+ {tm:'10:30',lb:'専門チームの依頼',t:'ログを調べて、原因の手がかりを専門チームに渡す',d:'専門チーム（架空）から、接続エラーの推移をログで確認するよう依頼がありました。SPLを一から書かず、ひな型を使って調べます。'},
+ {tm:'まとめ',lb:'振り返り',t:'問い合わせからログ分析までを、一つの業務の流れで見る',d:'今日の流れと、テックタッチが手当てした場面を振り返ります。どこで、どの支援が効くかを一緒に確かめたい点です。'}];
+
+const SERVICES=[
+ {id:'contract',n:'契約照会サービス（架空）',s:38,sev:'high'},
+ {id:'kanri',n:'契約管理サービス（架空）',s:58,sev:'medium'},
+ {id:'agent',n:'代理店ポータル（架空）',s:71,sev:'low'},
+ {id:'mypage',n:'顧客マイページ（架空）',s:96,sev:'normal'},
+ {id:'auth',n:'認証基盤（架空）',s:100,sev:'normal'},
+ {id:'report',n:'帳票出力（架空）',s:92,sev:'normal'}];
+const RISE=[10,10,11,10,11,10,11,12,11,13,20,30,34,33,35],FLAT=[20,21,20,19,21,20,21,20,20,21,20,21,20,21,20],MILD=[10,11,10,12,11,12,13,12,14,13,15,14,16,15,16];
+const KPIS={
+ contract:[{n:'応答時間（p95）',v:'1,850 ms',s:'high',p:RISE,bad:1},{n:'DB接続待ち時間',v:'640 ms',s:'high',p:RISE,bad:1},{n:'エラー率',v:'0.8 %',s:'medium',p:MILD},{n:'リクエスト数',v:'6,200 件／15分',s:'normal',p:FLAT}],
+ kanri:[{n:'応答時間（p95）',v:'720 ms',s:'medium',p:MILD},{n:'バッチ処理の遅延',v:'4 分',s:'low',p:MILD},{n:'エラー率',v:'0.1 %',s:'normal',p:FLAT},{n:'リクエスト数',v:'1,900 件／15分',s:'normal',p:FLAT}]};
+
+function spark(vals,w=200,h=32,col='#4a5160'){
+ const mn=Math.min(...vals),mx=Math.max(...vals)||1,r=(mx-mn)||1;
+ const pts=vals.map((v,i)=>`${(i/(vals.length-1)*w).toFixed(1)},${(h-3-(v-mn)/r*(h-6)).toFixed(1)}`).join(' ');
+ return `<svg width="${w}" height="${h}"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2"/></svg>`;}
+
+/* ---------- top-level pieces ---------- */
+function chbar(ch){return `<div class="chbar">${CH.map((c,i)=>`<div class="chi ${i<ch?'done':i===ch?'cur':''}"><span class="n">${i<ch?'✓':i+1}</span><div><b>${c[0]}</b><small>${c[1]}</small></div></div>`).join('')}</div>`;}
+function hdr(ch){const h=HDR[ch];return `<div class="hdr"><div class="tm"><b>${h.tm}</b><small>${h.lb}</small></div><div><h2>${h.t}</h2><p>${h.d}</p></div></div>`;}
+function abar(st){
+ if(st.view==='launcher')return '';
+ let nav,an;
+ if(st.view==='sa'||st.view==='er'){an='IT Service Intelligence';nav=[['Service Analyzer ▾',st.view==='sa'],['Episode Review',st.view==='er','navER'],['Glass Tables'],['Deep Dives'],['Dashboards ▾'],['Search ▾'],['Configuration ▾']];}
+ else if(st.view==='ite'){an='IT Essentials Work';nav=[['Entity Overview',1],['Search ▾'],['Configuration ▾']];}
+ else{an='Search & Reporting';nav=[['Search',st.sv!=='reports'],['Analytics'],['Datasets'],['Reports',st.sv==='reports','navReports'],['Alerts'],['Dashboards']];}
+ return `<div class="abar">${nav.map(n=>`<span class="nv ${n[1]?'on':''}" ${n[2]?`data-k="${n[2]}"`:''}>${n[0]}</span>`).join('')}<span class="an">${an}</span></div>`;}
+function win(st){
+ const top=st.view==='launcher'?86:130;
+ return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>監視画面（架空）　Splunk の画面イメージを踏襲</span></div>
+ <div class="sbar"><div class="slogo">Splunk Cloud Platform<small>画面イメージ</small></div><span class="it">Apps ▾</span><div class="rt"><span>Messages ▾</span><span>Settings ▾</span><span>Activity ▾</span><span>Help ▾</span><span class="find">Find</span></div></div>
+ ${abar(st)}<div class="wbody" style="top:${top}px"><div class="main">${VIEWS[st.view](st)}</div>${st.pop?'<div class="dim"></div>'+POPS[st.pop]():''}${tt(st.tt)}</div></div>`;}
+function chat(c){return `<div class="chat" data-k="chat"><div class="av">${c.a}</div><div><div class="hd"><b>${c.who}</b>${c.tm}</div><p>${c.t}</p><small>社内チャット（架空）の通知</small></div><span class="cl">閉じる</span></div>`;}
+const CHATS={
+ biz:{a:'業',who:'業務部門（架空）',tm:'10:16',t:'10時過ぎから、契約照会の画面が遅いという声が出ています。状況を確認してもらえますか？'},
+ exp:{a:'専',who:'専門チーム（架空）',tm:'10:30',t:'接続エラーの件数を、5分ごとの推移で共有してください。SPLは Reports に保存してある「接続エラーの推移（標準）」を使ってください。'},
+ rep:{a:'専',who:'専門チーム（架空）',tm:'10:34',t:'確認しました。接続プールの設定をこちらで確認します。この検索はレポートとして保存し、運用チームに共有してください。'}};
+
+/* ---------- views ---------- */
+const VIEWS={
+launcher(st){
+ const apps=[['Search & Reporting','#3c8a3f','S','appSearch'],['IT Service Intelligence','#1b6ec2','I','appITSI'],['IT Essentials Work','#6b4fbf','E','appITE'],['Cloud Monitoring Console','#7a828e','C']];
+ return `<div class="lhome"><aside class="lapps"><div class="lt">Apps</div>${apps.map(a=>`<div class="la"><span class="ic" style="background:${a[1]}">${a[2]}</span>${a[0]}</div>`).join('')}<div class="la" style="color:var(--sub)">＋ Find more apps</div></aside>
+ <section class="lmain">${st.chat?chat(CHATS[st.chat]):''}<div class="crumb">Home</div><div class="h1">Home <small>ホーム</small></div><div class="sect">最近使ったアプリ</div>
+ <div class="ltiles">${[['IT Service Intelligence','サービスの健全性を見る','#1b6ec2','I','tileITSI'],['Search & Reporting','ログを検索する','#3c8a3f','S'],['IT Essentials Work','サーバーなどの状態を見る','#6b4fbf','E'],['Dashboards','チームのダッシュボード','#7a828e','D']].map(t=>`<div class="lti" ${t[4]?`data-k="${t[4]}"`:''}><span class="ic" style="background:${t[2]};width:30px;height:30px">${t[3]}</span><b>${t[0]}</b><span>${t[1]}</span></div>`).join('')}</div>
+ <div style="margin-top:16px;color:var(--sub);font-size:14px">ホーム画面は架空です。</div></section></div>`;},
+sa(st){
+ const sel=st.saSel;
+ let h=`<div class="crumb">IT Service Intelligence ＞ Service Analyzer</div><div class="h1">Service Analyzer <small>サービスの健全性（Tile view）</small></div>
+ <div class="filt"><div class="fd">View　<b>Tile ▾</b></div><div class="fd" data-k="saTime">🕘 Time range　<b>${st.saTime}</b> ▾</div><div class="fd">Services　<b>All (6)</b> ▾</div>
+ ${st.drop==='saTime'?`<div class="dd" style="left:124px;top:48px">${['Last 15 minutes','Last 60 minutes','Last 4 hours','Last 24 hours'].map(o=>`<div class="${o===st.saTime?'cur':''}" ${o==='Last 60 minutes'?'data-k="opt60"':''}>${o}</div>`).join('')}</div>`:''}</div>
+ <div class="tiles" data-k="tiles">${SERVICES.map(s=>`<div class="tl ${sel===s.id?'sel':''}" data-k="tile_${s.id}"><div class="nm">${s.n}</div><div class="sc" style="color:${SEVC[s.sev]}">${s.s}</div><div class="lb">Health score</div><div class="bar" style="background:${SEVC[s.sev]}"></div></div>`).join('')}</div>`;
+ if(sel==='contract') h+=`<div class="epbar"><b>進行中のエピソード</b><span>E-0412　契約照会サービス（架空）の応答時間の悪化（10:02〜・New）</span><span class="lnk" data-k="epLink" style="margin-left:auto">Episode Review で開く ›</span></div>`;
+ if(sel){const S=SERVICES.find(s=>s.id===sel),K=KPIS[sel];
+  h+=`<div class="box"><div class="ph"><b>KPI　${S.n}</b><span style="font-size:15px"><span data-k="hsWrap">Health score <b style="color:${SEVC[S.sev]};font-size:20px">${S.s}</b> ${sev(S.sev)}<span class="qm" data-k="hsQ">?</span></span></span></div>
+  <table class="kt"><tr><th style="width:34%">KPI</th><th>現在値</th><th>Severity</th><th>推移（${st.saTime}）</th></tr>
+  ${K.map((k,i)=>`<tr ${k.bad&&i===0?'data-k="kpiBad1"':''} ${k.bad&&i===1?'data-k="kpiBad2"':''}><td>${k.n}</td><td><b>${k.v}</b></td><td>${sev(k.s)}</td><td>${spark(k.p,200,30,SEVC[k.s])}</td></tr>`).join('')}</table></div>`;}
+ else h+=`<div class="box empty">サービスを選ぶと、KPI（重要業績評価指標）の状態が表示されます。</div>`;
+ return h;},
+er(st){
+ const eps=[{id:'E-0412',t:'契約照会サービス（架空）の応答時間の悪化',m:`${st.erStatus}・${st.erOwner}・10:02〜・イベント 38`,s:'high',sel:1},
+  {id:'E-0409',t:'帳票出力（架空）のジョブ遅延',m:'In Progress・運用B（架空）・08:41〜・イベント 12',s:'medium'},
+  {id:'E-0405',t:'認証基盤（架空）の証明書期限の通知',m:'Resolved・運用A（架空）・前日・イベント 3',s:'low'}];
+ const tabs=[['Impact','tabImpact'],['Events Timeline'],['Common Fields'],['Comments'],['Activity'],['All Events','tabEvents']];
+ let body='';
+ if(st.erTab==='impact') body=`<div style="font-size:15px;font-weight:700;margin-bottom:6px">影響を受けているサービス</div>
+  <table class="et"><tr><th>サービス</th><th>Health score</th><th>Severity</th><th>関係</th></tr>
+  <tr><td>契約照会サービス（架空）</td><td><b>38</b></td><td>${sev('high')}</td><td>エピソードの対象</td></tr>
+  <tr><td>代理店ポータル（架空）</td><td><b>71</b></td><td>${sev('low')}</td><td>契約照会を利用</td></tr>
+  <tr><td>顧客マイページ（架空）</td><td><b>96</b></td><td>${sev('normal')}</td><td>影響なし</td></tr></table>
+  <div style="display:flex;gap:30px;margin-top:14px;font-size:15.5px"><div data-k="impWrap"><span style="color:var(--sub)">影響の範囲</span><span class="qm" data-k="impQ">?</span>　<b>代理店ポータルの照会の一部（架空）</b></div></div>
+  <div style="margin-top:14px;font-size:15px;color:var(--sub)">関連エンティティ</div><div style="margin-top:6px;display:flex;gap:12px;align-items:center"><span class="chipe">🖥 ctr-db-01（架空）</span><span class="chipe">🖥 ctr-app-01（架空）</span><span class="lnk" data-k="entLink">Entity Overview で開く ›</span></div>`;
+ else body=`<table class="et"><tr><th>時刻</th><th>Severity</th><th>内容（Notable event）</th></tr>
+  <tr><td>10:02:31</td><td>${sev('high')}</td><td>応答時間（p95）がしきい値を超えました（架空）</td></tr>
+  <tr><td>10:03:10</td><td>${sev('high')}</td><td>DB接続待ち時間がしきい値を超えました（架空）</td></tr>
+  <tr><td>10:06:44</td><td>${sev('medium')}</td><td>エラー率が上昇しました（架空）</td></tr>
+  <tr><td>10:11:02</td><td>${sev('low')}</td><td>代理店ポータルの健全性スコアが低下しました（架空）</td></tr></table>`;
+ return `<div class="crumb">IT Service Intelligence ＞ Episode Review</div><div class="h1">Episode Review <small>エピソード（関連するアラートのまとまり）の確認</small></div>
+ <div class="erw"><div class="elist"><div class="filt"><div class="fd">Status　<b>All ▾</b></div><div class="fd">Time　<b>Last 24 hours ▾</b></div></div>
+ ${eps.map(e=>`<div class="ec ${e.sel?'sel':''}" style="border-left-color:${SEVC[e.s]}"><span>${e.id}</span><b>${e.t}</b><span>${e.m}</span></div>`).join('')}</div>
+ <div class="edet"><div data-k="epHead"><div class="eid">E-0412　${sev('high')}</div><div class="etitle">契約照会サービス（架空）の応答時間の悪化</div><div class="emeta">開始 10:02　｜　最新のイベント 10:17　｜　イベント 38件　｜　対象 契約照会サービス（架空）</div></div>
+ <div class="ectl"><span class="sel2">Severity <b>High ▾</b></span><span style="display:inline-flex;gap:10px" data-k="epStatus"><span class="sel2">Status <b>${st.erStatus} ▾</b></span><span class="sel2">Owner <b>${st.erOwner} ▾</b></span></span><span class="abtn ${st.erStatus==='New'?'':'g'}" data-k="ackBtn">${st.erStatus==='New'?'Acknowledge':'Acknowledged ✓'}</span><span class="abtn g">Actions ▾</span></div>
+ <div class="tabs">${tabs.map(t=>`<span class="tab ${(t[1]==='tabImpact'&&st.erTab==='impact')||(t[1]==='tabEvents'&&st.erTab==='events')?'on':''}" ${t[1]?`data-k="${t[1]}"`:''}>${t[0]}</span>`).join('')}</div>${body}</div></div>`;},
+ite(st){
+ const vals=[];for(let i=0;i<=50;i++){let v=i<28?182+((i*37)%13)-6:Math.min(486,182+(i-28)*26+((i*17)%11));if(i>40)v=476+((i*13)%11);vals.push(v);}
+ const w=1290,h=210,x=i=>40+i/50*(w-60),y=v=>h-24-(v/550)*(h-40);
+ const pts=vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+ const ticks=[0,10,20,30,40,50].map(i=>`<text x="${x(i)}" y="${h-4}" font-size="13" fill="#6b7280" text-anchor="middle">${['09:30','09:40','09:50','10:00','10:10','10:20'][i/10]}</text>`).join('');
+ return `<div class="crumb">IT Essentials Work ＞ Entity Overview ＞ ctr-db-01（架空）</div><div class="h1">ctr-db-01（架空） <small>エンティティの状態（Analytics）</small></div>
+ <div style="font-size:14.5px;color:var(--sub);margin:-6px 0 12px">種類：*nix（架空）｜役割：契約DBサーバー（架空）｜関連サービス：契約照会サービス（架空）</div>
+ <div class="vit"><div class="vc"><span>CPU使用率</span><b>34 %</b><small>過去60分の平均</small></div><div class="vc"><span>メモリ使用率</span><b>71 %</b><small>過去60分の平均</small></div><div class="vc"><span>ディスクI/O待ち</span><b>12 ms</b><small>過去60分の平均</small></div>
+ <div class="vc" style="border-top-color:var(--high)" data-k="vConn"><span>DB接続数（架空の指標）</span><b style="color:var(--high)">482 / 500</b><small>上限 500（架空）に近い</small></div></div>
+ <div class="box" style="padding:12px 16px" data-k="connChart"><div style="font-size:16px;font-weight:700">DB接続数（1分ごと）</div>
+ <svg width="${w}" height="${h}"><line x1="40" x2="${w-20}" y1="${y(500)}" y2="${y(500)}" stroke="#d1453b" stroke-dasharray="6 5" stroke-width="1.5"/><text x="${w-24}" y="${y(500)-6}" font-size="13" fill="#d1453b" text-anchor="end">上限 500（架空）</text>
+ ${[0,250,500].map(v=>`<text x="30" y="${y(v)+4}" font-size="12" fill="#8a919c" text-anchor="end">${v}</text><line x1="40" x2="${w-20}" y1="${y(v)}" y2="${y(v)}" stroke="#eef0f3"/>`).join('')}
+ <line x1="${x(28)}" x2="${x(28)}" y1="16" y2="${h-24}" stroke="#ec7a2e" stroke-dasharray="4 4"/><text x="${x(28)-6}" y="30" font-size="13" fill="#b5560f" text-anchor="end">09:58 増加開始</text>
+ <line x1="${x(32)}" x2="${x(32)}" y1="16" y2="${h-24}" stroke="#2b3038" stroke-dasharray="4 4"/><text x="${x(32)+6}" y="30" font-size="13" fill="#2b3038">10:02 エピソード開始</text>
+ <polyline points="${pts}" fill="none" stroke="#1b6ec2" stroke-width="2.5"/>${ticks}</svg></div>`;},
+search(st){
+ const sv=st.sv;
+ if(sv==='reports') return `<div class="crumb">Search & Reporting ＞ Reports</div><div class="h1">Reports <small>保存済みの検索（専門チームが作成したSPLのひな型を含む）</small></div>
+  <div class="box"><table class="rt2"><tr><th>Title</th><th>Actions</th><th>Owner</th><th>Sharing</th></tr>
+  <tr data-k="rpt1"><td><b>接続エラーの推移（標準）</b><span class="tag">専門チームが確認済み（架空）</span></td><td><span class="lnk" data-k="rptOpen">Open in Search</span>　Edit ▾</td><td>専門チーム（架空）</td><td>App</td></tr>
+  <tr><td><b>エラーの内訳（標準）</b><span class="tag">専門チームが確認済み（架空）</span></td><td><span class="lnk">Open in Search</span>　Edit ▾</td><td>専門チーム（架空）</td><td>App</td></tr>
+  <tr><td><b>遅い処理の上位（標準）</b><span class="tag">専門チームが確認済み（架空）</span></td><td><span class="lnk">Open in Search</span>　Edit ▾</td><td>専門チーム（架空）</td><td>App</td></tr>
+  <tr><td><b>夜間バッチの実行結果</b></td><td><span class="lnk">Open in Search</span>　Edit ▾</td><td>運用B（架空）</td><td>Private</td></tr></table></div>
+  <div style="margin-top:10px;color:var(--sub);font-size:14px">レポート名・所有者は架空です。</div>`;
+ const loaded=sv!=='home';
+ const spl=loaded?`<div class="ln"><span class="k4">index</span>=app_logs <span class="k4">service</span>=<span class="k3">"contract_inquiry"</span> <span class="k4">log_level</span>=<span class="k3">ERROR</span></div><div class="ln"><span class="pp">|</span> <span class="k1">search</span> <span class="k4">message</span>=<span class="k3">"*connection*"</span></div><div class="ln"><span class="pp">|</span> <span class="k1">timechart</span> span=5m <span class="k2">count</span> <span class="k1">by</span> error_code</div>`:'enter search here...';
+ let h=`<div class="titlerow"><div><div class="crumb">Search & Reporting ＞ Search</div><div class="h1" style="margin-bottom:8px">${loaded?'接続エラーの推移（標準）':'New Search'}</div></div><div class="ra"><span class="jbt" data-k="saveAs">Save As ▾</span><span class="jbt">Create Table View</span><span class="jbt">Close</span></div></div>
+ ${st.chat&&sv==='home'?chat(CHATS[st.chat]):''}
+ <div class="sbx"><div class="sin mono" data-k="spl">${spl}</div><div class="tp" data-k="tp"><span>${st.tp}</span><span>▾</span></div><div class="sbtn" data-k="sbtn"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="15" y1="15" x2="21" y2="21" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg></div></div>
+ ${st.drop==='tp'?`<div class="dd" style="right:84px;top:${loaded?168:150}px;width:230px">${['Last 15 minutes','Last 60 minutes','Last 4 hours','Last 24 hours','Today'].map(o=>`<div class="${o===st.tp?'cur':''}" ${o==='Last 60 minutes'?'data-k="tp60"':''}>${o}</div>`).join('')}</div>`:''}`;
+ if(sv==='results'){
+  const A=[3,2,4,3,2,4,46,88,112,126,131,138,142],B=[0,0,0,0,0,0,0,22,51,74,88,96,104],C=[2,1,3,2,2,1,5,6,8,7,5,4,4];
+  const w=1340,ch=228,x=i=>56+i/12*(w-90),y=v=>ch-30-(v/160)*(ch-50);
+  const line=(arr,col)=>`<polyline points="${arr.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}" fill="none" stroke="${col}" stroke-width="2.6"/>${arr.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${col}"/>`).join('')}`;
+  h+=`<div class="jobl"><span class="ok">✓ 1,286 events</span><span>（今日 09:30:00 〜 10:30:00）</span><span>No Event Sampling ▾</span><span class="ja"><span class="jbt">Job ▾</span><span class="jbt" data-k="share">↗ Share</span><span class="jbt">⬇ Export</span><span class="jbt">Smart Mode ▾</span></span></div>
+  <div class="tabs" style="margin-bottom:8px"><span class="tab">Events (1,286)</span><span class="tab">Patterns</span><span class="tab">Statistics (13)</span><span class="tab on">Visualization</span></div>
+  <div class="box" style="padding:8px 14px" data-k="chart"><div style="display:flex;gap:22px;font-size:14px;color:#3a4150;justify-content:flex-end"><span><b style="color:#d1453b">━</b> DB_CONN_TIMEOUT</span><span><b style="color:#ec7a2e">━</b> POOL_EXHAUSTED</span><span><b style="color:#1b6ec2">━</b> CONN_RESET</span></div>
+  <svg width="${w}" height="${ch}">${[0,50,100,150].map(v=>`<line x1="56" x2="${w-30}" y1="${y(v)}" y2="${y(v)}" stroke="#eef0f3"/><text x="46" y="${y(v)+4}" font-size="12" fill="#8a919c" text-anchor="end">${v}</text>`).join('')}
+  ${[0,2,4,6,8,10,12].map(i=>`<text x="${x(i)}" y="${ch-8}" font-size="13" fill="#6b7280" text-anchor="middle">${['09:30','09:40','09:50','10:00','10:10','10:20','10:30'][i/2]}</text>`).join('')}
+  ${line(C,'#1b6ec2')}${line(B,'#ec7a2e')}${line(A,'#d1453b')}</svg></div>`;}
+ else h+=`<div class="box empty" style="height:220px">${loaded?'検索を実行すると、ここに結果が表示されます。':'検索文（SPL）を入力するか、Reports から保存済みの検索を開きます。'}</div>`;
+ return h;}
+};
+
+/* ---------- techtouch panel ---------- */
+function tt(t){
+ if(!t)return '';
+ const ai=t.kind==='ai';
+ let h=`<div class="ttp ${ai?'ai':''}" data-k="ttp"><span class="chip">${ai?'テックタッチ＋AI Hub':'テックタッチ'}</span><span class="lbl">${t.lbl||'ガイド（案）'}</span><h3>${t.title}</h3>`;
+ if(t.mode==='list'){h+=`<div class="dsc">${t.dsc}</div>${t.items.map((it,i)=>`<div class="git ${i===0?'on':''}"><b>${it[0]}</b><span>${it[1]}</span></div>`).join('')}`;}
+ else{
+  h+=`<ul class="steps">${t.steps.map((s,i)=>`<li class="${t.cur==null||i<t.cur||t.mode==='done'?(t.cur==null&&t.mode!=='done'?'':'ok'):i===t.cur?'cur':''}"><span class="d">${(t.cur!=null&&i<t.cur)||t.mode==='done'?'✓':i+1}</span>${s}</li>`).join('')}</ul>`;
+  if(t.msg)h+=`<div class="msg">${t.msg}</div>`;
+  if(t.warn)h+=`<div class="warn">${t.warn}</div>`;
+  if(t.ttg)h+=`<div class="ttg"><b><span>テックタッチ 操作ガイド</span><span>${t.cur+1} / ${t.steps.length}</span></b>${t.ttg}</div>`;
+  if(t.chk)h+=`<div class="chk">${t.chk.map(c=>`<div>${c}</div>`).join('')}</div>`;
+  if(t.rec)h+=`<div class="rec">${t.rec.map(r=>`<div><b>${r[0]}</b>${r[1]}</div>`).join('')}</div>`;
+  if(t.ai)h+=`<div class="aibox"><b>AI Hub（例文）</b>${t.ai}</div>`;
+  if(t.why)h+=`<div class="why">${t.why}</div>`;
+  if(t.asst)h+=`<div class="asst">${t.asst}</div>`;
+ }
+ if(t.note)h+=`<div class="note">${t.note}</div>`;
+ h+=`<div class="btns"><span class="btn2">戻る</span><span class="btn1" data-k="ttBtn">${t.btn}</span></div></div>`;
+ return h;}
+
+/* ---------- popups ---------- */
+const POPS={
+ start:()=>`<div class="pop" style="left:300px;top:70px;width:760px"><span class="chip">テックタッチ</span><span style="font-size:14px;color:var(--sub);margin-left:8px">ポップアップ（案）</span>
+  <h4>障害の一次確認は、社内手順どおりに進めます</h4><p>概要 → 影響範囲 → 関連エンティティ → 連絡、の4つのステップを順番に案内します。</p>
+  <div class="note">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。</div><div class="btns"><span class="btn2">閉じる</span><span class="btn1" data-k="popStart">ガイドを開始</span></div></div>`,
+ contact:()=>`<div class="pop" style="left:200px;top:14px;width:900px"><span class="chip">テックタッチ</span><span style="font-size:14px;color:var(--sub);margin-left:8px">ステップ4/4　社内手順（架空）</span>
+  <h4 style="margin-top:6px">障害の一次連絡</h4><ol>
+  <li><b>1. 優先度を決める</b>：影響範囲が「代理店ポータルの照会の一部」のため「中」（社内基準・架空）</li>
+  <li><b>2. 連絡先</b>：システム運用チーム（架空）、業務部門の窓口（架空）</li>
+  <li><b>3. 伝える内容（例）</b></li></ol>
+  <div class="tbox">【障害一次連絡】E-0412 契約照会サービスの応答時間の悪化（対応中）<br>・開始：10:02　・影響：契約照会サービス、代理店ポータルの照会の一部<br>・関連：ctr-db-01 の接続数が上限付近（09:58〜。原因は未確定）<br>・次の連絡：原因を確認したあと</div>
+  <div class="note" style="margin-top:6px">連絡手段・連絡先は架空です。デモのため実際の送信はしません。</div><div class="btns"><span class="btn2">閉じる</span><span class="btn1" data-k="popOk">連絡内容を確認した</span></div></div>`};
+
+/* ---------- cards ---------- */
+function card(c){
+ if(c.type==='title') return `<div class="cardbg"></div><div class="card" style="top:250px"><div class="sm">構想デモ</div><h1>Splunk × テックタッチ</h1><h2>運用担当者の一日（架空）：問い合わせから、ログ分析まで</h2>
+  <p>観測は Splunk（ITSI・IT Essentials Work・Search & Reporting）。利用者が迷う画面での介入はテックタッチ。</p>
+  <div class="lg"><span><i style="border:1.5px solid #8a919c"></i>監視画面（Splunk の画面イメージ・架空）</span><span><i style="background:var(--tt)"></i>テックタッチ ガイド（案）</span><span><i style="background:var(--ai)"></i>AI Hub 理解支援（構想）</span></div>
+  <div class="fn">${NOTE}<br>監視画面は Splunk の画面イメージを踏襲した架空画面です（ITSI・IT Essentials Work の画面名は公開ドキュメントを参考）。登場する人物・部署・手順も架空です。</div></div>`;
+ if(c.type==='agenda') return `<div class="cardbg"></div><div class="card" style="top:250px"><div class="sm">今日の業務の流れ（架空）</div><h1 style="font-size:40px">一つの問い合わせを、業務の流れに沿って進める</h1>
+  <div class="ag"><div><b>10:16</b><strong>第1章　問い合わせを受けて、健全性を確認</strong><span>デモ①・仮説1　Service Analyzer</span></div><div><b>10:18</b><strong>第2章　障害の一次確認と連絡</strong><span>デモ②・仮説4・5　Episode Review／Entity Overview</span></div><div><b>10:30</b><strong>第3章　ログを調べて、専門チームに渡す</strong><span>デモ③・仮説3　Search & Reporting</span></div><div><b>まとめ</b><strong>振り返り</strong><span>本日伺いたいこと・最初の一歩</span></div></div>
+  <div class="fn">担当者が Splunk を使うのは月に数回、という想定の人物像です。</div></div>`;
+ if(c.type==='chapter') return `<div class="cardbg"></div><div class="card ${c.ai?'ai':''}" style="top:300px"><div class="sm">${c.sm}</div><h1 style="font-size:42px">${c.h}</h1><div class="sup">${c.sup}</div><div class="fn">${NOTE}${c.fn?'<br>'+c.fn:''}</div></div>`;
+ if(c.type==='closing') return `<div class="cardbg"></div><div class="card" style="top:340px"><div class="sm">最初の一歩</div><h1 style="font-size:38px">対象を一つ決める → 実画面で確かめる → 変化を測る</h1><p>確かめ方：自力完了率・所要時間・依頼件数・再実行。削減率などの数値はお約束しません。</p><div class="fn">${NOTE}<br>監視画面は Splunk の画面イメージを踏襲した架空画面です。</div></div>`;
+ if(c.type==='summary') return chbar(3)+hdr(3)+`<div class="sumg">
+  <div class="sbox"><h5>今日の業務の流れ（架空）</h5><div class="tlx">
+   <div><em>10:16</em><p>業務部門から問い合わせ<span>「10時過ぎから契約照会の画面が遅い」</span></p></div>
+   <div><em>10:17</em><p>第1章　担当サービスの健全性を確認<span>ガイド6ステップ。健全性スコア38、応答時間とDB接続待ちの悪化を確認</span></p></div>
+   <div><em>10:18</em><p>第2章　障害の一次確認と連絡<span>ガイド4ステップ。影響範囲から優先度「中」と判断し、社内手順どおりに連絡</span></p></div>
+   <div><em>10:30</em><p>第3章　ログをひな型から調べる<span>ガイド7ステップ。接続エラーの推移を確認し、専門チームの確認を受けて共有</span></p></div></div></div>
+  <div class="sbox"><h5>このデモで、テックタッチが手当てした場面</h5><div class="cnt"><div><b>17</b><span>ガイドで進めたステップ</span></div><div><b>2</b><span>選び直し・順番の案内</span></div><div><b>4</b><span>基準・社内手順の表示</span></div><div><b>3</b><span>AI Hub欄の説明（例文）</span></div></div>
+   <div class="sfn">このデモを操作した回数です。効果の数値ではありません。</div></div>
+  <div class="sbox"><h5>確かめ方（案）</h5><div class="ul"><div>自力完了率：依頼せずに作業を終えられた割合</div><div>所要時間：作業の開始から完了まで</div><div>依頼件数：専門チームへの問い合わせの件数</div><div>再実行：同じ作業を、次回も自力でできるか</div></div><div class="sfn">数値の目標は、現状を伺ってから設定します。ガイドの完了率だけでは判断せず、作業の結果で確かめます。</div></div>
+  <div class="sbox"><h5>本日伺いたいこと</h5><div class="ul"><div>画面の探し方、時間範囲の指定、サービスの選び分けのどこで迷いますか？</div><div>障害時の一次確認で、人によって手順がばらつくのはどこですか？</div><div>ひな型選び、時間範囲の指定、結果の読み方のどこで手が止まりますか？</div><div>対象者・止まる場面・現在の解決方法・既存の支援・自走の判断基準</div></div></div></div>`;
+ return '';}
+function qhtml(q){return `<div class="qbg"></div><div class="qcard"><span class="chip" style="${q.ai?'background:var(--ai)':''}">伺いたいこと</span><h1>${q.t}</h1></div>`;}
+
+/* ---------- storyboard ---------- */
+const STEPS=[];
+const TRANS={hl:null,bal:null,tip:null,q:null,click:false,cur:null,drop:null,note:null};
+function S(d,s){STEPS.push({d,s});}
+const G1=['IT Service Intelligence を開く','時間範囲を選ぶ','担当サービスを選ぶ','健全性スコアの意味を確認する','悪化しているKPIを確認する','エピソードを開く'];
+const G2=['エピソードの概要を確認する','影響範囲を確認する','関連エンティティを確認する','社内手順に沿って連絡する'];
+const G3=['ひな型（Reports）の一覧を開く','ひな型を選んで検索で開く','検索の中身（SPL）を確認する','時間範囲を合わせる','検索して結果を見る','専門チームに確認を依頼する','レポートとして保存し共有する'];
+const g1=(cur,o={})=>Object.assign({kind:'tt',mode:'steps',title:'担当サービスの状況を確認する',steps:G1,cur,btn:'次へ'},o);
+const g2=(cur,o={})=>Object.assign({kind:'tt',mode:'steps',lbl:'ガイド（案）・社内手順',title:'障害の一次確認（社内手順）',steps:G2,cur,btn:'次へ'},o);
+const g3=(cur,o={})=>Object.assign({kind:'ai',mode:'steps',lbl:'支援（構想）',title:'ログをひな型から調べる',steps:G3,cur,btn:'次へ'},o);
+
+S(7.5,{card:{type:'title'}});
+S(7,{card:{type:'agenda'}});
+S(5,{card:{type:'chapter',sm:'第1章・デモ①・仮説1　画面・操作で迷う',h:'10:16　問い合わせを受けて、担当サービスの健全性を確認する',sup:'支援：テックタッチのガイド（案）'}});
+// ---- chapter 1
+S(6.5,{card:null,ch:0,view:'launcher',chat:'biz',tt:{kind:'tt',mode:'list',lbl:'ガイド一覧（案）',title:'この画面で使えるガイド',dsc:'問い合わせのあったサービスの状況を確認します。ガイドを選ぶと、操作する場所を順番に案内します。',items:[['担当サービスの状況を確認する','6ステップ・目安3分（架空）・おすすめ'],['障害の一次確認（社内手順）','Episode Review の画面で表示されます'],['ログをひな型から調べる','Search & Reporting の画面で表示されます']],btn:'ガイドを開始'},cur:[1250,700],c1:'業務部門から「10時過ぎから契約照会の画面が遅い」と連絡が入りました。',note:'担当者が Splunk を使うのは月に数回です（想定の人物像）。'});
+S(5,{hl:'ttBtn',cur:'ttBtn',click:true,c1:'テックタッチのガイド一覧から「担当サービスの状況を確認する」を選びます。'});
+S(6,{tt:g1(0,{msg:'IT Service Intelligence を開きます。',why:'確認する理由：サービスの健全性とKPIは、このアプリでまとめて確認できます。'}),hl:'tileITSI',bal:{t:'① IT Service Intelligence を開きます',s:'サービスの健全性は、このアプリで確認します'},cur:'tileITSI',click:true,c1:'① どのアプリを開けばよいかを、画面上の位置で示します。'});
+S(6,{view:'sa',saTime:'Last 24 hours',saSel:null,tt:g1(1,{msg:'問い合わせの「10時過ぎ」を含む「Last 60 minutes」を選びます。',why:'確認する理由：範囲が長すぎると、10時過ぎの変化が見えにくくなります（社内の目安・架空）。'}),hl:'saTime',bal:{t:'② 問い合わせの「10時過ぎ」に合わせて、時間範囲を選びます',s:'10:00 以降を含む「Last 60 minutes」'},cur:'saTime',click:true,c1:'② 問い合わせの「10時過ぎ」に合わせて、時間範囲を選びます。'});
+S(4,{drop:'saTime',hl:'opt60',cur:'opt60',click:true,c1:'② 一覧から「Last 60 minutes」を選びます。'});
+S(6,{saTime:'Last 60 minutes',tt:g1(2,{msg:'問い合わせのあったサービスのタイルを選びます。',why:'確認する理由：サービスごとに、どのKPIが悪化しているかを確認します。'}),hl:'tiles',bal:{t:'③ 問い合わせのあったサービスを選びます',s:'問い合わせ：「契約照会の画面が遅い」',p:'b'},cur:'tile_kanri',click:true,c1:'③ 問い合わせのあったサービスを選びます。'});
+S(7,{saSel:'kanri',tt:g1(2,{warn:'選んだのは「契約管理サービス（架空）」です。問い合わせは「契約照会」です。名前の似たサービスに注意して、選び直してください。'}),hl:'tile_contract',ring:'w',bal:{t:'③「契約照会サービス（架空）」を選び直します',s:'健全性スコア 38（High）'},cur:'tile_contract',click:true,c1:'名前の似たサービスを選ぶと、ガイドが選び直しを案内します。',note:'選び直しの案内は構想の表現です。'});
+S(7.5,{saSel:'contract',tt:g1(3,{msg:'健全性スコアが 38 まで下がっています。「?」で社内の判断基準を確認します。',why:'確認する理由：数値の意味が分かると、どこまで急ぐべきかを判断できます。'}),tip:{k:'hsQ',p:'l',h:'テックタッチ ツールチップ（案）：社内の判断基準（架空）',t:'健全性スコアは、KPIの状態を重要度で重み付けし、0〜100で表した値です。社内では 60 未満を「要確認」としています（架空）。'},cur:'hsQ',c1:'④ 健全性スコアが 38 まで下がっています。「?」で社内の判断基準（架空）を表示します。'});
+S(6.5,{tt:g1(4,{msg:'Severity が High のKPIを確認します。',why:'確認する理由：どの指標が悪いかを、次の一次確認と連絡に使います。'}),hl:'kpiBad',bal:{t:'⑤ 重大度（Severity）が高いKPIを確認します',s:'応答時間（p95）と DB接続待ち時間',p:'b'},cur:[1060,700],c1:'⑤ 悪化しているKPIは「応答時間」と「DB接続待ち時間」です。',note:'原因はこの画面だけでは特定できません。'});
+S(6.5,{tt:g1(5,{msg:'同じ時間帯に、エピソード「E-0412」が発生しています。開きます。',why:'確認する理由：エピソードが発生している場合は、社内手順の一次確認に切り替えます。'}),hl:'epLink',bal:{t:'⑥ 同じ時間帯のエピソードを開きます',s:'障害の一次確認（社内手順）に切り替えます',p:'br'},cur:'epLink',click:true,c1:'⑥ 同じ時間帯にエピソードが発生しています。一次確認に切り替えます。'});
+S(4.5,{q:{t:'画面の探し方、時間範囲の指定、サービスの選び分けのどこで迷いますか？'}});
+// ---- chapter 2
+S(5,{card:{type:'chapter',sm:'第2章・デモ②・仮説4・5　実務で再現できない／学びを再利用できない',h:'10:18　障害の一次確認を、社内手順どおりに進めて連絡する',sup:'支援：テックタッチのガイド（ポップアップ・吹き出し）（案）',fn:'社内手順・連絡先は架空です。お客様の実際の手順に置き換える前提です。'}});
+S(7,{card:null,ch:1,view:'er',erTab:'impact',erStatus:'New',erOwner:'unassigned',tt:g2(null,{msg:'ポップアップの「ガイドを開始」から始めます。',btn:'ガイドを開始'}),pop:'start',hl:'popStart',cur:'popStart',click:true,c1:'エピソードを開くと、テックタッチのポップアップが社内手順（架空）の一次確認を案内します。'});
+S(6.5,{pop:null,tt:g2(0,{msg:'何が・いつから・どこで起きているかを確認します。',why:'確認する理由：連絡の最初に伝える内容です。以降の確認の起点になります。'}),hl:'epHead',bal:{t:'ステップ1/4：エピソードの概要を確認します',s:'何が・いつから・どこで起きているか',p:'b'},cur:[1100,560],c1:'ステップ1：何が・いつから・どこで起きているかを確認します。'});
+S(7,{tt:g2(0,{msg:'「Acknowledge」を押して、自分が対応することを示します。',why:'確認する理由：状態が In Progress になり、自分が担当者になります。対応の重複を防ぎます。'}),hl:'ackBtn',bal:{t:'ステップ1/4：「Acknowledge」を押します',s:'状態が In Progress になり、担当者が自分になります',p:'b'},cur:'ackBtn',click:true,c1:'ステップ1：Acknowledge で、誰が対応しているかを明確にします。'});
+S(6.5,{erStatus:'In Progress',erOwner:'運用担当（架空）',tt:g2(1,{msg:'「Impact」タブで、影響を受けているサービスを確認します。',why:'確認する理由：影響範囲で優先度を決めます（社内手順・架空）。'}),hl:'tabImpact',bal:{t:'ステップ2/4：影響範囲を確認します',s:'「Impact」タブの内容を見ます',p:'b'},cur:'tabEvents',click:true,c1:'ステップ2：影響範囲を確認します。'});
+S(7,{erTab:'events',tt:g2(1,{warn:'社内手順では、イベントの前に影響範囲を確認します。影響範囲で優先度を決めてから、イベントを確認します。'}),hl:'tabImpact',ring:'w',bal:{t:'先に「Impact」タブに戻ります',s:'社内手順の順番：概要 → 影響範囲 → 関連エンティティ → 連絡',p:'b'},cur:'tabImpact',click:true,c1:'影響範囲の前に「All Events」を開くと、社内手順の順番を案内します。',note:'順番の案内は構想の表現です。'});
+S(7.5,{erTab:'impact',tt:g2(1,{msg:'影響の範囲を社内の基準に当てはめて、優先度を決めます。',why:'確認する理由：優先度で、連絡先と連絡の急ぎ方が変わります（社内手順・架空）。'}),tip:{k:'impQ',p:'r',h:'テックタッチ ツールチップ（案）：優先度の基準（社内・架空）',t:'全利用者に影響 → 高／一部の利用者に影響 → 中／影響なし → 低。今回は「代理店ポータルの照会の一部」のため「中」です。'},cur:'impQ',c1:'「?」で社内の優先度の基準（架空）を表示します。一部に影響しているため、優先度は「中」です。'});
+S(6,{tt:g2(2,{msg:'関連エンティティ「ctr-db-01」の状態を確認します。',why:'確認する理由：関係するサーバーの状態を、連絡に含めるためです。'}),hl:'entLink',bal:{t:'ステップ3/4：関連エンティティの状態を確認します',s:'Entity Overview（IT Essentials Work の機能）を開きます',p:'t'},cur:'entLink',click:true,c1:'ステップ3：関連エンティティを、Entity Overview で確認します。'});
+S(7.5,{view:'ite',tt:g2(2,{msg:'接続数が上限（500・架空）に近づいています。増え始めたのは、エピソードの少し前（09:58）です。',why:'確認する理由：関係するサーバーの状態を、連絡に含めるためです。原因は、この段階では確定しません。'}),hl:'vConn',bal:{t:'DB接続数が上限に近づいています',s:'09:58 から増加（架空）',p:'b'},cur:[1150,720],c1:'接続数が上限に近いことを確認します。原因はこの段階では確定しません。'});
+S(6,{tt:g2(3,{msg:'社内手順の連絡内容の例を表示します。',why:'確認する理由：連絡の宛先と内容を、人によってばらつかせないためです。',btn:'連絡内容の例を表示'}),hl:'ttBtn',cur:'ttBtn',click:true,c1:'ステップ4：社内手順に沿って、連絡内容の例を確認します。'});
+S(8,{pop:'contact',hl:'popOk',cur:'popOk',click:true,c1:'ステップ4：優先度・連絡先・伝える内容の例を確認します。'});
+S(7,{pop:null,tt:g2(4,{mode:'done',msg:'一次確認の4ステップが完了しました。',rec:[['10:18','概要を確認（E-0412 応答時間の悪化・In Progress）'],['10:19','影響範囲を確認（代理店ポータルの照会の一部 → 優先度「中」）'],['10:21','関連エンティティを確認（ctr-db-01 の接続数が上限付近。原因は未確定）'],['10:22','社内手順に沿って連絡（システム運用チーム・業務部門の窓口）']],note:'時刻・記録はすべて架空です。',btn:'第3章へ進む'}),cur:[1180,760],c1:'一次確認の4ステップが完了しました。パネルに、確認した内容の記録（例）を表示します。'});
+S(4.5,{q:{t:'障害時の一次確認で、人によって手順がばらつくのはどこですか？'}});
+// ---- chapter 3
+S(5,{card:{type:'chapter',ai:1,sm:'第3章・デモ③・仮説3　作成・修正で止まる',h:'10:30　ログを調べて、原因の手がかりを専門チームに渡す',sup:'支援：テックタッチ＋AI Hub（案・構想）',fn:'AI Hub欄は事前に作成した例文です。'}});
+S(7,{card:null,ch:2,view:'search',sv:'home',tp:'Last 24 hours',chat:'exp',tt:{kind:'ai',mode:'list',lbl:'支援（構想）',title:'おすすめのガイド',dsc:'専門チームの依頼に合ったガイドを、ひな型の説明付きで表示します。',items:[['ログをひな型から調べる','7ステップ・目安5分（架空）'],['エラーの内訳を調べる','5ステップ・目安3分（架空）']],btn:'ガイドを開始'},hl:'ttBtn',ring:'ai',cur:'ttBtn',click:true,c1:'専門チーム（架空）から、接続エラーの推移をログで確認するよう依頼がありました。'});
+S(6,{tt:g3(0,{ttg:'助言のあった「接続エラーの推移（標準）」は、Reports に保存されています。'}),hl:'navReports',ring:'ai',bal:{t:'①「Reports」を開きます',s:'専門チームが作成したSPLのひな型が保存されています',p:'b',ai:1},cur:'navReports',click:true,c1:'① SPLを一から書かずに、専門チームが保存したひな型（Reports）を使います。'});
+S(7.5,{sv:'reports',tt:g3(1,{ttg:'「接続エラーの推移（標準）」を、Open in Search で開きます。',ai:'ひな型の意図：「接続エラーの推移（標準）」は、指定したサービスの接続エラーを5分ごとに数え、エラーの種類別に推移を見るためのひな型です。'}),hl:'rptOpen',ring:'ai',bal:{t:'②「Open in Search」で開きます',s:'専門チームが確認済みのひな型（架空）',p:'b',ai:1},cur:'rptOpen',click:true,c1:'② 確認済みのひな型を選びます。AI Hub欄が、ひな型の意図を説明します（例文）。'});
+S(8.5,{sv:'loaded',tt:g3(2,{ttg:'検索の中身を確認してから、条件を変えます。',ai:'1行目：契約照会サービスの ERROR ログに絞ります。\n2行目：メッセージに「connection」を含むものに絞ります。\n3行目：5分ごとの件数を、エラーの種類（error_code）別に数えます。'}),hl:'spl',ring:'ai',cur:[1000,640],c1:'③ 検索の中身（SPL）を、AI Hub欄が1行ずつ説明します（例文）。'});
+S(6,{tt:g3(3,{ttg:'第1・2章で確認した開始時刻（10:02）を含む範囲にします。'}),hl:'tp',ring:'ai',bal:{t:'④ 時間範囲を合わせます',s:'10:02 の開始を含む「Last 60 minutes」',p:'b',ai:1},cur:'tp',click:true,c1:'④ 時間範囲を、障害の開始（10:02）を含む範囲に変えます。'});
+S(4,{drop:'tp',hl:'tp60',ring:'ai',cur:'tp60',click:true,c1:'④ 一覧から「Last 60 minutes」を選びます。'});
+S(5,{tp:'Last 60 minutes',tt:g3(4,{ttg:'条件を確認して、検索を実行します。'}),hl:'sbtn',ring:'ai',bal:{t:'⑤ 検索を実行します',s:'',p:'l',ai:1},cur:'sbtn',click:true,c1:'⑤ 条件を確認して、検索を実行します。'});
+S(8.5,{sv:'results',tt:g3(4,{ai:'結果の見方：10:00台から DB_CONN_TIMEOUT が増え、10:05 以降は POOL_EXHAUSTED も出ています。第2章で確認した接続数の増加（09:58〜）と、時間帯が合っています。',why:'原因は、この画面だけでは特定できません。'}),hl:'chart',ring:'ai',cur:[900,780],c1:'⑤ 10時台から接続エラーが増えています。第2章で見た時間帯と合っているかを確かめます。',note:'原因はこの画面だけでは特定できません。'});
+S(7,{tt:g3(5,{chk:['対象サービスが「契約照会」になっている','時間範囲が障害の開始（10:02）を含んでいる','増え始めの時刻が第2章と合っている'],ttg:'結果のリンクを共有し、専門チームに確認を依頼します。'}),hl:'share',ring:'ai',bal:{t:'⑥ 結果を共有し、専門チームに確認を依頼します',s:'共有する前に、条件を見直します',p:'l',ai:1},cur:'share',click:true,c1:'⑥ 条件を見直してから、専門チームに確認を依頼します。'});
+S(6,{chat2:'rep',tt:g3(6,{ttg:'専門チームから返信が届きました。'}),cur:[1000,800],c1:'専門チームから返信が届きました。'});
+S(6.5,{chat2:null,tt:g3(6,{ttg:'「Save As」から、レポートとして保存します。次回は同じ条件ですぐに確認できます。'}),hl:'saveAs',ring:'ai',bal:{t:'⑦「Save As」から、レポートとして保存します',s:'保存して、運用チームに共有します',p:'l',ai:1},cur:'saveAs',click:true,c1:'⑦ レポートとして保存し、運用チームに共有します。'});
+S(7.5,{tt:g3(7,{mode:'done',msg:'保存して、運用チーム（架空）に共有しました。',note:'デモのため実際には保存していません。実環境では保存先と共有範囲を確認します。',asst:'SPLの作成・説明が必要な場合：利用条件を満たす Splunk AI Assistant の活用を含めて確認します。',btn:'振り返りへ'}),cur:[1100,800],c1:'保存したレポートを、次回の確認や再発時の比較に使います。'});
+S(4.5,{q:{t:'ひな型選び、時間範囲の指定、結果の読み方のどこで手が止まりますか？',ai:1}});
+// ---- summary
+S(12,{card:{type:'summary'},cur:[1500,820],c1:'振り返り：問い合わせからログ分析までを、一つの業務の流れとして見ました。'});
+S(7,{c1:'回数はこのデモを操作した回数で、効果の数値ではありません。',note:'確かめ方は、自力完了率・所要時間・依頼件数・再実行です。'});
+S(8,{card:{type:'closing'},c1:null});
+
+/* ---------- engine ---------- */
+const scene=document.getElementById('scene'),ov=document.getElementById('ov'),qv=document.getElementById('q'),capEl=document.getElementById('cap'),cursor=document.getElementById('cursor'),rip=document.getElementById('rip');
+let STATES=[],STARTS=[],POS=[],TOTAL=0,curIdx=-1,LAY=[];
+function buildStates(){let c={cur:null};STATES=[];STARTS=[];let t=0;
+ for(const st of STEPS){const n=Object.assign({},c,TRANS,{ring:null},st.s);if(!('c1' in st.s))n.c1=c.c1;if(!('c1' in st.s)&&!('note' in st.s))n.note=c.note;STATES.push(n);STARTS.push(t);t+=st.d;c=n;}
+ TOTAL=t;}
+function renderScene(st){
+ if(st.card){scene.innerHTML=card(st.card);}
+ else{let h=chbar(st.ch)+hdr(st.ch)+win(st);scene.innerHTML=h;
+  if(st.chat2){const m=scene.querySelector('.main');m.insertAdjacentHTML('beforeend',`<div style="position:absolute;left:26px;right:26px;top:70px;z-index:6">${chat(CHATS[st.chat2])}</div>`);}}
+ qv.innerHTML=st.q?qhtml(st.q):'';
+ const c1=capEl.querySelector('.c1'),c2=capEl.querySelector('.c2');
+ if(st.c1&&(!st.card||st.card.type==='summary')){capEl.style.display='block';c1.textContent=st.c1;c2.textContent=(st.note?st.note+'　':'')+NOTE;}else capEl.style.display='none';
+ if(st.q)capEl.style.display='none';
+}
+function rectOf(k){if(k==='kpiBad'){const a=rectOf('kpiBad1'),b=rectOf('kpiBad2');return a&&b?{left:a.left,top:a.top,right:a.right,bottom:b.bottom,width:a.width,height:b.bottom-a.top}:null;}
+ const e=scene.querySelector(`[data-k="${k}"]`);if(!e)return null;const r=e.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};}
+function layout(st){
+ const L={};
+ if(st.hl){const r=rectOf(st.hl);if(r)L.ring={x:r.left-5,y:r.top-5,w:r.width+10,h:r.height+10,cls:st.ring||(st.tt&&st.tt.kind==='ai'&&!st.card?'':'')};}
+ if(st.bal){const r=rectOf(st.bal.k||st.hl);if(r)L.bal={r,b:st.bal};}
+ if(st.tip){const r=rectOf(st.tip.k);if(r)L.tip={r,t:st.tip};}
+ if(st.cur){if(Array.isArray(st.cur))L.cur=st.cur;else{const r=rectOf(st.cur);if(r)L.cur=[r.left+Math.min(r.width*0.5,r.width-8),r.top+r.height*0.55];}}
+ return L;}
+function drawOv(st,L){
+ let h='';
+ if(L.ring)h+=`<div class="ring ${L.ring.cls||''}" style="left:${L.ring.x}px;top:${L.ring.y}px;width:${L.ring.w}px;height:${L.ring.h}px"></div>`;
+ if(L.bal){const {r,b}=L.bal,p=b.p||'b';let pos;
+  if(p==='b')pos=`left:${Math.max(40,r.left)}px;top:${r.bottom+14}px`;
+  else if(p==='br')pos=`right:${1920-r.right}px;top:${r.bottom+14}px`;
+  else if(p==='t')pos=`left:${Math.max(40,r.left)}px;bottom:${1080-r.top+14}px`;
+  else if(p==='r')pos=`left:${r.right+16}px;top:${r.top}px`;
+  else pos=`right:${1920-r.left+16}px;top:${r.top}px`;
+  h+=`<div class="bal ${p} ${b.ai?'ai':''}" style="${pos}">${b.t}${b.s?`<small>${b.s}</small>`:''}</div>`;}
+ if(L.tip){const {r,t}=L.tip,p=t.p||'b';let pos;
+  if(p==='l')pos=`right:${1920-r.left+14}px;top:${r.top-10}px`;else if(p==='r')pos=`left:${r.right+14}px;top:${r.top-30}px`;else pos=`left:${r.left-20}px;top:${r.bottom+12}px`;
+  h+=`<div class="tip" style="${pos}"><b>${t.h}</b>${t.t}</div>`;}
+ ov.innerHTML=h;}
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,cl=x=>Math.max(0,Math.min(1,x));
+async function init(){
+ buildStates();await document.fonts.ready;
+ for(let pass=0;pass<2;pass++){LAY=[];POS=[];let p=[1500,900];
+  for(let i=0;i<STATES.length;i++){renderScene(STATES[i]);const L=layout(STATES[i]);LAY.push(L);if(L.cur)p=L.cur;POS.push(p);}
+  await document.fonts.ready;await new Promise(r=>setTimeout(r,300));}
+ curIdx=-1;return TOTAL;}
+function seek(t){
+ let i=STARTS.length-1;while(i>0&&STARTS[i]>t)i--;
+ const st=STATES[i],lt=t-STARTS[i];
+ if(i!==curIdx){renderScene(st);drawOv(st,LAY[i]);curIdx=i;}
+ // fades
+ const a=cl(lt/0.3);ov.style.opacity=a;
+ const cardA=st.card&&(i===0||!STATES[i-1].card||STATES[i-1].card.type!==st.card.type)?cl(lt/0.45):1;scene.style.opacity=cardA;
+ qv.style.opacity=st.q?cl(lt/0.4):0;
+ // cursor
+ const from=i>0?POS[i-1]:POS[0],to=POS[i];const e=ease(cl((lt-0.25)/0.95));
+ const x=from[0]+(to[0]-from[0])*e,y=from[1]+(to[1]-from[1])*e;
+ const hide=!!st.card&&st.card.type!=='summary'||!!st.q;
+ cursor.style.display=hide?'none':'block';cursor.style.transform=`translate(${x-3}px,${y-2}px)`;
+ let rp=0;if(st.click&&!hide){rp=cl((lt-1.35)/0.45);}
+ if(rp>0&&rp<1){const R=10+38*rp;rip.style.display='block';rip.style.left=(to[0]-R)+'px';rip.style.top=(to[1]-R)+'px';rip.style.width=rip.style.height=2*R+'px';rip.style.opacity=1-rp;rip.style.borderColor=st.ring==='ai'||st.bal&&st.bal.ai?'var(--ai)':'var(--tt)';}else rip.style.display='none';
+ return `${i}|${x.toFixed(0)},${y.toFixed(0)}|${a.toFixed(2)}|${cardA.toFixed(2)}|${qv.style.opacity}|${rp>0&&rp<1?rp.toFixed(2):0}`;}
+window.DEMO={init,seek,get total(){return TOTAL},get starts(){return STARTS}};
+</script>
+</body></html>

@@ -1,0 +1,12 @@
+{
+  "name": "splunk-techtouch-demo",
+  "private": true,
+  "description": "Splunk × テックタッチ 構想デモ動画（HTMLを自動録画してmp4化）",
+  "scripts": {
+    "record": "node record.js demo.html splunk-techtouch-demo.mp4 30"
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "5.1.1",
+    "@fontsource/noto-sans-jp": "5.1.1"
+  }
+}
