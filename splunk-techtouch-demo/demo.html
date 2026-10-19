@@ -16,6 +16,7 @@ body{font-family:"Noto Sans JP","IPAGothic",sans-serif;color:var(--ink);-webkit-
 #stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:#f6f7f9}
 #scene,#q,#ov{position:absolute;inset:0}
 #ov{z-index:10}#q{z-index:15}
+.shotchat{position:absolute;right:22px;top:16px;width:590px;z-index:6}
 .shotc{position:absolute;left:24px;top:12px;border:1px solid #d0d5dc;border-radius:6px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);background:#fff}.shotc img{display:block}.shotc .bx{position:absolute}
 .sw{position:absolute;inset:0;display:flex}
 .snav{width:232px;flex:none;background:#fff;border-right:1px solid var(--line);padding:14px 12px}
@@ -256,7 +257,7 @@ table{border-collapse:collapse;width:100%}
 <script>
 const NOTE='構想デモ｜画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。';
 const NOTE_PROOF='Splunk Cloud・テックタッチの実画面（デモ環境）｜ログ・人物・サービス名は架空です。';
-const NOTE_REAL='Splunk Cloud の実画面（デモ環境）｜ログ・サービス名・人物は架空です。AI Hub欄は例文（構想）です。';
+const NOTE_REAL='Splunk Cloud・テックタッチの実画面（デモ環境）｜ログ・サービス名・人物は架空です。AI Hub欄は例文（構想）です。';
 const SEVC={critical:'var(--critical)',high:'var(--high)',medium:'var(--medium)',low:'var(--low)',normal:'var(--normal)',info:'var(--info)'};
 const SEVN={critical:'Critical',high:'High',medium:'Medium',low:'Low',normal:'Normal',info:'Info'};
 const sev=s=>`<span class="sev" style="background:${SEVC[s]}">${SEVN[s]}</span>`;
@@ -266,7 +267,7 @@ const HDR=[
  {tm:'10:18',lb:'障害を確認',t:'障害の一次確認を、社内手順どおりに進めて連絡する',d:'同じ時間帯にエピソードが発生していました。人によって順番がばらつかないよう、社内手順（架空）に沿って確認し、関係者に連絡します。'},
  {tm:'10:30',lb:'専門チームの依頼',t:'ログを調べて、原因の手がかりを専門チームに渡す',d:'専門チーム（架空）から、接続エラーの推移をログで確認するよう依頼がありました。SPLを一から書かず、ひな型を使って調べます。'},
  {tm:'まとめ',lb:'振り返り',t:'問い合わせからログ分析までを、一つの業務の流れで見る',d:'今日の流れと、テックタッチが手当てした場面を振り返ります。どこで、どの支援が効くかを一緒に確かめたい点です。'},
- {tm:'実機',lb:'デモ環境',t:'実機で確かめたこと：Splunk Cloud × テックタッチ',d:'Splunk Cloud（デモ環境）の実画面とテックタッチ（実機）で、第3章のガイドを作成しました。ログは架空のサンプルデータです。'}];
+ {tm:'実機',lb:'作り方',t:'ガイドの作り方：Splunk Cloud × テックタッチ（実機）',d:'第3章のガイドは、Splunk Cloud（デモ環境）の実画面の上で作成し、管理画面で公開しました。ログは架空のサンプルデータです。'}];
 
 const SERVICES=[
  {id:'contract',n:'契約照会サービス（架空）',s:38,sev:'high'},
@@ -296,10 +297,10 @@ function abar(st){
  else{an='Search & Reporting';nav=[['Search',st.sv!=='reports'],['Analytics'],['Datasets'],['Reports',st.sv==='reports','navReports'],['Alerts'],['Dashboards']];}
  return `<div class="abar">${nav.map(n=>`<span class="nv ${n[1]?'on':''}" ${n[2]?`data-k="${n[2]}"`:''}>${n[0]}</span>`).join('')}<span class="an">${an}</span></div>`;}
 function win(st){
- if(st.view==='shot'){const sz=IMGSZ[st.shot]||{w:1280,h:800},H=720,W=Math.min(1810,Math.round(sz.w*H/sz.h)),L=st.tt?24:Math.round((1858-W)/2);
+ if(st.view==='shot'){const sz=IMGSZ[st.shot]||{w:1280,h:800},H=720,W=Math.min(1810,Math.round(sz.w*H/sz.h)),L=st.tt||st.chat||st.chat2?24:Math.round((1858-W)/2);
   const bx=Object.entries(REAL_BOXES[st.shot]||{}).map(([k,b])=>`<div class="bx" data-k="${k}" style="left:${b[0]/sz.w*W}px;top:${b[1]/sz.h*H}px;width:${b[2]/sz.w*W}px;height:${b[3]/sz.h*H}px"></div>`).join('');
-  return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>${st.wtitle||'Splunk Cloud Platform 実画面（デモ環境・架空データ）　テックタッチ（実機）'}</span></div>
-  <div class="wbody" style="top:40px"><div class="shotc" style="left:${L}px;width:${W}px;height:${H}px"><img src="${SHOTDIR}${st.shot}" style="width:${W}px;height:${H}px">${bx}${st.chat?`<div style="position:absolute;left:20px;right:20px;top:70px">${chat(CHATS[st.chat])}</div>`:''}</div>${tt(st.tt)}</div></div>`;}
+  return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>${st.wtitle||'Splunk Cloud Platform 実画面（デモ環境・架空データ）　テックタッチ（実機・公開中のガイドを再生）'}</span></div>
+  <div class="wbody" style="top:40px"><div class="shotc" style="left:${L}px;width:${W}px;height:${H}px"><img src="${SHOTDIR}${st.shot}" style="width:${W}px;height:${H}px">${bx}</div>${st.chat||st.chat2?`<div class="shotchat">${chat(CHATS[st.chat||st.chat2])}</div>`:''}${tt(st.tt)}</div></div>`;}
  const top=st.view==='launcher'||st.view==='search'?86:130;
  return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>監視画面（架空）　Splunk の画面イメージを踏襲</span></div>
  <div class="sbar"><div class="slogo">Splunk Cloud Platform<small>画面イメージ</small></div><span class="it">Apps ▾</span><div class="rt"><span>Messages ▾</span><span>Settings ▾</span><span>Activity ▾</span><span>Help ▾</span><span class="find">Find</span></div></div>
@@ -307,7 +308,7 @@ function win(st){
 function chat(c){return `<div class="chat" data-k="chat"><div class="av">${c.a}</div><div><div class="hd"><b>${c.who}</b>${c.tm}</div><p>${c.t}</p><small>社内チャット（架空）の通知</small></div><span class="cl">閉じる</span></div>`;}
 const CHATS={
  biz:{a:'業',who:'業務部門（架空）',tm:'10:16',t:'10時過ぎから、契約照会の画面が遅いという声が出ています。状況を確認してもらえますか？'},
- exp:{a:'専',who:'専門チーム（架空）',tm:'10:30',t:'接続エラーの件数を、5分ごとの推移で共有してください。SPLは Reports に保存してある「接続エラーの推移（標準）」を使ってください。'},
+ exp:{a:'専',who:'専門チーム（架空）',tm:'10:30',t:'接続エラーの件数を、5分ごとの推移で共有してください。SPLはレポートに保存してある「接続エラーの推移（標準）」を使ってください。'},
  rep:{a:'専',who:'専門チーム（架空）',tm:'10:34',t:'確認しました。接続プールの設定をこちらで確認します。この検索はレポートとして保存し、運用チームに共有してください。'}};
 
 /* ---------- views ---------- */
@@ -442,9 +443,9 @@ function card(c){
  if(c.type==='title') return `<div class="cardbg"></div><div class="card" style="top:250px"><div class="sm">構想デモ</div><h1>Splunk × テックタッチ</h1><h2>運用担当者の一日（架空）：問い合わせから、ログ分析まで</h2>
   <p>観測は Splunk（ITSI・IT Essentials Work・Search & Reporting）。利用者が迷う画面での介入はテックタッチ。</p>
   <div class="lg"><span><i style="border:1.5px solid #8a919c"></i>監視画面（Splunk の画面イメージ・架空）</span><span><i style="background:var(--tt)"></i>テックタッチ ガイド（案）</span><span><i style="background:var(--ai)"></i>AI Hub 理解支援（構想）</span><span><i style="background:#2b3038"></i>実機の画面（デモ環境）</span></div>
-  <div class="fn">${NOTE}<br>監視画面は Splunk の画面イメージを踏襲した架空画面です（ITSI・IT Essentials Work の画面名は公開ドキュメントを参考）。第3章の最後に、Splunk Cloud（デモ環境）とテックタッチの実画面を含みます。登場する人物・部署・手順・ログは架空です。</div></div>`;
+  <div class="fn">${NOTE}<br>監視画面は Splunk の画面イメージを踏襲した架空画面です（ITSI・IT Essentials Work の画面名は公開ドキュメントを参考）。第3章は、Splunk Cloud（デモ環境）とテックタッチの実画面です。登場する人物・部署・手順・ログは架空です。</div></div>`;
  if(c.type==='agenda') return `<div class="cardbg"></div><div class="card" style="top:250px"><div class="sm">今日の業務の流れ（架空）</div><h1 style="font-size:40px">一つの問い合わせを、業務の流れに沿って進める</h1>
-  <div class="ag"><div><b>10:16</b><strong>第1章　問い合わせを受けて、健全性を確認</strong><span>デモ①・仮説1　Service Analyzer</span></div><div><b>10:18</b><strong>第2章　障害の一次確認と連絡</strong><span>デモ②・仮説4・5　Episode Review／Entity Overview</span></div><div><b>10:30</b><strong>第3章　ログを調べて、専門チームに渡す</strong><span>デモ③・仮説3　Search & Reporting＋実機での確認</span></div><div><b>まとめ</b><strong>振り返り</strong><span>本日伺いたいこと・最初の一歩</span></div></div>
+  <div class="ag"><div><b>10:16</b><strong>第1章　問い合わせを受けて、健全性を確認</strong><span>デモ①・仮説1　Service Analyzer</span></div><div><b>10:18</b><strong>第2章　障害の一次確認と連絡</strong><span>デモ②・仮説4・5　Episode Review／Entity Overview</span></div><div><b>10:30</b><strong>第3章　ログを調べて、専門チームに渡す</strong><span>デモ③・仮説3　Splunk Cloud 実画面＋テックタッチ（実機）</span></div><div><b>まとめ</b><strong>振り返り</strong><span>本日伺いたいこと・最初の一歩</span></div></div>
   <div class="fn">担当者が Splunk を使うのは月に数回、という想定の人物像です。</div></div>`;
  if(c.type==='chapter') return `<div class="cardbg"></div><div class="card ${c.ai?'ai':''}" style="top:300px"><div class="sm">${c.sm}</div><h1 style="font-size:42px">${c.h}</h1><div class="sup">${c.sup}</div><div class="fn">${NOTE}${c.fn?'<br>'+c.fn:''}</div></div>`;
  if(c.type==='closing') return `<div class="cardbg"></div><div class="card" style="top:340px"><div class="sm">最初の一歩</div><h1 style="font-size:38px">対象を一つ決める → 実画面で確かめる → 変化を測る</h1><p>確かめ方：自力完了率・所要時間・依頼件数・再実行。削減率などの数値はお約束しません。</p><div class="fn">${NOTE}<br>監視画面は Splunk の画面イメージを踏襲した架空画面です。</div></div>`;
@@ -453,8 +454,8 @@ function card(c){
    <div><em>10:16</em><p>業務部門から問い合わせ<span>「10時過ぎから契約照会の画面が遅い」</span></p></div>
    <div><em>10:17</em><p>第1章　担当サービスの健全性を確認<span>ガイド6ステップ。健全性スコア38、応答時間とDB接続待ちの悪化を確認</span></p></div>
    <div><em>10:18</em><p>第2章　障害の一次確認と連絡<span>ガイド4ステップ。影響範囲から優先度「中」と判断し、社内手順どおりに連絡</span></p></div>
-   <div><em>10:30</em><p>第3章　ログをひな型から調べる<span>ガイド7ステップ。接続エラーの推移を確認し、専門チームの確認を受けて共有</span></p></div>
-   <div><em>実機</em><p>Splunk Cloud（デモ環境）で第3章のガイドを作成<span>実画面の上に吹き出しを置き、架空のサンプルログ（823件）で同じ傾向を確認</span></p></div></div></div>
+   <div><em>10:30</em><p>第3章　ログをひな型から調べる<span>テックタッチ（実機）のガイド7ステップ。接続エラーの推移を確認し、専門チームの確認を受けて共有</span></p></div>
+   <div><em>実機</em><p>ガイドの作り方（実機）<span>Splunk Cloud の実画面の上で吹き出しを置き、管理画面で公開（ログは架空・823件）</span></p></div></div></div>
   <div class="sbox"><h5>このデモで、テックタッチが手当てした場面</h5><div class="cnt"><div><b>17</b><span>ガイドで進めたステップ</span></div><div><b>2</b><span>選び直し・順番の案内</span></div><div><b>4</b><span>基準・社内手順の表示</span></div><div><b>3</b><span>AI Hub欄の説明（例文）</span></div></div>
    <div class="sfn">このデモを操作した回数です。効果の数値ではありません。</div></div>
   <div class="sbox"><h5>確かめ方（案）</h5><div class="ul"><div>自力完了率：依頼せずに作業を終えられた割合</div><div>所要時間：作業の開始から完了まで</div><div>依頼件数：専門チームへの問い合わせの件数</div><div>再実行：同じ作業を、次回も自力でできるか</div></div><div class="sfn">数値の目標は、現状を伺ってから設定します。ガイドの完了率だけでは判断せず、作業の結果で確かめます。</div></div>
@@ -465,10 +466,13 @@ function qhtml(q){return `<div class="qbg"></div><div class="qcard"><span class=
 /* ---------- storyboard ---------- */
 
 /* ---------- real-screen chapter 3 (demo.html?real) ---------- */
-const REAL=new URLSearchParams(location.search).has('real');
-const SHOTDIR='real/'+(new URLSearchParams(location.search).get('real')||'shots')+'/';
+// Chapter 3 uses the real Splunk Cloud + Techtouch playback screenshots; ?mock switches back to the mock screens.
+const REAL=!new URLSearchParams(location.search).has('mock');
+const SHOTDIR='real/'+(new URLSearchParams(location.search).get('shots')||'shots')+'/';
 // Element boxes per screenshot, in screenshot pixels [x,y,w,h]. Filled in after the real screenshots arrive.
 const REAL_BOXES={
+ 'r01.jpg':{guideLink:[724,180,162,28]},
+ 'r10.jpg':{pubP:[636,364,72,28]},
  '../proof/p1_results.jpg':{chartP:[258,70,690,235]},
  '../proof/p2_reports_balloon.jpg':{openP:[658,568,92,26]},
  '../proof/p3_share_balloon.jpg':{shareP:[1060,194,38,38]},
@@ -477,18 +481,18 @@ const REAL_BOXES={
 const IMGSZ={};
 const aiOnly=(t,o={})=>Object.assign({kind:'ai',mode:'aionly',lbl:'構想',title:'AI Hub欄（例文）',ai:t},o);
 function realCh3(){
- S(5,{card:{type:'chapter',ai:1,sm:'第3章・デモ③・仮説3　作成・修正で止まる',h:'10:30　ログを調べて、原因の手がかりを専門チームに渡す',sup:'支援：テックタッチ（実機）＋AI Hub（構想）',fn:'第3章は Splunk Cloud Platform の実画面（デモ環境）です。ログはデモ用に生成した架空データです。'}});
- S(7,{card:null,ch:2,view:'shot',shot:'r01.png',chat:'exp',tt:null,cur:'guideStart',c1:'専門チーム（架空）から、接続エラーの推移をログで確認するよう依頼がありました。'});
- S(6,{shot:'r02.png',chat:null,cur:'reports',click:true,c1:'① SPLを一から書かずに、専門チームが保存したひな型（レポート）を使います。',note:null});
- S(7,{shot:'r03.png',cur:'openInSearch',click:true,c1:'② 確認済みのひな型を、検索画面で開きます。'});
- S(8.5,{shot:'r04.png',tt:aiOnly('1行目：契約照会サービスの ERROR ログに絞ります。\n2行目：メッセージに「connection」を含むものに絞ります。\n3行目：5分ごとの件数を、エラーの種類（error_code）別に数えます。'),cur:'spl',c1:'③ 検索の中身（SPL）を確認します。AI Hub欄が1行ずつ説明します（例文）。'});
- S(6.5,{shot:'r05.png',tt:null,cur:'timepicker',click:true,c1:'④ 時間範囲を、障害の開始（10:02）を含む 09:30〜10:30 にします。'});
- S(8.5,{shot:'r06.png',tt:aiOnly('結果の見方：10:00台から DB_CONN_TIMEOUT が増え、10:05 以降は POOL_EXHAUSTED も出ています。第2章で確認した接続数の増加（09:58〜）と、時間帯が合っています。',{note:'原因は、この画面だけでは特定できません。'}),cur:'chart',c1:'⑤ 10時台から接続エラーが増えています。第2章で見た時間帯と合っているかを確かめます。',note:'原因はこの画面だけでは特定できません。'});
- S(6.5,{shot:'r07.png',tt:null,cur:'share',click:true,c1:'⑥ 結果を共有して、専門チームに確認を依頼します。',note:null});
+ S(5,{card:{type:'chapter',ai:1,sm:'第3章・デモ③・仮説3　作成・修正で止まる',h:'10:30　ログを調べて、原因の手がかりを専門チームに渡す',sup:'支援：テックタッチ（実機）のガイド＋AI Hub（構想）',fn:'第3章は Splunk Cloud（デモ環境）とテックタッチの実画面です。ログはデモ用に生成した架空データです。AI Hub欄は例文（構想）です。'}});
+ S(7.5,{card:null,ch:2,view:'shot',shot:'r01.jpg',chat:'exp',tt:null,hl:'guideLink',c1:'専門チーム（架空）の依頼を受け、ガイド一覧から「ログをひな型から調べる」を選びます。'});
+ S(6.5,{shot:'r02.jpg',chat:null,c1:'① 吹き出しが「レポート」を指します。SPLを一から書かずに、ひな型を使います。'});
+ S(8,{shot:'r03.jpg',tt:aiOnly('ひな型の意図：「接続エラーの推移（標準）」は、指定したサービスの接続エラーを5分ごとに数え、エラーの種類別に推移を見るためのひな型です。'),c1:'② 確認済みのひな型を、サーチで開きます。AI Hub欄が、ひな型の意図を説明します（例文）。'});
+ S(8.5,{shot:'r04.jpg',tt:aiOnly('1行目：契約照会サービスの ERROR ログに絞ります。\n2行目：メッセージに「connection」を含むものに絞ります。\n3行目：5分ごとの件数を、エラーの種類（error_code）別に数えます。'),c1:'③ 検索の中身（SPL）を確認します。AI Hub欄が1行ずつ説明します（例文）。'});
+ S(6.5,{shot:'r05.jpg',tt:null,c1:'④ 時間範囲が、障害の開始（10:02）を含む 09:30〜10:30 かを確認します。'});
+ S(8.5,{shot:'r06.jpg',tt:aiOnly('結果の見方：10:00台から DB_CONN_TIMEOUT が増え、10:05 以降は POOL_EXHAUSTED も出ています。第2章で確認した接続数の増加（09:58〜）と、時間帯が合っています。',{note:'原因は、この画面だけでは特定できません。'}),c1:'⑤ 10時台から接続エラーが増えています。第2章で見た時間帯と合っているかを確かめます。',note:'原因はこの画面だけでは特定できません。'});
+ S(6.5,{shot:'r07.jpg',tt:null,c1:'⑥ 結果を共有して、専門チームに確認を依頼します。',note:null});
  S(6,{chat2:'rep',c1:'専門チームから返信が届きました。'});
- S(6.5,{shot:'r08.png',chat2:null,cur:'saveAs',click:true,c1:'⑦ レポートとして保存し、運用チームに共有します。'});
- S(7.5,{shot:'r09.png',tt:aiOnly('',{title:'このあと',ai:null,note:'デモのため、保存先と共有範囲は実環境で確認します。',asst:'SPLの作成・説明が必要な場合：利用条件を満たす Splunk AI Assistant の活用を含めて確認します。'}),c1:'保存したレポートを、次回の確認や再発時の比較に使います。'});
- S(4.5,{q:{t:'ひな型選び、時間範囲の指定、結果の読み方のどこで手が止まりますか？',ai:1}});
+ S(6.5,{shot:'r08.jpg',chat2:null,c1:'⑦ レポートとして保存し、運用チームに共有します。'});
+ S(7.5,{shot:'r09.jpg',tt:aiOnly('',{title:'このあと',ai:null,note:'デモのため、保存先と共有範囲は実環境で確認します。',asst:'SPLの作成・説明が必要な場合：利用条件を満たす Splunk AI Assistant の活用を含めて確認します。'}),c1:'ガイドが終了しました。保存したレポートを、次回の確認や再発時の比較に使います。'});
+ S(4.5,{q:{t:'ひな型選び、時間範囲の確認、結果の読み方のどこで手が止まりますか？',ai:1}});
 }
 const STEPS=[];
 const TRANS={hl:null,bal:null,tip:null,q:null,click:false,cur:null,drop:null,note:null,wtitle:null};
@@ -544,14 +548,10 @@ S(6.5,{chat2:null,tt:g3(6,{ttg:'「名前を付けて保存」から、レポー
 S(7.5,{tt:g3(7,{mode:'done',msg:'保存して、運用チーム（架空）に共有しました。',note:'デモのため実際には保存していません。実環境では保存先と共有範囲を確認します。',asst:'SPLの作成・説明が必要な場合：利用条件を満たす Splunk AI Assistant の活用を含めて確認します。',btn:'振り返りへ'}),cur:[1100,820],c1:'保存したレポートを、次回の確認や再発時の比較に使います。'});
 S(4.5,{q:{t:'ひな型選び、時間範囲の確認、結果の読み方のどこで手が止まりますか？',ai:1}});
 }else realCh3();
-// ---- proof on the real demo environment
-S(4.5,{card:{type:'chapter',sm:'実機で確かめたこと',h:'Splunk Cloud（デモ環境）の実画面で、第3章のガイドを作成',sup:'テックタッチ（実機）のガイドエディターと、架空のサンプルログで確認',fn:'ログは makeresults で作った架空データです。画面は実機の画面です。手順・人物・サービス名は架空です。'}});
-S(7,{card:null,ch:2,hdr:4,view:'shot',shot:'../proof/p1_results.jpg',tt:null,chat:null,chat2:null,hl:'chartP',c1:'実機でも、同じひな型で同じ傾向を確認しました（架空データ・823件）。',note:null});
-S(7,{shot:'../proof/p2_reports_balloon.jpg',hl:'openP',c1:'テックタッチのガイドは、Splunk Cloud の実画面の上で作成しました。'});
-S(7,{shot:'../proof/p3_share_balloon.jpg',hl:'shareP',c1:'吹き出しは、Splunk の画面の要素（共有ボタンなど）を指して表示します。'});
-S(6.5,{shot:'../proof/p4_flow.jpg',hl:'flowP',c1:'吹き出しをつなげて、一つのガイドにします。'});
-S(6.5,{shot:'../proof/p5_admin.jpg',wtitle:'テックタッチ 管理画面（実機）',hl:'pubP',c1:'作ったガイドは管理画面で、公開・非公開を切り替えて展開します。'});
-// ---- summary
+// ---- how the guide was built on the real demo environment
+S(4.5,{card:{type:'chapter',sm:'テックタッチの作り方（実機）',h:'ガイドは、Splunk Cloud の実画面の上で作って公開する',sup:'ガイドエディターと管理画面（デモ環境）',fn:'画面は実機の画面です。ログ・手順・人物・サービス名は架空です。'}});
+S(7.5,{card:null,ch:2,hdr:4,view:'shot',shot:'../proof/p4_flow.jpg',tt:null,chat:null,chat2:null,hl:'flowP',c1:'Splunk の実画面の上で吹き出しを置き、ステップをつなげて一つのガイドにします。',note:null});
+S(7,{shot:'r10.jpg',wtitle:'テックタッチ 管理画面（実機）',hl:'pubP',c1:'管理画面で「公開」にすると、利用者の Splunk の画面にガイドが表示されます。'});
 S(12,{card:{type:'summary'},view:'search',hdr:null,cur:[1500,820],c1:'振り返り：問い合わせからログ分析までを、一つの業務の流れとして見ました。'});
 S(7,{c1:'回数はこのデモを操作した回数で、効果の数値ではありません。',note:'確かめ方は、自力完了率・所要時間・依頼件数・再実行です。'});
 S(8,{card:{type:'closing'},c1:null});
@@ -565,7 +565,7 @@ function buildStates(){let c={cur:null};STATES=[];STARTS=[];let t=0;
 function renderScene(st){
  if(st.card){scene.innerHTML=card(st.card);}
  else{let h=chbar(st.ch)+hdr(st.hdr!=null?st.hdr:st.ch)+win(st);scene.innerHTML=h;
-  if(st.chat2){const m=scene.querySelector('.main')||scene.querySelector('.shotc');m.insertAdjacentHTML('beforeend',`<div style="position:absolute;left:26px;right:26px;top:70px;z-index:6">${chat(CHATS[st.chat2])}</div>`);}}
+  if(st.chat2&&st.view!=='shot'){const m=scene.querySelector('.main')||scene.querySelector('.shotc');m.insertAdjacentHTML('beforeend',`<div style="position:absolute;left:26px;right:26px;top:70px;z-index:6">${chat(CHATS[st.chat2])}</div>`);}}
  qv.innerHTML=st.q?qhtml(st.q):'';
  const c1=capEl.querySelector('.c1'),c2=capEl.querySelector('.c2');
  if(st.c1&&(!st.card||st.card.type==='summary')){capEl.style.display='block';c1.textContent=st.c1;c2.textContent=(st.note?st.note+'　':'')+(st.view==='shot'?(st.hdr===4?NOTE_PROOF:NOTE_REAL):NOTE);}else capEl.style.display='none';
