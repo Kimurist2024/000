@@ -336,8 +336,8 @@ async function buildFull() {
     const s = content("デモ｜画面", "デモ動画の画面", "第1・2章はSplunkの画面イメージ、第3章はSplunk Cloud（デモ環境）とテックタッチの実画面。AI Hubは構想の画面イメージ", "デモ");
     const shots = [
       ["ch1_service_analyzer.jpg", "第1章　Service Analyzer", "悪化したKPIを、テックタッチのガイド（案）で確かめる", ["mock"]],
-      ["ch2_aihub_notice.jpg", "第2章　Entity Overview＋AI Hub", "AI Hubが、社内手順の形で一次連絡文を下書きする", ["mock", "hub"]],
-      ["ch3_real_aihub.jpg", "第3章　Search & Reporting＋AI Hub", "公開したガイドの吹き出し⑤と、AI Hubによる結果の読み方", ["real", "hub"]]
+      ["ch2_aihub_notice.jpg", "第2章　Entity Overview＋AI Hub", "画面に置いたAIボタンから、AI Hubが一次連絡文の案を作る", ["mock", "hub"]],
+      ["ch3_real_aihub.jpg", "第3章　Search & Reporting＋AI Hub", "公開したガイドの吹き出し⑤と、AIチェック（社内基準との照合）", ["real", "hub"]]
     ];
     const iw = (CW - 2 * 0.2) / 3;
     shots.forEach((sh, i) => {
@@ -349,7 +349,7 @@ async function buildFull() {
       text(s, sh[2], { x, y: y + h + 0.84, w: iw, h: 0.55, fontSize: 12, objectName: "shot-desc-" + i });
     });
     sq(s, M, 5.6, CW, 0.95, C.background1, C.accent6, "screen-note");
-    text(s, bullets(["ITSI・IT Essentials Workはデモ環境に入っていないため、Splunk Cloudの実画面の色・配置に合わせた画面イメージで描いています", "青い吹き出し・パネルがテックタッチのガイド、紫のパネルがAI Hub（構想・例文）です"]), { x: M + 0.15, y: 5.66, w: CW - 0.3, h: 0.85, fontSize: 12, valign: "middle", objectName: "screen-note-text" });
+    text(s, bullets(["ITSI・IT Essentials Workはデモ環境に入っていないため、Splunk Cloudの実画面の色・配置に合わせた画面イメージで描いています", "青い吹き出し・パネルがテックタッチのガイド、紫の「AI Hub」の札が付いた吹き出しがAI Hub（構想・例文）です。AI Hubの見た目は、公開されている製品画面に合わせています"]), { x: M + 0.15, y: 5.66, w: CW - 0.3, h: 0.85, fontSize: 12, valign: "middle", objectName: "screen-note-text" });
     s.addNotes("第1章と第2章は、ITSIとIT Essentials Workがデモ環境に入っていないため、画面イメージです。第3章は、Splunk Cloudのデモ環境とテックタッチの実画面です。AI Hubはデモ環境に入っていないため、構想の画面イメージと例文です。");
   }
 
@@ -535,7 +535,7 @@ async function buildShort() {
       ["実画面", C.accent1, "Splunk Cloudとテックタッチ\n（デモ環境）"],
       ["画面イメージ", GRAYHEAD, "ITSI・IT Essentials Work\n（デモ環境に未導入）"],
       ["青の吹き出し", C.accent2, "テックタッチのガイド"],
-      ["紫のパネル", AIHUB, "AI Hub（構想・例文）"]
+      ["紫の札の吹き出し", AIHUB, "AI Hub（構想・例文）"]
     ];
     lg.forEach((l, i) => {
       const y = 2.78 + i * 0.92;

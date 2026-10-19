@@ -4,8 +4,8 @@ const path = require('path');
 const SHOTS = [
   ['ch1_service_analyzer.jpg', 70],   // 第1章 Service Analyzer（悪化しているKPI）
   ['ch2_episode_review.jpg', 128],    // 第2章 Episode Review（優先度の基準）
-  ['ch2_aihub_notice.jpg', 160],      // 第2章 AI Hub（一次連絡文の下書き）
-  ['ch3_real_aihub.jpg', 226],        // 第3章 実画面＋AI Hub（結果の読み方）
+  ['ch2_aihub_notice.jpg', 159],      // 第2章 AI Hub（一次連絡文の下書き）
+  ['ch3_real_aihub.jpg', 224],        // 第3章 実画面＋AI Hub（結果の読み方）
 ];
 (async () => {
   const b = await chromium.launch();

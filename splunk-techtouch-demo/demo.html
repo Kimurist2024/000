@@ -307,23 +307,36 @@ table{border-collapse:collapse;width:100%}
 .spl .lti{border:1px solid #dfe3e8;border-radius:4px}.spl .lti b{font-weight:600}
 .spl .sect{color:#3c444d;font-weight:600}
 .spl .chat{border-radius:6px}
-/* ---- AI Hub chat panel (concept image) ---- */
-.aih{position:absolute;right:22px;top:16px;width:520px;background:#fff;border:1px solid #d6dbe2;border-radius:12px;box-shadow:0 10px 28px rgba(40,30,90,.18);z-index:4;overflow:hidden;font-family:"Noto Sans JP",sans-serif;color:#1f2430}
-.wbody.spl-on>.aih{top:66px}
-.aihh{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,#5a3ea6,#3f6fd8);color:#fff;padding:12px 16px}
-.aihl{font-weight:700;font-size:18px;letter-spacing:.3px}.aihs{font-size:13px;opacity:.9}
-.aihc{margin-left:auto;font-size:12.5px;background:rgba(255,255,255,.2);border-radius:12px;padding:2px 10px}
-.aihb{padding:14px 16px;background:#f7f7fb;min-height:300px}
-.mu{margin-left:auto;max-width:82%;width:fit-content;background:#e6ecfa;border-radius:12px 12px 2px 12px;padding:9px 14px;font-size:15.5px;line-height:1.6;margin-bottom:12px}
-.ma{display:flex;gap:10px;align-items:flex-start}
-.ma .av{flex:none;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5a3ea6,#3f6fd8);color:#fff;font:700 13px Roboto,sans-serif;display:grid;place-items:center}
-.ma .bub{background:#fff;border:1px solid #e1def0;border-radius:2px 12px 12px 12px;padding:10px 14px;font-size:15px;line-height:1.7;white-space:pre-line;min-height:46px;flex:1}
-.ma .refs,.ma .mab{display:none}.ma.done .refs,.ma.done .mab{display:flex}
-.refs{flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12.5px;color:#5a3ea6;align-items:center}
-.refs span{background:#efeaf9;border-radius:4px;padding:2px 8px}
-.mab{gap:8px;margin-top:10px}.mab span{border:1px solid #c9c2e6;border-radius:6px;padding:4px 12px;font-size:13.5px;color:#3c2c6e;background:#fff}
-.aihf{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e6e3f0;padding:10px 16px;color:#9a97ad;font-size:14px}
-.aihf b{width:30px;height:30px;border-radius:50%;background:#5a3ea6;color:#fff;display:grid;place-items:center}
+/* ---- AI Hub: drawn after published Techtouch AI Hub screens (AIチェック balloon, result popup). Concept image. ---- */
+.aiw{position:absolute;right:22px;top:16px;width:540px;z-index:4;font-family:"Noto Sans JP",sans-serif;color:#1f2430}
+.wbody.spl-on>.aiw{top:66px}
+.aitag{display:inline-flex;align-items:center;gap:8px;background:#5a3ea6;color:#fff;font-size:13px;font-weight:700;border-radius:12px;padding:3px 12px;margin-bottom:8px}
+.aitag small{font-weight:400;opacity:.9;font-size:12px}
+.aic{background:#fff;border-radius:6px;box-shadow:0 6px 22px rgba(0,0,0,.18);position:relative;overflow:hidden}
+.aic.aichk{border:2px solid #f2c94c}
+.aic .x{position:absolute;right:10px;top:6px;color:#9aa0aa;font-size:16px}
+.ailab{font-size:13px;font-weight:700;color:#2fae8c;margin:14px 18px 8px}
+.aibar{margin:0 18px;padding:9px 12px;font-size:17px;font-weight:700;text-align:center}
+.aibar.y{background:#fde9a8}.aibar.b{background:#dceefa;text-align:left;font-size:15px}
+.aibody{margin:10px 18px 0;font-size:15px;line-height:1.7;white-space:pre-line}
+.aitbl{margin:12px 18px 0;border:1px solid #dfe2e6}
+.aitbl .h{background:#e6e8eb;font-size:14px;font-weight:700;padding:7px 10px}
+.aitbl .b{font-size:14.5px;font-weight:700;color:#2fae8c;padding:8px 10px;white-space:pre-line;line-height:1.6}
+.aift{display:flex;align-items:center;gap:14px;padding:14px 18px 14px}
+.aift .aistop{font-size:12.5px;color:#8a919c;margin-right:auto}
+.aift .back{font-size:15px;color:#5d6573}
+.aift .go{background:#3cb999;color:#fff;font-size:15px;font-weight:700;border-radius:4px;padding:6px 14px}
+.aiav{height:120px;background:#80d4bb;display:grid;place-items:center}
+.aimsg{text-align:center;margin-top:10px;font-size:14px;color:#3a4150}
+.aittl{text-align:center;font-size:18px;font-weight:700;margin:4px 18px 4px}
+.ainote{text-align:center;font-size:12.5px;color:#8a919c;margin-bottom:8px}
+.aisec{margin:6px 18px 0;border:1px solid #cfe9e0}
+.aisec .h{background:#80d4bb;font-size:15px;font-weight:700;padding:6px 10px}
+.aisec .b{font-size:14.5px;line-height:1.65;padding:8px 10px;white-space:pre-line}
+.aiov{position:absolute;inset:0;background:rgba(255,255,255,.62);display:none;place-items:center;z-index:3;text-align:center;color:#1a5fb4;font-size:21px;font-weight:700;line-height:1.6}
+.aiwaiting .aiov{display:grid}.aiwaiting .aifull{display:none}
+.aidis{font-size:12.5px;color:#8a919c;margin:10px 18px 0}
+.aibtn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #1b6ec2;color:#1b6ec2;background:#fff;border-radius:4px;padding:5px 12px;font-size:14px;font-weight:700}
 </style>
 </head>
 <body>
@@ -457,7 +470,7 @@ ite(st){
  const w=1080,h=210,x=i=>40+i/50*(w-60),y=v=>h-24-(v/550)*(h-40);
  const pts=vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
  const ticks=[0,10,20,30,40,50].map(i=>`<text x="${x(i)}" y="${h-4}" font-size="13" fill="#6b7280" text-anchor="middle">${['09:30','09:40','09:50','10:00','10:10','10:20'][i/10]}</text>`).join('');
- return `<div class="h1">ctr-db-01（架空） <small>エンティティの状態（Analytics）</small></div>
+ return `<div class="h1" style="display:flex;align-items:center">ctr-db-01（架空） <small style="margin-left:12px">エンティティの状態（Analytics）</small>${st.aiBtn?'<span class="aibtn" data-k="aiBtn" style="margin-left:24px">✦ AIで一次連絡文を作る</span>':''}</div>
  <div style="font-size:14.5px;color:var(--sub);margin:-6px 0 12px">種類：*nix（架空）｜役割：契約DBサーバー（架空）｜関連サービス：契約照会サービス（架空）</div>
  <div class="vit"><div class="vc"><span>CPU使用率</span><b>34 %</b><small>過去60分の平均</small></div><div class="vc"><span>メモリ使用率</span><b>71 %</b><small>過去60分の平均</small></div><div class="vc"><span>ディスクI/O待ち</span><b>12 ms</b><small>過去60分の平均</small></div>
  <div class="vc" style="border-top-color:#F26A35" data-k="vConn"><span>DB接続数（架空の指標）</span><b style="color:#d4541f">482 / 500</b><small>上限 500（架空）に近い</small></div></div>
@@ -497,19 +510,24 @@ search(st){
  return h;}
 };
 
-/* ---------- AI Hub (concept image: not installed in the demo tenant) ---------- */
-const KBN='（架空）';
+/* ---------- AI Hub (concept image: not installed in the demo tenant) ----------
+   Drawn after published Techtouch AI Hub screens: an AI step inside a guide shows its result as a
+   Techtouch balloon ("AIチェック" with a yellow header bar and an example table) or as a result popup
+   (illustration, "お待たせしました", section header, action button). */
+const AVATAR=`<svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="46" fill="#fff" opacity=".35"/><circle cx="48" cy="40" r="17" fill="#fff"/><path d="M18 88c4-18 16-27 30-27s26 9 30 27z" fill="#fff"/><path d="M30 40a18 18 0 0 1 36 0" fill="none" stroke="#2f5d55" stroke-width="4"/><rect x="25" y="38" width="7" height="12" rx="3" fill="#2f5d55"/><rect x="64" y="38" width="7" height="12" rx="3" fill="#2f5d55"/><path d="M68 50c0 7-6 10-12 10" fill="none" stroke="#2f5d55" stroke-width="3"/></svg>`;
 const AIH={
- contact:{q:'このエピソードの一次連絡文を、社内手順で作ってください。',a:'【障害一次連絡】E-0412 契約照会サービスの応答時間の悪化（対応中）\n・開始：10:02\n・影響：契約照会サービス、代理店ポータルの照会の一部\n・優先度：中（一部の利用者に影響）\n・関連：ctr-db-01 の接続数が上限付近（09:58〜。原因は未確定）\n・連絡先：システム運用チーム、業務部門の窓口\n・次の連絡：原因を確認したあと',refs:['一次連絡の手順','優先度の基準'],btns:['コピー','連絡ツールに貼り付け']},
- spl:{q:'このSPLを、1行ずつ説明してください。',a:'1行目：契約照会サービス（contract_inquiry）の ERROR ログに絞ります。\n2行目：message に「connection」を含む、接続まわりのエラーに絞ります。\n3行目：5分ごとの件数を、エラーの種類（error_code）別に数えます。\nこのひな型は傾向を見るためのもので、原因の特定には使いません。',refs:['アプリログ辞書','承認済みSPLひな型']},
- read:{q:'この結果を、どう読めばよいですか？',a:'・10:00台から DB_CONN_TIMEOUT が増え、5分あたり約80〜100件になっています。\n・10:05 以降は POOL_EXHAUSTED も、5分あたり約50〜70件出ています。\n・社内基準では、5分あたり50件を超えたら専門チーム（DB）に確認を依頼します。今回は依頼が必要です。\n・原因（DBか、接続プールの設定か）は、この結果だけでは断定できません。',refs:['判断基準と連絡','アプリログ辞書']},
- draft:{q:'専門チームへの確認依頼文を作ってください。',a:'件名：【確認依頼】契約照会サービス 接続エラーの増加\n事象：DB_CONN_TIMEOUT と POOL_EXHAUSTED が増加\n時間帯：10:00〜（POOL_EXHAUSTED は 10:05〜）\n件数：5分あたり DB_CONN_TIMEOUT 約80〜100件、POOL_EXHAUSTED 約50〜70件\n添付：検索結果のリンク\n依頼：接続プールの設定と ctr-db-01 の状態の確認\n※原因は未確定です。',refs:['判断基準と連絡'],btns:['コピー','チャットに貼り付け']}};
+ contact:{kind:'popup',wait:'AIが一次連絡文を作成しています',ttl:'一次連絡文の案を作成しました',note:'AIの出力内容に問題がないか確認してから、連絡ツールに貼り付けてください',sec:'一次連絡文（案）',body:'【障害一次連絡】E-0412 契約照会サービスの応答時間の悪化（対応中）\n・開始：10:02\n・影響：契約照会サービス、代理店ポータルの照会の一部\n・優先度：中（一部の利用者に影響）\n・関連：ctr-db-01 の接続数が上限付近（09:58〜。原因は未確定）\n・次の連絡：原因を確認したあと',btns:['コピーする']},
+ spl:{kind:'explain',wait:'AIがSPLを確認しています',lab:'AI解説',bar:'このSPLを1行ずつ説明します',body:'■ 1行目：契約照会サービス（contract_inquiry）の ERROR ログに絞ります\n■ 2行目：message に「connection」を含む、接続まわりのエラーに絞ります\n■ 3行目：5分ごとの件数を、エラーの種類（error_code）別に数えます\nこのひな型は傾向を見るためのもので、原因の特定には使いません。',tbl:['参照した社内ナレッジ（架空）','アプリログ辞書／承認済みSPLひな型']},
+ read:{kind:'check',wait:'AIが社内基準と照らしています',lab:'AIチェック',bar:'⚠ 専門チームへの確認依頼が必要です ⚠',body:'10:00台から DB_CONN_TIMEOUT が、5分あたり約80〜100件に増えています。10:05 以降は POOL_EXHAUSTED も約50〜70件出ています。\n原因（DBか、接続プールの設定か）は、この結果だけでは断定できません。',tbl:['社内基準（架空）','5分あたり50件を超えたら、専門チーム（DB）に確認を依頼する']},
+ draft:{kind:'popup',wait:'AIが確認依頼文を作成しています',ttl:'確認依頼文の案を作成しました',note:'AIの出力内容に問題がないか確認してから、チャットに貼り付けてください',sec:'確認依頼文（案）',body:'件名：【確認依頼】契約照会サービス 接続エラーの増加\n事象：DB_CONN_TIMEOUT と POOL_EXHAUSTED が増加\n時間帯：10:00〜（POOL_EXHAUSTED は 10:05〜）\n件数：5分あたり約80〜100件／約50〜70件\n依頼：接続プールの設定と ctr-db-01 の状態の確認\n※原因は未確定です。検索結果のリンクを添付します。',btns:['コピーする']}};
 function aih(a){
  if(!a)return '';
- return `<div class="aih" data-k="aih"><div class="aihh"><span class="aihl">AI Hub</span><span class="aihs">テックタッチ</span><span class="aihc">構想・画面イメージ</span></div>
- <div class="aihb"><div class="mu">${a.q}</div><div class="ma"><span class="av">AI</span><div style="flex:1"><div class="bub mat" data-full="${encodeURIComponent(a.a)}"></div>
- <div class="refs">参照したナレッジ${KBN}：${a.refs.map(r=>`<span>${r}</span>`).join('')}</div>${a.btns?`<div class="mab">${a.btns.map(b=>`<span>${b}</span>`).join('')}</div>`:''}</div></div></div>
- <div class="aihf"><span>AI Hub に質問する…</span><b>↑</b></div></div>`;}
+ const foot=a.btns?`<div class="aift"><span class="aistop">◉ ガイドを停止</span>${a.btns.map(b=>`<span class="go">${b}</span>`).join('')}</div>`:`<div class="aift"><span class="aistop">◉ ガイドを停止</span><span class="back">もどる</span><span class="go">次へ</span></div>`;
+ let card;
+ if(a.kind==='popup') card=`<div class="aic"><div class="aiav">${AVATAR}</div><div class="aimsg">✨✨ お待たせしました ✨✨</div><div class="aittl">${a.ttl}</div><div class="ainote">${a.note}</div><div class="aisec"><div class="h">${a.sec}</div><div class="b">${a.body}</div></div><div class="aidis">※AIは不正確な情報を表示することがあります</div>${foot}</div>`;
+ else card=`<div class="aic ${a.kind==='check'?'aichk':''}"><span class="x">×</span><div class="ailab">${a.lab}</div><div class="aibar ${a.kind==='check'?'y':'b'}">${a.bar}</div><div class="aibody">${a.body}</div><div class="aitbl"><div class="h">${a.tbl[0]}</div><div class="b">${a.tbl[1]}</div></div><div class="aidis">※AIは不正確な情報を表示することがあります</div>${foot}</div>`;
+ return `<div class="aiw" data-k="aih"><div class="aitag">AI Hub<small>構想・画面イメージ（デモ環境には未導入）</small></div>
+ <div class="aifull">${card}</div></div><div class="aiov"><div>${a.wait}<br>操作せずにお待ちください</div></div>`;}
 
 /* ---------- techtouch panel ---------- */
 function tt(t){
@@ -593,10 +611,10 @@ function realCh3(){
  S(7.5,{card:null,ch:2,view:'shot',shot:'r01.jpg',chat:'exp',tt:null,aih:null,hl:'guideLink',c1:'専門チーム（架空）の依頼を受け、ガイド一覧から「ログをひな型から調べる」を選びます。'});
  S(6.5,{shot:'r02.jpg',chat:null,c1:'① 吹き出しが「レポート」を指します。SPLを一から書かずに、ひな型を使います。'});
  S(6.5,{shot:'r03.jpg',c1:'② 確認済みのひな型を、サーチで開きます。'});
- S(10.5,{shot:'r04.jpg',aih:AIH.spl,aihType:true,c1:'③ 検索の中身（SPL）を AI Hub に聞きます。社内ナレッジを参照して1行ずつ説明します。'});
+ S(10.5,{shot:'r04.jpg',aih:AIH.spl,aihType:true,c1:'③ ガイドのAIステップが、社内ナレッジを参照してSPLを1行ずつ説明します。'});
  S(6.5,{shot:'r05.jpg',aih:null,c1:'④ 時間範囲が、障害の開始（10:02）を含む 09:30〜10:30 かを確認します。'});
- S(12,{shot:'r06.jpg',aih:AIH.read,aihType:true,c1:'⑤ 結果の読み方を AI Hub に聞きます。社内基準に照らすと、専門チームへの確認依頼が必要です。',note:'原因はこの画面だけでは特定できません。'});
- S(12,{shot:'r07.jpg',aih:AIH.draft,aihType:true,c1:'⑥ AI Hub が、社内の連絡の形で確認依頼文を下書きします。担当者が確かめてから送ります。',note:null});
+ S(11,{shot:'r06.jpg',aih:AIH.read,aihType:true,c1:'⑤ AIチェックが、結果を社内基準と照らします。専門チームへの確認依頼が必要です。',note:'原因はこの画面だけでは特定できません。'});
+ S(11,{shot:'r07.jpg',aih:AIH.draft,aihType:true,c1:'⑥ AI Hub が、社内の連絡の形で確認依頼文の案を作ります。担当者が確かめてから送ります。',note:null});
  S(6,{aih:null,chat2:'rep',c1:'専門チームから返信が届きました。'});
  S(6.5,{shot:'r08.jpg',chat2:null,c1:'⑦ レポートとして保存し、運用チームに共有します。'});
  S(7,{shot:'r09.jpg',c1:'ガイドが終了しました。保存したレポートを、次回の確認や再発時の比較に使います。',note:'SPLの作成・説明には、利用条件を満たせば Splunk AI Assistant も併用できます（デモ環境では未使用）。'});
@@ -637,9 +655,9 @@ S(7,{erTab:'events',tt:g2(1,{warn:'社内手順では、イベントの前に影
 S(7.5,{erTab:'impact',tt:g2(1,{msg:'影響の範囲を社内の基準に当てはめて、優先度を決めます。',why:'確認する理由：優先度で、連絡先と連絡の急ぎ方が変わります（社内手順・架空）。'}),tip:{k:'impQ',p:'r',h:'テックタッチ ツールチップ（案）：優先度の基準（社内・架空）',t:'全利用者に影響 → 高／一部の利用者に影響 → 中／影響なし → 低。今回は「代理店ポータルの照会の一部」のため「中」です。'},cur:'impQ',c1:'「?」で社内の優先度の基準（架空）を表示します。一部に影響しているため、優先度は「中」です。'});
 S(6,{tt:g2(2,{msg:'関連エンティティ「ctr-db-01」の状態を確認します。',why:'確認する理由：関係するサーバーの状態を、連絡に含めるためです。'}),hl:'entLink',bal:{t:'ステップ3/4：関連エンティティの状態を確認します',s:'Entity Overview（IT Essentials Work の機能）を開きます',p:'t'},cur:'entLink',click:true,c1:'ステップ3：関連エンティティを、Entity Overview で確認します。'});
 S(7.5,{view:'ite',tt:g2(2,{msg:'接続数が上限（500・架空）に近づいています。増え始めたのは、エピソードの少し前（09:58）です。',why:'確認する理由：関係するサーバーの状態を、連絡に含めるためです。原因は、この段階では確定しません。'}),hl:'vConn',bal:{t:'DB接続数が上限に近づいています',s:'09:58 から増加（架空）',p:'b'},cur:[1150,720],c1:'接続数が上限に近いことを確認します。原因はこの段階では確定しません。'});
-S(6,{tt:g2(3,{msg:'画面の情報と社内手順から、AI Hub が一次連絡文を下書きします。',why:'確認する理由：連絡の宛先と内容を、人によってばらつかせないためです。',btn:'AI Hub で連絡文を作る'}),hl:'ttBtn',cur:'ttBtn',click:true,c1:'ステップ4：社内手順に沿った一次連絡を、AI Hub で下書きします。'});
-S(11,{tt:null,aih:AIH.contact,aihType:true,cur:[1000,760],c1:'AI Hub が、画面の情報と社内手順から一次連絡文を下書きします。担当者が確かめて送ります。',note:'AI Hub は構想の画面イメージです（デモ環境には未導入）。'});
-S(7,{pop:null,aih:null,tt:g2(4,{mode:'done',msg:'一次確認の4ステップが完了しました。',rec:[['10:18','概要を確認（E-0412 応答時間の悪化・In Progress）'],['10:19','影響範囲を確認（代理店ポータルの照会の一部 → 優先度「中」）'],['10:21','関連エンティティを確認（ctr-db-01 の接続数が上限付近。原因は未確定）'],['10:22','社内手順に沿って連絡（システム運用チーム・業務部門の窓口）']],note:'時刻・記録はすべて架空です。',btn:'第3章へ進む'}),cur:[1180,760],c1:'一次確認の4ステップが完了しました。パネルに、確認した内容の記録（例）を表示します。'});
+S(7,{tt:g2(3,{msg:'画面に置いたAIボタンで、一次連絡文の案を作ります。',why:'確認する理由：連絡の宛先と内容を、人によってばらつかせないためです。'}),aiBtn:true,hl:'aiBtn',bal:{t:'④「AIで一次連絡文を作る」を押します',s:'画面の情報と社内手順から、AIが案を作ります',p:'b'},cur:'aiBtn',click:true,c1:'ステップ4：テックタッチが画面に置いたAIボタンから、一次連絡文の案を作ります。'});
+S(10,{tt:null,aih:AIH.contact,aihType:true,cur:[1000,760],c1:'AI Hub が、画面の情報と社内手順から一次連絡文の案を作ります。担当者が確かめて送ります。',note:'AI Hub は構想の画面イメージです（デモ環境には未導入）。'});
+S(7,{pop:null,aih:null,aiBtn:false,tt:g2(4,{mode:'done',msg:'一次確認の4ステップが完了しました。',rec:[['10:18','概要を確認（E-0412 応答時間の悪化・In Progress）'],['10:19','影響範囲を確認（代理店ポータルの照会の一部 → 優先度「中」）'],['10:21','関連エンティティを確認（ctr-db-01 の接続数が上限付近。原因は未確定）'],['10:22','社内手順に沿って連絡（システム運用チーム・業務部門の窓口）']],note:'時刻・記録はすべて架空です。',btn:'第3章へ進む'}),cur:[1180,760],c1:'一次確認の4ステップが完了しました。パネルに、確認した内容の記録（例）を表示します。'});
 S(4.5,{q:{t:'障害時の一次確認で、人によって手順がばらつくのはどこですか？'}});
 // ---- chapter 3
 if(!REAL){
@@ -726,9 +744,8 @@ function seek(t){
  cursor.style.display=hide?'none':'block';cursor.style.transform=`translate(${x-3}px,${y-2}px)`;
  let rp=0;if(st.click&&!hide){rp=cl((lt-1.35)/0.45);}
  if(rp>0&&rp<1){const R=10+38*rp;rip.style.display='block';rip.style.left=(to[0]-R)+'px';rip.style.top=(to[1]-R)+'px';rip.style.width=rip.style.height=2*R+'px';rip.style.opacity=1-rp;rip.style.borderColor=st.ring==='ai'||st.bal&&st.bal.ai?'var(--ai)':'var(--tt)';}else rip.style.display='none';
- let tw=0;const mt=scene.querySelector('.mat');
- if(mt){const full=decodeURIComponent(mt.dataset.full),n=st.aihType?Math.max(0,Math.min(full.length,Math.floor((lt-0.9)*32))):full.length;
-  if(mt.dataset.n!==String(n)){mt.textContent=full.slice(0,n);mt.dataset.n=n;mt.parentNode.parentNode.classList.toggle('done',n>=full.length);}tw=n;}
+ let tw=0;const aw=scene.querySelector('.aiw');
+ if(aw){const wait=!!st.aihType&&lt<2.2;aw.parentNode.classList.toggle('aiwaiting',wait);tw=wait?1:2;}
  return `${i}|${x.toFixed(0)},${y.toFixed(0)}|${a.toFixed(2)}|${cardA.toFixed(2)}|${qv.style.opacity}|${rp>0&&rp<1?rp.toFixed(2):0}|${tw}`;}
 window.DEMO={init,seek,get total(){return TOTAL},get starts(){return STARTS}};
 </script>
