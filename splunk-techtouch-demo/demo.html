@@ -7,6 +7,11 @@
 <link rel="stylesheet" href="node_modules/@fontsource/noto-sans-jp/500.css">
 <link rel="stylesheet" href="node_modules/@fontsource/noto-sans-jp/700.css">
 <link rel="stylesheet" href="node_modules/@fontsource/jetbrains-mono/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/noto-sans-jp/600.css">
+<link rel="stylesheet" href="node_modules/@fontsource/roboto/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/roboto/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/roboto/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/roboto-mono/400.css">
 <style>
 :root{--line:#e2e5ea;--ink:#1f2430;--sub:#5d6573;--mut:#8a919c;--tt:#1a7fc1;--ttd:#12608f;--tts:#e8f3fb;--ai:#5a3ea6;--ais:#f2eefa;--ok:#2c7a4b;--warn:#b5560f;--warns:#fdf1e6;
 --critical:#d1453b;--high:#ec7a2e;--medium:#d9a514;--low:#9bb52c;--normal:#3c9a5f;--info:#4a8fd6;}
@@ -249,6 +254,59 @@ table{border-collapse:collapse;width:100%}
 .cnt div{background:#f4f6f8;border-radius:8px;padding:12px 14px}.cnt b{font-size:44px;display:block;line-height:1.2}.cnt span{font-size:15.5px;color:var(--sub);line-height:1.45;display:block}
 .ul div{font-size:17.5px;line-height:1.9}.ul div:before{content:"・"}
 .sfn{font-size:15px;color:var(--sub);margin-top:8px;line-height:1.6}
+/* ---- Splunk Cloud look (colors sampled from the demo tenant screenshots) ---- */
+.spl{position:absolute;inset:0;background:#f3f4f6;color:#2b3033;font-family:"Splunk Platform Sans","Proxima Nova",Roboto,"Hiragino Sans","Noto Sans JP",sans-serif}
+.spl .mono,.spl .sin{font-family:"Splunk Platform Mono","Roboto Mono","Noto Sans JP",monospace}
+.stop{height:52px;background:#000;display:flex;align-items:center;padding:0 22px;color:#fff}
+.slg{font-family:Roboto,sans-serif;font-size:24px;letter-spacing:-.4px;line-height:1}.slg b{font-weight:700}.slg span{font-weight:500;font-size:20px;letter-spacing:0;margin-left:1px}
+.sics{margin-left:auto;display:flex;align-items:center;gap:24px;color:#c3cbd4}
+.sics .sep{width:1px;height:24px;background:#5c6773}
+.susr{display:flex;align-items:center;gap:8px;font-size:15px;color:#fff;font-weight:500}
+.sbd{position:absolute;top:52px;left:0;right:0;bottom:0;display:flex}
+.spl .snav{width:240px;flex:none;background:#ecedf1;border-right:0;padding:12px 14px}
+.snav .hb{color:#3c444d;font-size:20px;margin:0 0 12px 18px}
+.spl .sapp{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15.5px;margin:0 6px 16px;color:#21262a}
+.sapp .aic{width:32px;height:32px;display:grid;place-items:center;color:#fff;font:700 20px Roboto,sans-serif;flex:none}
+.spl .sni{display:flex;align-items:center;gap:13px;font-size:15.5px;padding:11px 14px;border-radius:6px;color:#3c444d;margin-bottom:2px;white-space:nowrap}
+.spl .sni svg{color:#5c6773;flex:none}
+.spl .sni.on{background:#fff;box-shadow:inset 4px 0 0 #1f882c;color:#21262a;font-weight:500}.spl .sni.on svg{color:#1f882c}
+.snav .sgrp{font-size:12.5px;color:#6b7480;margin:14px 14px 6px;font-weight:600}
+.smain{width:1160px;flex:none;padding:16px 22px;overflow:hidden;position:relative}
+.wbody.spl-on>.ttp{top:66px}
+.spl .h1{font-size:24px;font-weight:600;color:#21262a;margin:0 0 12px}.spl .h1 small{font-size:14.5px;font-weight:400;color:#6b7480}
+.spl .box{background:#fff;border:1px solid #dfe3e8;border-radius:4px}
+.spl .empty{color:#6b7480}
+.spl .fd{height:36px;border:1px solid #c3cbd4;border-radius:4px;font-size:14.5px;color:#5c6773;padding:0 12px}.spl .fd b{color:#21262a;font-weight:500}
+.spl .dd{border:1px solid #c3cbd4;border-radius:4px;box-shadow:0 4px 14px rgba(0,0,0,.18)}.spl .dd div{font-size:14.5px}.spl .dd .cur{background:#e9f2fa;font-weight:500}
+.spl .tl{border:0;border-radius:4px;padding:10px 12px 14px;height:118px}
+.spl .tl .nm{font-size:14px;font-weight:600}.spl .tl .sc{font-size:38px;font-weight:600}.spl .tl .lb{font-size:12.5px;opacity:.85;color:inherit}
+.spl .tl .bar{display:none}.spl .tl.sel{outline:3px solid #000;outline-offset:2px}
+.spl .epbar{background:#fff;border:1px solid #dfe3e8;border-left:4px solid #F26A35;border-radius:4px;font-size:15px}.spl .epbar b{color:#21262a}
+.spl .lnk{color:#006eaa;font-weight:500}
+.spl .ph{border-bottom:1px solid #e1e5ea}.spl .ph b{font-size:16px;font-weight:600}
+.spl .kt th,.spl .et th,.spl .rt2 th{font-size:13.5px;color:#3c444d;font-weight:600;border-bottom:1px solid #c3cbd4;background:#fff}
+.spl .kt td,.spl .et td,.spl .rt2 td{border-bottom:1px solid #e1e5ea;font-size:15px}
+.spl .sev{border-radius:3px;font-size:12.5px;font-weight:600;padding:2px 9px}
+.spl .ec{border:1px solid #dfe3e8;border-left:5px solid;border-radius:4px}.spl .ec.sel{outline:2px solid #006eaa;outline-offset:-1px}
+.spl .elist{width:350px}
+.spl .edet{border:1px solid #dfe3e8;border-radius:4px}
+.spl .etitle{font-weight:600}
+.spl .ectl{flex-wrap:wrap;row-gap:8px}
+.spl .sel2{border:1px solid #c3cbd4;border-radius:4px;height:34px;font-size:14px}
+.spl .abtn{border-radius:4px;height:34px;font-size:14px;background:#1a8929;font-weight:600}
+.spl .abtn.g{background:#fff;color:#21262a;border:1px solid #c3cbd4;font-weight:500}
+.spl .tab{font-size:14.5px;color:#3c444d;padding:8px 12px}.spl .tab.on{color:#21262a;font-weight:500;border-color:#1a6ba5}
+.spl .chipe{background:#eef0f3;border-radius:4px;font-size:14.5px}
+.spl .vc{border:1px solid #dfe3e8;border-radius:4px;border-top:4px solid #99D18B}.spl .vc b{font-weight:600}
+.spl .sbtn{background:#1d8828;border-radius:4px}
+.spl .sin{border:1px solid #c3cbd4;border-radius:4px;font-size:14.5px}
+.spl .tp{border:1px solid #c3cbd4;border-radius:4px;font-size:14.5px}
+.spl .aib{border-radius:4px;color:#d74c39}
+.spl .ul2{color:#006eaa}
+.spl .rdesc{color:#3c444d}
+.spl .lti{border:1px solid #dfe3e8;border-radius:4px}.spl .lti b{font-weight:600}
+.spl .sect{color:#3c444d;font-weight:600}
+.spl .chat{border-radius:6px}
 </style>
 </head>
 <body>
@@ -258,9 +316,11 @@ table{border-collapse:collapse;width:100%}
 const NOTE='構想デモ｜画面・サービス名・手順・数値は架空で、実際の製品画面や連携動作を示すものではありません。';
 const NOTE_PROOF='Splunk Cloud・テックタッチの実画面（デモ環境）｜ログ・人物・サービス名は架空です。';
 const NOTE_REAL='Splunk Cloud・テックタッチの実画面（デモ環境）｜ログ・サービス名・人物は架空です。AI Hub欄は例文（構想）です。';
-const SEVC={critical:'var(--critical)',high:'var(--high)',medium:'var(--medium)',low:'var(--low)',normal:'var(--normal)',info:'var(--info)'};
+const SEVC={critical:'#B50101',high:'#F26A35',medium:'#FCB64E',low:'#FFE98C',normal:'#99D18B',info:'#AED3E5'};
+const SPKC={critical:'#B50101',high:'#F26A35',medium:'#e09a1f',low:'#c9a800',normal:'#5aa147',info:'#5c9fc4'};
+const SEVT={critical:'#fff',high:'#fff',medium:'#21262a',low:'#21262a',normal:'#21262a',info:'#21262a'};
 const SEVN={critical:'Critical',high:'High',medium:'Medium',low:'Low',normal:'Normal',info:'Info'};
-const sev=s=>`<span class="sev" style="background:${SEVC[s]}">${SEVN[s]}</span>`;
+const sev=s=>`<span class="sev" style="background:${SEVC[s]};color:${SEVT[s]}">${SEVN[s]}</span>`;
 const CH=[['第1章　問い合わせ・状況確認','10:16　デモ①'],['第2章　一次確認・連絡','10:18　デモ②'],['第3章　ログを調べる','10:30　デモ③'],['振り返り','まとめ']];
 const HDR=[
  {tm:'10:16',lb:'問い合わせ',t:'問い合わせを受けて、担当サービスの健全性を確認する',d:'業務部門から「10時過ぎから契約照会の画面が遅い」と連絡が入りました。担当者がSplunkを使うのは月に数回です（想定の人物像）。'},
@@ -289,22 +349,42 @@ function spark(vals,w=200,h=32,col='#4a5160'){
 /* ---------- top-level pieces ---------- */
 function chbar(ch){return `<div class="chbar">${CH.map((c,i)=>`<div class="chi ${i<ch?'done':i===ch?'cur':''}"><span class="n">${i<ch?'✓':i+1}</span><div><b>${c[0]}</b><small>${c[1]}</small></div></div>`).join('')}</div>`;}
 function hdr(ch){const h=HDR[ch];return `<div class="hdr"><div class="tm"><b>${h.tm}</b><small>${h.lb}</small></div><div><h2>${h.t}</h2><p>${h.d}</p></div></div>`;}
-function abar(st){
- if(st.view==='launcher'||st.view==='search')return '';
- let nav,an;
- if(st.view==='sa'||st.view==='er'){an='IT Service Intelligence';nav=[['Service Analyzer ▾',st.view==='sa'],['Episode Review',st.view==='er','navER'],['Glass Tables'],['Deep Dives'],['Dashboards ▾'],['Search ▾'],['Configuration ▾']];}
- else if(st.view==='ite'){an='IT Essentials Work';nav=[['Entity Overview',1],['Search ▾'],['Configuration ▾']];}
- else{an='Search & Reporting';nav=[['Search',st.sv!=='reports'],['Analytics'],['Datasets'],['Reports',st.sv==='reports','navReports'],['Alerts'],['Dashboards']];}
- return `<div class="abar">${nav.map(n=>`<span class="nv ${n[1]?'on':''}" ${n[2]?`data-k="${n[2]}"`:''}>${n[0]}</span>`).join('')}<span class="an">${an}</span></div>`;}
+const ICON={
+ search:'<circle cx="10" cy="10" r="6"/><line x1="14.5" y1="14.5" x2="19" y2="19"/>',
+ data:'<ellipse cx="11" cy="6" rx="7" ry="3"/><path d="M4 6v10c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/>',
+ report:'<path d="M6 3h8l4 4v14H6z"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/>',
+ alert:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/>',
+ dash:'<rect x="4" y="4" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/>',
+ module:'<path d="M12 3l8 4v10l-8 4-8-4V7z"/>',
+ tiles:'<rect x="3" y="4" width="8" height="7" rx="1"/><rect x="13" y="4" width="8" height="7" rx="1"/><rect x="3" y="13" width="8" height="7" rx="1"/><rect x="13" y="13" width="8" height="7" rx="1"/>',
+ episode:'<path d="M4 6h16M4 12h16M4 18h10"/>',
+ glass:'<rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="12" r="2"/><path d="M11 12h6"/>',
+ deep:'<path d="M3 17l5-6 4 4 4-7 5 9"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+ entity:'<rect x="4" y="4" width="16" height="6" rx="1"/><rect x="4" y="14" width="16" height="6" rx="1"/><circle cx="8" cy="7" r=".8"/><circle cx="8" cy="17" r=".8"/>',
+ home:'<path d="M4 11l8-7 8 7v9H4z"/>',
+ app:'<rect x="4" y="4" width="16" height="16" rx="3"/>'};
+const APPS={
+ launcher:{name:'Splunk Cloud Platform',bg:'#000',g:'>',nav:[['ホーム','home',1],['GRP','アプリ'],['Search & Reporting','app'],['IT Service Intelligence','app'],['IT Essentials Work','app'],['Cloud Monitoring Console','app']]},
+ sa:{name:'IT Service Intelligence',bg:'#1b6ec2',g:'I',nav:[['Service Analyzer','tiles',1],['Episode Review','episode'],['Glass Tables','glass'],['Deep Dives','deep'],['Dashboards','dash'],['Search','search'],['Configuration','gear']]},
+ er:{name:'IT Service Intelligence',bg:'#1b6ec2',g:'I',nav:[['Service Analyzer','tiles'],['Episode Review','episode',1,'navER'],['Glass Tables','glass'],['Deep Dives','deep'],['Dashboards','dash'],['Search','search'],['Configuration','gear']]},
+ ite:{name:'IT Essentials Work',bg:'#6b4fbf',g:'E',nav:[['Entity Overview','entity',1],['Search','search'],['Configuration','gear']]},
+ search:{name:'Search & Reporting',bg:'#5cb85c',g:'>',nav:[['サーチ','search','s'],['データセット','data'],['レポート','report','r','navReports'],['アラート','alert'],['ダッシュボード','dash'],['モジュール','module']]}};
+const svgI=(p,c='currentColor',s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+function splTop(){
+ const ic=p=>svgI(p,'#c3cbd4',22);
+ return `<div class="stop"><div class="slg"><b>splunk&gt;</b><span>Cloud</span></div><div class="sics">${ic('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14"/><circle cx="12" cy="17" r=".6"/>')}${ic(ICON.search)}${ic('<path d="M3 12h4l2-6 4 12 2-6h6"/>')}${ic(ICON.gear)}${ic('<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>')}${ic('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14"/><circle cx="12" cy="17" r=".6"/>')}<span class="sep"></span><span class="susr">${svgI('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>','#fff',20)}運用担当（架空） ▾</span>${svgI('<circle cx="5" cy="5" r="1.2"/><circle cx="12" cy="5" r="1.2"/><circle cx="19" cy="5" r="1.2"/><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/><circle cx="5" cy="19" r="1.2"/><circle cx="12" cy="19" r="1.2"/><circle cx="19" cy="19" r="1.2"/>','#c3cbd4',22)}</div></div>`;}
+function splNav(st){
+ const A=APPS[st.view];
+ const on=n=>n[2]===1||(n[2]==='s'&&st.sv!=='reports')||(n[2]==='r'&&st.sv==='reports');
+ return `<aside class="snav"><div class="hb">☰</div><div class="sapp"><span class="aic" style="background:${A.bg}">${A.g}</span>${A.name}</div>${A.nav.map(n=>n[0]==='GRP'?`<div class="sgrp">${n[1]}</div>`:`<div class="sni ${on(n)?'on':''}" ${n[3]?`data-k="${n[3]}"`:''}>${svgI(ICON[n[1]])}${n[0]}</div>`).join('')}</aside>`;}
 function win(st){
  if(st.view==='shot'){const sz=IMGSZ[st.shot]||{w:1280,h:800},H=720,W=Math.min(1810,Math.round(sz.w*H/sz.h)),L=st.tt||st.chat||st.chat2?24:Math.round((1858-W)/2);
   const bx=Object.entries(REAL_BOXES[st.shot]||{}).map(([k,b])=>`<div class="bx" data-k="${k}" style="left:${b[0]/sz.w*W}px;top:${b[1]/sz.h*H}px;width:${b[2]/sz.w*W}px;height:${b[3]/sz.h*H}px"></div>`).join('');
   return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>${st.wtitle||'Splunk Cloud Platform 実画面（デモ環境・架空データ）　テックタッチ（実機・公開中のガイドを再生）'}</span></div>
   <div class="wbody" style="top:40px"><div class="shotc" style="left:${L}px;width:${W}px;height:${H}px"><img src="${SHOTDIR}${st.shot}" style="width:${W}px;height:${H}px">${bx}</div>${st.chat||st.chat2?`<div class="shotchat">${chat(CHATS[st.chat||st.chat2])}</div>`:''}${tt(st.tt)}</div></div>`;}
- const top=st.view==='launcher'||st.view==='search'?86:130;
- return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>監視画面（架空）　Splunk の画面イメージを踏襲</span></div>
- <div class="sbar"><div class="slogo">Splunk Cloud Platform<small>画面イメージ</small></div><span class="it">Apps ▾</span><div class="rt"><span>Messages ▾</span><span>Settings ▾</span><span>Activity ▾</span><span>Help ▾</span><span class="find">Find</span></div></div>
- ${abar(st)}<div class="wbody" style="top:${top}px"><div class="main">${VIEWS[st.view](st)}</div>${st.pop?'<div class="dim"></div>'+POPS[st.pop]():''}${tt(st.tt)}</div></div>`;}
+ return `<div class="win"><div class="wbar"><i></i><i></i><i></i><span>監視画面（架空）　Splunk Cloud の画面イメージを踏襲</span></div>
+ <div class="wbody spl-on" style="top:40px"><div class="spl">${splTop()}<div class="sbd">${splNav(st)}<div class="smain">${VIEWS[st.view](st)}</div></div></div>${st.pop?'<div class="dim"></div>'+POPS[st.pop]():''}${tt(st.tt)}</div></div>`;}
 function chat(c){return `<div class="chat" data-k="chat"><div class="av">${c.a}</div><div><div class="hd"><b>${c.who}</b>${c.tm}</div><p>${c.t}</p><small>社内チャット（架空）の通知</small></div><span class="cl">閉じる</span></div>`;}
 const CHATS={
  biz:{a:'業',who:'業務部門（架空）',tm:'10:16',t:'10時過ぎから、契約照会の画面が遅いという声が出ています。状況を確認してもらえますか？'},
@@ -315,21 +395,20 @@ const CHATS={
 const VIEWS={
 launcher(st){
  const apps=[['Search & Reporting','#3c8a3f','S','appSearch'],['IT Service Intelligence','#1b6ec2','I','appITSI'],['IT Essentials Work','#6b4fbf','E','appITE'],['Cloud Monitoring Console','#7a828e','C']];
- return `<div class="lhome"><aside class="lapps"><div class="lt">Apps</div>${apps.map(a=>`<div class="la"><span class="ic" style="background:${a[1]}">${a[2]}</span>${a[0]}</div>`).join('')}<div class="la" style="color:var(--sub)">＋ Find more apps</div></aside>
- <section class="lmain">${st.chat?chat(CHATS[st.chat]):''}<div class="crumb">Home</div><div class="h1">Home <small>ホーム</small></div><div class="sect">最近使ったアプリ</div>
+ return `<section>${st.chat?chat(CHATS[st.chat]):''}<div class="h1">ホーム</div><div class="sect">最近使ったアプリ</div>
  <div class="ltiles">${[['IT Service Intelligence','サービスの健全性を見る','#1b6ec2','I','tileITSI'],['Search & Reporting','ログを検索する','#3c8a3f','S'],['IT Essentials Work','サーバーなどの状態を見る','#6b4fbf','E'],['Dashboards','チームのダッシュボード','#7a828e','D']].map(t=>`<div class="lti" ${t[4]?`data-k="${t[4]}"`:''}><span class="ic" style="background:${t[2]};width:30px;height:30px">${t[3]}</span><b>${t[0]}</b><span>${t[1]}</span></div>`).join('')}</div>
- <div style="margin-top:16px;color:var(--sub);font-size:14px">ホーム画面は架空です。</div></section></div>`;},
+ <div style="margin-top:16px;color:#6b7480;font-size:14px">ホーム画面は架空です。</div></section>`;},
 sa(st){
  const sel=st.saSel;
- let h=`<div class="crumb">IT Service Intelligence ＞ Service Analyzer</div><div class="h1">Service Analyzer <small>サービスの健全性（Tile view）</small></div>
+ let h=`<div class="h1">Service Analyzer <small>サービスの健全性（Tile view）</small></div>
  <div class="filt"><div class="fd">View　<b>Tile ▾</b></div><div class="fd" data-k="saTime">🕘 Time range　<b>${st.saTime}</b> ▾</div><div class="fd">Services　<b>All (6)</b> ▾</div>
  ${st.drop==='saTime'?`<div class="dd" style="left:124px;top:48px">${['Last 15 minutes','Last 60 minutes','Last 4 hours','Last 24 hours'].map(o=>`<div class="${o===st.saTime?'cur':''}" ${o==='Last 60 minutes'?'data-k="opt60"':''}>${o}</div>`).join('')}</div>`:''}</div>
- <div class="tiles" data-k="tiles">${SERVICES.map(s=>`<div class="tl ${sel===s.id?'sel':''}" data-k="tile_${s.id}"><div class="nm">${s.n}</div><div class="sc" style="color:${SEVC[s.sev]}">${s.s}</div><div class="lb">Health score</div><div class="bar" style="background:${SEVC[s.sev]}"></div></div>`).join('')}</div>`;
+ <div class="tiles" data-k="tiles">${SERVICES.map(s=>`<div class="tl ${sel===s.id?'sel':''}" data-k="tile_${s.id}" style="background:${SEVC[s.sev]};color:${SEVT[s.sev]}"><div class="nm">${s.n}</div><div class="sc">${s.s}</div><div class="lb">Health score</div><div class="bar" style="background:${SEVC[s.sev]}"></div></div>`).join('')}</div>`;
  if(sel==='contract') h+=`<div class="epbar"><b>進行中のエピソード</b><span>E-0412　契約照会サービス（架空）の応答時間の悪化（10:02〜・New）</span><span class="lnk" data-k="epLink" style="margin-left:auto">Episode Review で開く ›</span></div>`;
  if(sel){const S=SERVICES.find(s=>s.id===sel),K=KPIS[sel];
-  h+=`<div class="box"><div class="ph"><b>KPI　${S.n}</b><span style="font-size:15px"><span data-k="hsWrap">Health score <b style="color:${SEVC[S.sev]};font-size:20px">${S.s}</b> ${sev(S.sev)}<span class="qm" data-k="hsQ">?</span></span></span></div>
+  h+=`<div class="box"><div class="ph"><b>KPI　${S.n}</b><span style="font-size:15px"><span data-k="hsWrap">Health score <b style="font-size:20px">${S.s}</b> ${sev(S.sev)}<span class="qm" data-k="hsQ">?</span></span></span></div>
   <table class="kt"><tr><th style="width:34%">KPI</th><th>現在値</th><th>Severity</th><th>推移（${st.saTime}）</th></tr>
-  ${K.map((k,i)=>`<tr ${k.bad&&i===0?'data-k="kpiBad1"':''} ${k.bad&&i===1?'data-k="kpiBad2"':''}><td>${k.n}</td><td><b>${k.v}</b></td><td>${sev(k.s)}</td><td>${spark(k.p,200,30,SEVC[k.s])}</td></tr>`).join('')}</table></div>`;}
+  ${K.map((k,i)=>`<tr ${k.bad&&i===0?'data-k="kpiBad1"':''} ${k.bad&&i===1?'data-k="kpiBad2"':''}><td>${k.n}</td><td><b>${k.v}</b></td><td>${sev(k.s)}</td><td>${spark(k.p,200,30,SPKC[k.s])}</td></tr>`).join('')}</table></div>`;}
  else h+=`<div class="box empty">サービスを選ぶと、KPI（重要業績評価指標）の状態が表示されます。</div>`;
  return h;},
 er(st){
@@ -350,7 +429,7 @@ er(st){
   <tr><td>10:03:10</td><td>${sev('high')}</td><td>DB接続待ち時間がしきい値を超えました（架空）</td></tr>
   <tr><td>10:06:44</td><td>${sev('medium')}</td><td>エラー率が上昇しました（架空）</td></tr>
   <tr><td>10:11:02</td><td>${sev('low')}</td><td>代理店ポータルの健全性スコアが低下しました（架空）</td></tr></table>`;
- return `<div class="crumb">IT Service Intelligence ＞ Episode Review</div><div class="h1">Episode Review <small>エピソード（関連するアラートのまとまり）の確認</small></div>
+ return `<div class="h1">Episode Review <small>エピソード（関連するアラートのまとまり）の確認</small></div>
  <div class="erw"><div class="elist"><div class="filt"><div class="fd">Status　<b>All ▾</b></div><div class="fd">Time　<b>Last 24 hours ▾</b></div></div>
  ${eps.map(e=>`<div class="ec ${e.sel?'sel':''}" style="border-left-color:${SEVC[e.s]}"><span>${e.id}</span><b>${e.t}</b><span>${e.m}</span></div>`).join('')}</div>
  <div class="edet"><div data-k="epHead"><div class="eid">E-0412　${sev('high')}</div><div class="etitle">契約照会サービス（架空）の応答時間の悪化</div><div class="emeta">開始 10:02　｜　最新のイベント 10:17　｜　イベント 38件　｜　対象 契約照会サービス（架空）</div></div>
@@ -358,23 +437,21 @@ er(st){
  <div class="tabs">${tabs.map(t=>`<span class="tab ${(t[1]==='tabImpact'&&st.erTab==='impact')||(t[1]==='tabEvents'&&st.erTab==='events')?'on':''}" ${t[1]?`data-k="${t[1]}"`:''}>${t[0]}</span>`).join('')}</div>${body}</div></div>`;},
 ite(st){
  const vals=[];for(let i=0;i<=50;i++){let v=i<28?182+((i*37)%13)-6:Math.min(486,182+(i-28)*26+((i*17)%11));if(i>40)v=476+((i*13)%11);vals.push(v);}
- const w=1290,h=210,x=i=>40+i/50*(w-60),y=v=>h-24-(v/550)*(h-40);
+ const w=1080,h=210,x=i=>40+i/50*(w-60),y=v=>h-24-(v/550)*(h-40);
  const pts=vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
  const ticks=[0,10,20,30,40,50].map(i=>`<text x="${x(i)}" y="${h-4}" font-size="13" fill="#6b7280" text-anchor="middle">${['09:30','09:40','09:50','10:00','10:10','10:20'][i/10]}</text>`).join('');
- return `<div class="crumb">IT Essentials Work ＞ Entity Overview ＞ ctr-db-01（架空）</div><div class="h1">ctr-db-01（架空） <small>エンティティの状態（Analytics）</small></div>
+ return `<div class="h1">ctr-db-01（架空） <small>エンティティの状態（Analytics）</small></div>
  <div style="font-size:14.5px;color:var(--sub);margin:-6px 0 12px">種類：*nix（架空）｜役割：契約DBサーバー（架空）｜関連サービス：契約照会サービス（架空）</div>
  <div class="vit"><div class="vc"><span>CPU使用率</span><b>34 %</b><small>過去60分の平均</small></div><div class="vc"><span>メモリ使用率</span><b>71 %</b><small>過去60分の平均</small></div><div class="vc"><span>ディスクI/O待ち</span><b>12 ms</b><small>過去60分の平均</small></div>
- <div class="vc" style="border-top-color:var(--high)" data-k="vConn"><span>DB接続数（架空の指標）</span><b style="color:var(--high)">482 / 500</b><small>上限 500（架空）に近い</small></div></div>
+ <div class="vc" style="border-top-color:#F26A35" data-k="vConn"><span>DB接続数（架空の指標）</span><b style="color:#d4541f">482 / 500</b><small>上限 500（架空）に近い</small></div></div>
  <div class="box" style="padding:12px 16px" data-k="connChart"><div style="font-size:16px;font-weight:700">DB接続数（1分ごと）</div>
  <svg width="${w}" height="${h}"><line x1="40" x2="${w-20}" y1="${y(500)}" y2="${y(500)}" stroke="#d1453b" stroke-dasharray="6 5" stroke-width="1.5"/><text x="${w-24}" y="${y(500)-6}" font-size="13" fill="#d1453b" text-anchor="end">上限 500（架空）</text>
  ${[0,250,500].map(v=>`<text x="30" y="${y(v)+4}" font-size="12" fill="#8a919c" text-anchor="end">${v}</text><line x1="40" x2="${w-20}" y1="${y(v)}" y2="${y(v)}" stroke="#eef0f3"/>`).join('')}
  <line x1="${x(28)}" x2="${x(28)}" y1="16" y2="${h-24}" stroke="#ec7a2e" stroke-dasharray="4 4"/><text x="${x(28)-6}" y="30" font-size="13" fill="#b5560f" text-anchor="end">09:58 増加開始</text>
  <line x1="${x(32)}" x2="${x(32)}" y1="16" y2="${h-24}" stroke="#2b3038" stroke-dasharray="4 4"/><text x="${x(32)+6}" y="30" font-size="13" fill="#2b3038">10:02 エピソード開始</text>
- <polyline points="${pts}" fill="none" stroke="#1b6ec2" stroke-width="2.5"/>${ticks}</svg></div>`;},
+ <polyline points="${pts}" fill="none" stroke="#7B56DB" stroke-width="2.5"/>${ticks}</svg></div>`;},
 search(st){
  const sv=st.sv,loaded=sv==='loaded';
- const nav=[['サーチ','navSearch',sv!=='reports','<circle cx="10" cy="10" r="6"/><line x1="14.5" y1="14.5" x2="19" y2="19"/>'],['データセット','','','<ellipse cx="11" cy="6" rx="7" ry="3"/><path d="M4 6v10c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/>'],['レポート','navReports',sv==='reports','<path d="M6 3h8l4 4v14H6z"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/>'],['アラート','','','<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/>'],['ダッシュボード','','','<rect x="4" y="4" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/>'],['モジュール','','','<path d="M12 3l8 4v10l-8 4-8-4V7z"/>']];
- const side=`<aside class="snav"><div class="sapp"><span class="sic"></span>Search &amp; Reporting</div>${nav.map(n=>`<div class="sni ${n[2]?'on':''}" ${n[1]?`data-k="${n[1]}"`:''}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">${n[3]}</svg>${n[0]}</div>`).join('')}</aside>`;
  let h='';
  if(sv==='reports'){
   const rows=[['Errors in the last 24 hours','nobody','App'],['Errors in the last hour','nobody','App'],['Splunk errors last 24 hours','nobody','App'],['エラーの内訳（標準）','sc_admin','プライベート'],['接続エラーの推移（標準）','sc_admin','プライベート',1],['遅い処理の上位（標準）','sc_admin','プライベート']];
@@ -389,7 +466,7 @@ search(st){
   <div class="sbx" style="margin-top:8px"><div class="sin mono" data-k="spl" style="min-height:${loaded?96:48}px">${spl}</div><div class="tp" data-k="tp"><span>時間範囲: 日付と時間の範囲</span><span>▾</span></div><div class="sbtn"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#fff" stroke-width="2.6"/><line x1="15" y1="15" x2="21" y2="21" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg></div><div class="aib">✦</div></div>`;
   if(loaded){
    const S1={DB_CONN_TIMEOUT:[2,8,2,9,6,2,41,84,83,96,83,78],POOL_EXHAUSTED:[0,0,0,0,0,0,0,50,66,59,56,57],CONN_RESET:[0,0,0,0,0,0,3,8,9,5,6,10]};
-   const COL={CONN_RESET:'#7b61d9',DB_CONN_TIMEOUT:'#c9278f',POOL_EXHAUSTED:'#12917f'};
+   const COL={CONN_RESET:'#7B56DB',DB_CONN_TIMEOUT:'#CB2196',POOL_EXHAUSTED:'#008C80'};
    const w=1010,ch=250,x=i=>46+i/11*(w-70),y=v=>ch-28-(v/125)*(ch-44);
    h+=`<div class="jobl"><span class="ok">✓ 823件のイベント</span><span>(2026/10/19 9:30:00.000〜2026/10/19 10:30:00.000)</span><span class="ja"><span class="jbt0">ジョブ ▾</span>${ic('<line x1="9" y1="5" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="19"/>')}${ic('<rect x="6" y="6" width="12" height="12"/>')}<span data-k="share" class="icb">${ic('<path d="M4 17c2-6 7-8 13-8"/><path d="M14 5l4 4-4 4"/>')}</span>${ic('<rect x="6" y="9" width="12" height="8"/><path d="M8 9V4h8v5"/>')}${ic('<path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><line x1="5" y1="20" x2="19" y2="20"/>')}<span class="jbt0">スマートモード ▾</span></span></div>
    <div class="tabs" style="margin-bottom:6px"><span class="tab">イベント</span><span class="tab">パターン</span><span class="tab">統計情報 (12)</span><span class="tab on">視覚エフェクト</span></div>
@@ -400,7 +477,7 @@ search(st){
    <div class="lgd">${Object.keys(COL).map(k=>`<div><b style="background:${COL[k]}"></b>${k}</div>`).join('')}</div></div>`;
   }else h+=`<div class="box empty" style="height:200px">検索文（SPL）を入力するか、レポートから保存済みのサーチを開きます。</div>`;
  }
- return `<div class="sw">${side}<div class="sm2">${h}</div></div>`;}
+ return h;}
 };
 
 /* ---------- techtouch panel ---------- */
@@ -427,10 +504,10 @@ function tt(t){
 
 /* ---------- popups ---------- */
 const POPS={
- start:()=>`<div class="pop" style="left:300px;top:70px;width:760px"><span class="chip">テックタッチ</span><span style="font-size:14px;color:var(--sub);margin-left:8px">ポップアップ（案）</span>
+ start:()=>`<div class="pop" style="left:300px;top:140px;width:760px"><span class="chip">テックタッチ</span><span style="font-size:14px;color:var(--sub);margin-left:8px">ポップアップ（案）</span>
   <h4>障害の一次確認は、社内手順どおりに進めます</h4><p>概要 → 影響範囲 → 関連エンティティ → 連絡、の4つのステップを順番に案内します。</p>
   <div class="note">社内手順・連絡先は架空です。実際はお客様の手順に置き換えます。</div><div class="btns"><span class="btn2">閉じる</span><span class="btn1" data-k="popStart">ガイドを開始</span></div></div>`,
- contact:()=>`<div class="pop" style="left:200px;top:14px;width:900px"><span class="chip">テックタッチ</span><span style="font-size:14px;color:var(--sub);margin-left:8px">ステップ4/4　社内手順（架空）</span>
+ contact:()=>`<div class="pop" style="left:200px;top:70px;width:900px"><span class="chip">テックタッチ</span><span style="font-size:14px;color:var(--sub);margin-left:8px">ステップ4/4　社内手順（架空）</span>
   <h4 style="margin-top:6px">障害の一次連絡</h4><ol>
   <li><b>1. 優先度を決める</b>：影響範囲が「代理店ポータルの照会の一部」のため「中」（社内基準・架空）</li>
   <li><b>2. 連絡先</b>：システム運用チーム（架空）、業務部門の窓口（架空）</li>
@@ -565,7 +642,7 @@ function buildStates(){let c={cur:null};STATES=[];STARTS=[];let t=0;
 function renderScene(st){
  if(st.card){scene.innerHTML=card(st.card);}
  else{let h=chbar(st.ch)+hdr(st.hdr!=null?st.hdr:st.ch)+win(st);scene.innerHTML=h;
-  if(st.chat2&&st.view!=='shot'){const m=scene.querySelector('.main')||scene.querySelector('.shotc');m.insertAdjacentHTML('beforeend',`<div style="position:absolute;left:26px;right:26px;top:70px;z-index:6">${chat(CHATS[st.chat2])}</div>`);}}
+  if(st.chat2&&st.view!=='shot'){const m=scene.querySelector('.smain');m.insertAdjacentHTML('beforeend',`<div style="position:absolute;left:26px;right:26px;top:70px;z-index:6">${chat(CHATS[st.chat2])}</div>`);}}
  qv.innerHTML=st.q?qhtml(st.q):'';
  const c1=capEl.querySelector('.c1'),c2=capEl.querySelector('.c2');
  if(st.c1&&(!st.card||st.card.type==='summary')){capEl.style.display='block';c1.textContent=st.c1;c2.textContent=(st.note?st.note+'　':'')+(st.view==='shot'?(st.hdr===4?NOTE_PROOF:NOTE_REAL):NOTE);}else capEl.style.display='none';
