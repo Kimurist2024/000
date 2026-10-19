@@ -1,0 +1,11 @@
+{
+  "name": "splunk-techtouch-demo-slides",
+  "private": true,
+  "description": "Splunk ITSI × テックタッチ 構想デモの事前説明資料（PowerPoint）",
+  "scripts": {
+    "build": "node build_deck.js && node build_deck.js --short"
+  },
+  "dependencies": {
+    "pptxgenjs": "3.12.0"
+  }
+}
