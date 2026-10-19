@@ -23,6 +23,15 @@
 - 作り直し方：`cd demo/src && npm install && python3 build.py`（Node 18以上、Python 3）。動作確認：`node test_demo.js`（PlaywrightとChromiumが要る。`PLAYWRIGHT_MODULE` でモジュールの場所を指定できる）。
 - 公開してはいけない文言は、環境変数 `DEMO_FORBID`（カンマ区切り）で `build.py` が検査します。一覧はリポジトリに置きません。
 
+## 動画版
+
+`demo/video/splunk-es-soar-techtouch-demo.mp4`（1920×1080、H.264、約9分50秒）。イメージデモを台本どおりに自動操作して撮影したものです。表紙、仮説、流れ、S0〜S8、振り返り、言わないこと、クロージングの順で、各場面の終わりに「伺いたいこと」を出します。
+
+- 作り直し方：`cd demo/video && npm install` のあと、`NODE_PATH="$(npm root -g)" FFMPEG=/path/to/ffmpeg node record.js`（PlaywrightとChromium、libx264を含むffmpegが要る）。
+- 確認だけなら `CHECK=1` を付けて実行すると、動画を作らずに要所の画像を `demo/video/checks/` に保存します（1分ほど）。
+- 字幕と操作の順番は `demo/video/record.js` 末尾の「台本」で直します。日本語は Noto Sans JP に固定しています（中国語の字形が混ざらないため）。
+- 動画では、S5の「判定区分」とS6の「承認段階 KB06」のツールチップを上向きに開いています（デモ本体では画面枠の下で切れるため）。
+
 ## 検算
 
 ```
@@ -41,3 +50,4 @@ Splunk実機での実行結果ではありません。実機での確認（CSV�
 ## 版
 
 - 1.0（2026年10月9日）：初版。仮説に基づく架空の事案の型（人事システムへの第三者アクセス）で、ES・UEBA・SOAR版のシナリオ、固定テストログ、SPLと検算、AI Hubのナレッジ（KB01〜KB08、P1〜P8）、Splunk公式UI部品版のイメージデモを作成。
+- 1.0＋動画（2026年10月19日）：イメージデモの動画版 `demo/video/splunk-es-soar-techtouch-demo.mp4` と撮影スクリプトを追加（シナリオ・デモの内容は変更なし）。
