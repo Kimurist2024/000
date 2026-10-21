@@ -91,17 +91,29 @@ function chip(s, x, y, label, fill, name) {
 }
 function foot(s, t) { text(s, t, { x: M, y: 6.92, w: CW - 0.8, h: 0.42, fontSize: 11, color: C.accent5, valign: "middle", objectName: "footnote" }); }
 
-// 日本語の文字に使う書体（テーマの ea と Jpan）を、見出し・本文とも同じ書体にそろえる
-async function setJapaneseFont(file, face) {
+// 書き出した後の仕上げ。
+// ・日本語の文字に使う書体（テーマの ea と Jpan）を、見出し・本文とも同じ書体にそろえる
+// ・図形の番号（p:cNvPr の id）をスライドごとに振り直す。pptxgenjs はページ番号の欄に固定で 25 を振るため、
+//   図形の多いスライドで番号が重なり、PowerPoint が修復を求める
+// ・フォルダの項目を書き込まない
+async function finalizePptx(file, face) {
   const fs = require("fs");
   const JSZip = require(require.resolve("jszip", { paths: [require.resolve("pptxgenjs")] }));
-  const zip = await JSZip.loadAsync(fs.readFileSync(file));
-  for (const name of Object.keys(zip.files).filter((n) => /^ppt\/theme\/theme\d+\.xml$/.test(n))) {
-    let xml = await zip.file(name).async("string");
-    xml = xml.replace(/<a:ea typeface="[^"]*"\/>/g, '<a:ea typeface="' + face + '"/>')
-      .replace(/<a:font script="Jpan" typeface="[^"]*"\/>/g, '<a:font script="Jpan" typeface="' + face + '"/>');
-    zip.file(name, xml);
+  const zip = await JSZip.loadAsync(fs.readFileSync(file), { createFolders: false });
+  for (const name of Object.keys(zip.files)) {
+    if (zip.files[name].dir) continue;
+    if (/^ppt\/theme\/theme\d+\.xml$/.test(name)) {
+      let xml = await zip.file(name).async("string");
+      xml = xml.replace(/<a:ea typeface="[^"]*"\/>/g, '<a:ea typeface="' + face + '"/>')
+        .replace(/<a:font script="Jpan" typeface="[^"]*"\/>/g, '<a:font script="Jpan" typeface="' + face + '"/>');
+      zip.file(name, xml, { createFolders: false });
+    } else if (/^ppt\/(slides|slideLayouts|slideMasters)\/[^/]+\.xml$/.test(name)) {
+      let n = 0;
+      const xml = (await zip.file(name).async("string")).replace(/<p:cNvPr id="\d+"/g, () => '<p:cNvPr id="' + (++n) + '"');
+      zip.file(name, xml, { createFolders: false });
+    }
   }
+  for (const name of Object.keys(zip.files)) if (zip.files[name].dir) delete zip.files[name];
   fs.writeFileSync(file, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
 }
 
@@ -234,6 +246,6 @@ async function setJapaneseFont(file, face) {
     const { applyTheme } = require(APPLY_THEME);
     await applyTheme(OUT, THEME);
   }
-  await setJapaneseFont(OUT, THEME.bodyFontFace);
+  await finalizePptx(OUT, THEME.bodyFontFace);
   console.log("ok", OUT);
 })().catch((e) => { console.error(e); process.exit(1); });
