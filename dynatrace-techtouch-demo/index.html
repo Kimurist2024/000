@@ -235,6 +235,9 @@ p { margin: 0; }
   background: var(--dt-field); box-shadow: var(--dt-shadow-field); white-space: nowrap;
 }
 .dt-look-btn svg { width: 14px; height: 14px; }
+button.dt-look-btn { border: 0; font: inherit; cursor: pointer; }
+.dt-link { border: 0; background: none; padding: 0; font: inherit; color: var(--dt-primary); cursor: pointer; text-align: left; }
+.dt-link:hover { text-decoration: underline; }
 .dt-page { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .crumbs { font-size: 12px; color: var(--dt-text-sub); }
 .tb-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
@@ -724,7 +727,8 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
         </ul>
         <ul data-for="3" hidden>
           <li>仮説3「作成・修正で止まる」への支援案（ひな型編集の案内＋AI Hub＋Dynatrace Assist）。p.13に対応します。</li>
-          <li>見せ場：ひな型から作成 → 変える項目と理由（AI Hub欄は例文）→ 専門家に確認を依頼 → 承認後に保存して共有。</li>
+          <li>見せ場：テックタッチのガイド「ダッシュボードをひな型から作る」で、共有されたひな型を開いて複製 → 変える項目と理由（AI Hub欄は例文）→ 専門家に確認を依頼 → 承認後に共有。</li>
+          <li>Dynatraceに「ひな型から作成」の機能はありません。ひな型から作る流れはテックタッチのガイドが案内し、Dynatrace側は共有ダッシュボードを開く・複製する・変数を変える・共有する、の既存の操作だけを使います（「複製」の表記と場所は実機で確かめます）。</li>
           <li>Dynatrace Assistの利用状況（利用条件を満たすか）も伺います。</li>
           <li>問いかけ：「どこで依頼しますか」</li>
         </ul>
@@ -753,7 +757,7 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
     </div>
   </section>
 
-  <p class="foot">構想デモ　2026年9月30日作成</p>
+  <p class="foot">構想デモ　2026年9月30日作成・10月22日改訂（第3章：ひな型の複製）</p>
 </div>
 
 <script>
@@ -901,20 +905,20 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
   var G3 = [null,
     { label: "ダッシュボード画面を開く", target: '.dock [data-arg="dashboards"]', tip: "① 左のDockから「ダッシュボード」を開きます", sub: "",
       op: "左のDockから「ダッシュボード」を開きます。", hub: "" },
-    { label: "ひな型から作成する", target: "#w-c3-create", tip: "② 「ひな型から作成」を押します", sub: "一から作らず、専門家が確認済みのひな型を使います",
-      op: "「ひな型から作成」を押します。", hub: "ひな型を使う理由：指標の定義や集計のしかたを、専門家が確認済みの設定にそろえるためです。" },
-    { label: "ひな型を選ぶ", target: "#c3-templates", tip: "③ 専門家が確認済みのひな型から選びます", sub: "助言のあった「サービスの状況確認（標準）」",
-      op: "助言のあった「サービスの状況確認（標準）」を選びます。", hub: "ひな型の意図：「サービスの状況確認（標準）」は、担当サービスの平均応答時間とエラー率を、同じ長さの期間で比べるためのひな型です。" },
+    { label: "共有されたひな型を開く", target: "#w-c3-tpl-t1", tip: "② 専門家が共有したひな型を開きます", sub: "助言のあった「【ひな型】サービスの状況確認（標準）」",
+      op: "一覧から、専門家が共有したひな型「【ひな型】サービスの状況確認（標準）」を開きます。", hub: "ひな型を使う理由：指標の定義や集計のしかたを、専門家が確認済みの設定にそろえるためです。" },
+    { label: "複製して自分用にする", target: "#w-c3-dup", tip: "③ 「複製」で自分用のコピーを作ります", sub: "ひな型そのものは変えません",
+      op: "ひな型は直接変えず、「複製」で自分用のコピーを作ります。", hub: "ひな型の意図：「サービスの状況確認（標準）」は、担当サービスの平均応答時間とエラー率を、同じ長さの期間で比べるためのひな型です。" },
     { label: "対象サービスを変える", target: "#f-c3-service", tip: "④ 対象サービスを担当サービスに変えます", sub: "",
       op: "対象サービスを「契約照会サービス（架空）」に変えます。", hub: "変える理由：ひな型の既定は、すべてのサービスの合計です。担当サービスに絞らないと、他のサービスの変化が混ざります。" },
     { label: "時間枠を変える", target: "#f-c3-range", tip: "⑤ 時間枠を「過去 24 時間」に変えます", sub: "",
       op: "時間枠を「過去 24 時間」に変えます。", hub: "変える理由：問題が起きた10時台の前後を含めて、1日の中でいつ上がり始めたかを確認するためです。" },
-    { label: "変更箇所を見直す", target: "#c3-changes", tip: "⑥ 変更箇所を見直します", sub: "指標の定義は変えていないことを確認します",
-      op: "変更したのは2か所です。指標の定義を変えていないことを確認して、結果をプレビューします。", hub: "変えない項目：指標の定義（平均応答時間・エラー率）は、専門家が決めたものをそのまま使います。変えるのは対象と時間枠だけです。" },
-    { label: "結果を確認し、専門家に依頼する", target: "#w-c3-ask", tip: "⑦ 保存の前に、専門家に確認を依頼します", sub: "変更箇所2点と結果の画面を添えます",
-      op: "結果を確認し、保存の前に専門家に確認を依頼します。", hub: "結果の見方：10時台に平均応答時間が上がっています。第1章で確認した時間帯と合っているかを確かめます。原因はこの画面だけでは特定できません。" },
-    { label: "保存して運用チームに共有する", target: "#w-c3-save", tip: "⑧ 保存して、運用チームに共有します", sub: "専門家の確認が済みました",
-      op: "専門家の確認が済みました。保存して、運用チーム（架空）に共有します。", hub: "共有の意図：同じダッシュボードをチームで見ることで、毎朝の確認の手順をそろえます。" }
+    { label: "変更箇所を見直す", target: "#c3-vars", tip: "⑥ 変えたのは2か所です", sub: "サービスと時間枠。指標の定義は変えていません",
+      op: "変えたのはサービスと時間枠の2か所です。指標の定義を変えていないことを確かめます。", hub: "変えない項目：指標の定義（平均応答時間・エラー率）は、専門家が決めたものをそのまま使います。変えるのは対象と時間枠だけです。" },
+    { label: "結果を確認し、専門家に依頼する", target: "#w-c3-ask", tip: "⑦ 共有の前に、専門家に確認を依頼します", sub: "変更箇所2点と結果の画面を添えます（社内手順）",
+      op: "結果を確認し、共有の前に専門家に確認を依頼します（社内手順・架空）。", hub: "結果の見方：10時台に平均応答時間が上がっています。第1章で確認した時間帯と合っているかを確かめます。原因はこの画面だけでは特定できません。" },
+    { label: "運用チームに共有する", target: "#w-c3-share", tip: "⑧ 運用チームに共有します", sub: "専門家の確認が済みました",
+      op: "専門家の確認が済みました。運用チーム（架空）に共有します。", hub: "共有の意図：同じダッシュボードをチームで見ることで、毎朝の確認の手順をそろえます。" }
   ];
   var C1_KEYS = ["service", "period", "compare"];
   var C1_EXP = [SVC, "10:00–10:15", "09:45–10:00"];
@@ -923,7 +927,7 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
   var CHATS = {
     inquiry: { av: "業", who: "業務部門（架空）", time: "10:16", say: "10時過ぎから、契約照会の画面が遅いという声が出ています。状況を確認してもらえますか？" },
     advice: { av: "専", who: "専門家（架空）", time: "14:05", say: "今回の件、毎朝確認できるようにダッシュボードを作っておきましょう。ひな型「サービスの状況確認（標準）」を使ってください。" },
-    approved: { av: "専", who: "専門家（架空）", time: "14:12", say: "確認しました。この設定で保存して、運用チームに共有してください。" }
+    approved: { av: "専", who: "専門家（架空）", time: "14:12", say: "確認しました。この設定で、運用チームに共有してください。" }
   };
 
   /* ---------- 状態 ---------- */
@@ -1068,23 +1072,25 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
   }
   function toChapter3() { S.ch = 3; S.app = "home"; S.chat = "advice"; S.c2.modal = false; pendingTop = true; }
   function toChapter4() { S.ch = 4; S.chat = null; pendingTop = true; }
-  function c3Create() {
-    S.c3.view = "edit";
+  // 「ひな型から作る」はテックタッチのガイドの名前。Dynatrace側は、共有ダッシュボードを開いて複製する既存の操作だけを使う
+  function c3Open(v) {
+    if (v !== "t1") { fix("今回は助言のあった「【ひな型】サービスの状況確認（標準）」を使います。"); return; }
+    S.c3.tpl = v;
+    S.c3.view = "template";
     if (S.ch === 3 && S.c3.step === 2) done("c3");
+  }
+  function c3Dup() {
+    S.c3.view = "edit";
+    if (S.ch === 3 && S.c3.step === 3) done("c3");
   }
   function c3Eval() {
     var c = S.c3;
-    if (S.ch !== 3 || c.step < 3 || c.step > 8) return;
-    var t = c.tpl !== "t1" ? 3 : c.service !== SVC ? 4 : c.range !== "24h" ? 5 : 6;
+    if (S.ch !== 3 || c.step < 4 || c.step > 8) return;
+    var t = c.service !== SVC ? 4 : c.range !== "24h" ? 5 : 6;
     if (t < 6) {
       c.step = t; c.preview = false;
       if (c.asked) { c.asked = false; if (S.chat === "approved") S.chat = null; }
     } else if (c.step < 6) c.step = 6;
-  }
-  function c3Tpl(v) {
-    S.c3.tpl = v;
-    if (v !== "t1") fix("今回は助言のあった「サービスの状況確認（標準）」を使います。");
-    c3Eval();
   }
   function c3Service(v) {
     S.c3.service = v;
@@ -1098,7 +1104,7 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
   }
   function c3Preview() {
     var c = S.c3;
-    if (S.ch === 3 && c.step >= 3 && c.step < 6) { fix("先に設定を変更します。ガイドの順に進めます。"); return; }
+    if (S.ch === 3 && c.step >= 4 && c.step < 6) { fix("先にサービスと時間枠を変えます。ガイドの順に進めます。"); return; }
     c.preview = true;
     if (S.ch === 3 && c.step === 6) done("c3");
   }
@@ -1108,7 +1114,7 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
   }
   function c3Save() {
     var c = S.c3;
-    if (S.ch === 3 && c.step === 7) { fix("保存の前に、専門家に確認を依頼します（社内ルール・架空）。"); return; }
+    if (S.ch === 3 && c.step >= 4 && c.step <= 7) { fix("共有の前に、変更箇所を見直して専門家に確認を依頼します（社内ルール・架空）。"); return; }
     if (S.ch === 3 && c.step === 8) { c.saved = true; c.view = "saved"; S.chat = null; done("c3"); }
   }
 
@@ -1143,13 +1149,13 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
       switch (S.c3.step) {
         case 0: return { label: "ガイドを開始", run: start };
         case 1: return { label: "ダッシュボードを開く", run: function () { nav("dashboards"); } };
-        case 2: return { label: "ひな型から作成", run: c3Create };
-        case 3: return { label: "次へ", run: function () { c3Tpl("t1"); } };
+        case 2: return { label: "ひな型を開く", run: function () { c3Open("t1"); } };
+        case 3: return { label: "複製する", run: c3Dup };
         case 4: return { label: "次へ", run: function () { c3Service(SVC); } };
         case 5: return { label: "次へ", run: function () { c3Range("24h"); } };
-        case 6: return { label: "結果の確認へ", run: c3Preview };
+        case 6: return { label: "見直した", run: c3Preview };
         case 7: return { label: "専門家に確認を依頼", run: c3Ask };
-        case 8: return { label: "保存して共有", run: c3Save };
+        case 8: return { label: "共有する", run: c3Save };
         case 9: return { label: "振り返りへ", run: toChapter4 };
       }
     }
@@ -1180,8 +1186,8 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
       case "c2-contact": c2Contact(); break;
       case "c2-modal-done": c2ModalDone(); break;
       case "c2-modal-close": S.c2.modal = false; break;
-      case "c3-create": c3Create(); break;
-      case "c3-tpl": c3Tpl(value); break;
+      case "c3-open": c3Open(arg); break;
+      case "c3-dup": c3Dup(); break;
       case "c3-service": c3Service(value); break;
       case "c3-range": c3Range(value); break;
       case "c3-preview": c3Preview(); break;
@@ -1214,11 +1220,13 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
       '<span class="dock-item" title="運用担当（架空）"><span class="avatar">運</span><span class="dl">運用担当（架空）</span></span></div>';
   }
   function appHeader() {
-    var navs = { home: [], services: ["概要", "エンドポイント", "応答時間の分析"], problems: ["問題一覧"], dashboards: ["すべてのダッシュボード", "ひな型"] }[S.app];
-    var activeIdx = S.app === "dashboards" && S.c3.view === "edit" ? 1 : 0;
-    var nav = navs.map(function (n, i) { return "<span" + (i === activeIdx ? ' class="active"' : "") + ">" + n + "</span>"; }).join("");
+    var navs = { home: [], services: ["概要", "エンドポイント", "応答時間の分析"], problems: ["問題一覧"], dashboards: ["すべてのダッシュボード"] }[S.app];
+    var nav = navs.map(function (n, i) { return "<span" + (i === 0 ? ' class="active"' : "") + ">" + n + "</span>"; }).join("");
+    var share = S.app === "dashboards" && S.c3.view === "edit"
+      ? '<span class="tip-anchor" id="w-c3-share" data-tip-side="left"><button type="button" class="dt-look-btn" data-act="c3-save">共有</button></span>'
+      : '<span class="dt-look-btn" aria-hidden="true">共有</span>';
     return '<div class="appheader"><div class="ah-left"><span class="app-icon" aria-hidden="true">' + svg(S.app) + '</span><span class="app-name">' + APP_LABEL[S.app] + "</span>" +
-      (nav ? '<div class="ah-nav" aria-hidden="true">' + nav + "</div>" : "") + '</div><span class="dt-look-btn" aria-hidden="true">共有</span></div>';
+      (nav ? '<div class="ah-nav" aria-hidden="true">' + nav + "</div>" : "") + "</div>" + share + "</div>";
   }
   function chatHTML() { return S.chat && S.chat !== "approved" ? chatCard(S.chat) : ""; }
   function chatCard(key) {
@@ -1337,13 +1345,28 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
 
   function pageDashboards() {
     var c = S.c3;
+    // Dynatrace側は既存の操作だけを描く：共有ダッシュボードの一覧 → 開く → 複製 → 変数（サービス・時間枠）を変える → 共有
     if (c.view === "list") {
-      return '<div class="title-row"><div><p class="crumbs">ダッシュボード</p><h2 class="dt-h">すべてのダッシュボード</h2></div>' +
-        '<span class="tip-anchor" id="w-c3-create" data-tip-side="right"><button type="button" class="dt-accent" data-act="c3-create">ひな型から作成</button></span></div>' +
+      var row = function (v, name, owner, when) {
+        return '<tr><th scope="row"><span class="tip-anchor" id="w-c3-tpl-' + v + '" data-tip-side="right"><button type="button" class="dt-link" data-act="c3-open" data-arg="' + v + '">' + name + "</button></span></th><td>" + owner + "</td><td>" + when + "</td></tr>";
+      };
+      return '<div class="title-row"><div><p class="crumbs">ダッシュボード</p><h2 class="dt-h">すべてのダッシュボード</h2></div></div>' +
         '<div class="surface"><table class="dtable" style="min-width:0"><thead><tr><th scope="col">名前</th><th scope="col">所有者</th><th scope="col">更新</th></tr></thead><tbody>' +
+        row("t1", "【ひな型】サービスの状況確認（標準）", "専門家（架空）・共有", "先月") +
+        row("t2", "【ひな型】エラーの内訳（標準）", "専門家（架空）・共有", "先月") +
+        row("t3", "【ひな型】利用の多い時間帯（標準）", "専門家（架空）・共有", "先月") +
         '<tr><th scope="row">インフラの概要</th><td>基盤チーム（架空）</td><td>前日</td></tr>' +
         '<tr><th scope="row">代理店ポータルの状況</th><td>代理店システム担当（架空）</td><td>3日前</td></tr>' +
         '<tr><th scope="row">保険料計算の夜間処理</th><td>運用チーム（架空）</td><td>先週</td></tr></tbody></table></div>' +
+        '<p class="dt-fine">ダッシュボード名・所有者はすべて架空です。「【ひな型】」は、専門家が共有したダッシュボードに付ける社内の名前の付け方（架空）です。</p>';
+    }
+    if (c.view === "template") {
+      return '<div class="title-row"><div><p class="crumbs">ダッシュボード ＞ 【ひな型】サービスの状況確認（標準）</p><h2 class="dt-h">【ひな型】サービスの状況確認（標準）</h2></div>' +
+        '<span class="tip-anchor" id="w-c3-dup" data-tip-side="left"><button type="button" class="dt-emph" data-act="c3-dup">複製</button></span></div>' +
+        '<div class="toolbar" aria-label="ダッシュボードの変数"><span class="dt-field"><span class="pre">サービス</span><span class="locked">すべて</span></span>' +
+        '<span class="dt-field"><span class="pre">' + svg("clock") + '時間枠</span><span class="locked">過去 2 時間</span></span></div>' +
+        '<div class="surface"><div class="surface-head"><p class="dt-h3">平均応答時間・エラー率</p><p class="chart-legend"><span>すべてのサービス</span><span>過去 2 時間</span></p></div>' +
+        '<p class="dt-fine">専門家（架空）が作成して共有したダッシュボードです。指標の定義と集計のしかたは、このダッシュボードのものを使います。</p></div>' +
         '<p class="dt-fine">ダッシュボード名・所有者はすべて架空です。</p>';
     }
     if (c.view === "saved") {
@@ -1354,42 +1377,25 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
         '<div class="kpi"><span>エラー率（14時台）</span><b>0.2%</b></div></div>' +
         '<div class="surface"><div class="surface-head"><p class="dt-h3">平均応答時間（1時間ごと）</p><p class="chart-legend"><span>' + SVC + "</span><span>過去 24 時間</span></p></div>" +
         '<div class="chart-wrap">' + hourChart() + "</div></div>" +
-        '<p class="dt-fine">ひな型「サービスの状況確認（標準）」から作成。数値はすべて架空です。デモのため実際には保存していません。</p>';
+        '<p class="dt-fine">ひな型「【ひな型】サービスの状況確認（標準）」を複製して作成。数値はすべて架空です。デモのため実際には共有していません。</p>';
     }
-    var ok = c.tpl === "t1", svcChanged = c.service === SVC, rngChanged = c.range === "24h";
-    var tpl = function (v, name, desc) {
-      return '<label class="tpl"><input type="radio" name="c3-tpl" value="' + v + '" data-change="c3-tpl"' + (c.tpl === v ? " checked" : "") + '><span class="tpl-name">' + name +
-        '</span><span class="tpl-desc">' + desc + '</span><span class="badge">専門家が確認済み</span></label>';
-    };
-    var st = function (on, yes) { return '<span class="st' + (on ? " on" : "") + '">' + (on ? yes : "未変更") + "</span>"; };
-    var h = '<div><p class="crumbs">ダッシュボード ＞ ひな型から作成</p><h2 class="dt-h">ひな型の編集</h2></div>' +
-      '<p class="section-label">ひな型を選ぶ</p><div class="tpl-list" id="c3-templates" role="radiogroup" aria-label="ひな型">' +
-      tpl("t1", "サービスの状況確認（標準）", "平均応答時間とエラー率を期間で比べる") +
-      tpl("t2", "エラーの内訳（標準）", "エラーの種類と発生箇所を一覧する") +
-      tpl("t3", "利用の多い時間帯（標準）", "リクエスト数の推移を見る") + "</div>" +
-      '<p class="section-label">設定を変更する</p><div class="edit-grid">' +
-      '<div class="dt-field block" id="f-c3-service"><label for="c3-service">対象サービス</label>' +
-      sel("c3-service", "c3-service", [["all", "すべてのサービス（既定）"], SVC, "保険料計算サービス（架空）", "代理店ポータル（架空）"], c.service, !ok) + "</div>" +
+    var svcChanged = c.service === SVC, rngChanged = c.range === "24h";
+    var h = '<div><p class="crumbs">ダッシュボード ＞ 【ひな型】サービスの状況確認（標準）を複製</p><h2 class="dt-h">契約照会サービスの状況（架空）</h2></div>' +
+      '<div class="edit-grid" id="c3-vars">' +
+      '<div class="dt-field block" id="f-c3-service"><label for="c3-service">サービス</label>' +
+      sel("c3-service", "c3-service", [["all", "すべてのサービス（ひな型の既定）"], SVC, "保険料計算サービス（架空）", "代理店ポータル（架空）"], c.service, false) + "</div>" +
       '<div class="dt-field block" id="f-c3-range"><label for="c3-range">' + svg("clock") + "時間枠</label>" +
-      sel("c3-range", "c3-range", [["2h", "過去 2 時間（既定）"], ["24h", "過去 24 時間"], ["7d", "過去 7 日間"]], c.range, !ok || !svcChanged) + "</div>" +
-      '<div class="dt-field block"><span class="pre">指標（変更しない）</span><span class="locked">平均応答時間・エラー率</span></div></div>' +
-      '<p class="dt-callout"><b>専門家が確認済みの設定内容を使用する想定</b><br>対象サービス、集計期間、指標の定義を確認してから変更します。</p>' +
-      '<div class="surface changes" id="c3-changes"><div class="surface-head"><p class="section-label">変更箇所</p>' +
-      '<button type="button" class="dt-emph" data-act="c3-preview">結果をプレビュー</button></div><ul>' +
-      '<li><span class="k">対象サービス</span><span>すべてのサービス → ' + (svcChanged ? SVC : "（未変更）") + "</span>" + st(svcChanged, "変更") + "</li>" +
-      '<li><span class="k">時間枠</span><span>過去 2 時間 → ' + (rngChanged ? "過去 24 時間" : "（未変更）") + "</span>" + st(rngChanged, "変更") + "</li>" +
-      '<li><span class="k">指標</span><span>平均応答時間・エラー率</span><span class="st">変更しない</span></li></ul></div>';
-    if (c.preview) {
+      sel("c3-range", "c3-range", [["2h", "過去 2 時間（ひな型の既定）"], ["24h", "過去 24 時間"], ["7d", "過去 7 日間"]], c.range, !svcChanged) + "</div>" +
+      '<div class="dt-field block"><span class="pre">指標</span><span class="locked">平均応答時間・エラー率</span></div></div>';
+    if (svcChanged && rngChanged) {
       h += '<div class="surface" id="c3-result"><div class="surface-head"><p class="dt-h3">平均応答時間（1時間ごと）</p><p class="chart-legend"><span>' + SVC + "</span><span>過去 24 時間</span></p></div>" +
         '<div class="chart-wrap">' + hourChart() + "</div>" +
-        '<ul class="checks"><li>対象サービスが担当サービスになっている</li><li>時間枠が過去 24 時間になっている</li><li>10時台の上昇が、第1章で確認した時間帯と合っている</li></ul>' +
-        '<div class="row-actions"><span class="tip-anchor" id="w-c3-ask"><button type="button" class="dt-emph" data-act="c3-ask">専門家に確認を依頼</button></span>' +
-        '<span class="tip-anchor" id="w-c3-save"><button type="button" class="dt-accent" data-act="c3-save">保存して共有</button></span></div>' +
+        (c.preview ? '<div class="row-actions"><span class="tip-anchor" id="w-c3-ask"><button type="button" class="tt-chip" data-act="c3-ask">専門家に確認を依頼（社内手順）</button></span></div>' : "") +
         (c.asked ? '<p class="status" role="status">依頼しました：変更箇所2点と結果の画面を添えて、専門家（架空）に確認を依頼しました。デモのため送信はしません。</p>' : "") +
         (S.chat === "approved" ? chatCard("approved") : "") +
         '<p class="dt-fine">数値はすべて架空です。</p></div>';
     } else {
-      h += '<div class="empty" id="c3-result">' + svg("empty") + "<span>設定を変更して「結果をプレビュー」を押すと、ここに結果が表示されます。</span></div>";
+      h += '<div class="empty" id="c3-result">' + svg("empty") + "<span>サービスと時間枠を変えると、担当サービスの表示に切り替わります。</span></div>";
     }
     return h + '<div class="dql"><strong>DQLの作成・説明が必要な場合</strong><span>利用条件を満たすDynatrace Assistの活用を含めて確認します。</span></div>';
   }
@@ -1481,7 +1487,7 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
     }
     h += '<h3 class="ov-title">ダッシュボードをひな型から作る</h3>' + stepsList(G3, c.step);
     if (c.step === 9) {
-      return h + '<p class="now-box">保存して、運用チーム（架空）に共有しました。</p><p class="soft">デモのため実際には保存していません。実環境では保存先と共有範囲を確認します。</p>' + actions();
+      return h + '<p class="now-box">運用チーム（架空）に共有しました。</p><p class="soft">デモのため実際には共有していません。実環境では共有範囲を確認します。</p>' + actions();
     }
     if (offGuide()) return h + guideBody("", "") + actions();
     var g = G3[c.step];
@@ -1501,7 +1507,7 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
       tl("10:16", "業務部門から問い合わせ", "「10時過ぎから契約照会の画面が遅い」") +
       tl("10:17", "第1章　担当サービスの状況を確認", "ガイド7ステップ。平均応答時間 420 ms → 980 ms を確認し、検知された問題に気づく") +
       tl("10:18", "第2章　障害の一次確認と連絡", "ガイド4ステップ。影響範囲から優先度「中」と判断し、社内手順どおりに連絡") +
-      tl("14:05", "第3章　再発に備えてダッシュボードを作成", "ガイド8ステップ。ひな型から作り、専門家の確認を受けて運用チームに共有") +
+      tl("14:05", "第3章　再発に備えてダッシュボードを作成", "ガイド8ステップ。共有されたひな型を複製して作り、専門家の確認を受けて運用チームに共有") +
       "</ol></section>" +
       '<section class="sum-card"><h2>このデモで、テックタッチが手当てした場面</h2><div class="stats">' +
       stat(stepsDone(), "ガイドで進めたステップ") + stat(S.stats.fixes, "選び直し・順番の案内") + stat(S.stats.notes, "定義・基準・社内手順の表示") + "</div>" +
@@ -1564,7 +1570,7 @@ button.gitem { cursor: pointer; border-color: var(--tt); background: var(--tt-so
     }
     c = S.c3; g = G3[c.step];
     if (!g) return null;
-    var bad = !!S.warn && c.step >= 3 && c.step <= 5;
+    var bad = !!S.warn && c.step >= 2 && c.step <= 5;
     return { sel: g.target, tip: bad ? "選び直します" : g.tip, sub: bad ? "" : g.sub, warn: bad };
   }
 
