@@ -4,7 +4,7 @@
 //   node build_deck.js            → Dynatrace_デモのご説明.pptx
 // 体裁はテックタッチの資料に合わせる：青 055BB8／0876E8、淡い青の要点帯 EEF7FD、文字 1F2A37、枠線 D6DDE5、
 // 強調の橙 C86A00、書体 Yu Gothic、角の無い四角、左上の小見出し・題名・要点帯・青い見出し帯の付いた枠。
-// 時刻・章の長さ・問いは、デモ（../index.html）と動画（../video/dynatrace-techtouch-demo.mp4、3分35秒）に合わせる。
+// 時刻・章の長さ・問いは、デモ（../index.html）と動画（../video/dynatrace-techtouch-demo.mp4、3分34秒）に合わせる。
 const path = require("path");
 const pptxgen = require("pptxgenjs");
 
@@ -124,7 +124,7 @@ async function finalizePptx(file, face) {
     s.addText("Dynatrace\n運用担当者の一日\nデモのご説明", { placeholder: "title" });
     s.addText("Dynatrace ×\nテックタッチ（DAP＋AI Hub）", { placeholder: "body" });
     text(s, "月に数回しかDynatraceを使わない人が、\n迷わず・社内手順どおりに・自分で進める", { x: 5.75, y: 2.45, w: 7.1, h: 1.05, fontSize: 22, bold: true, color: C.accent1, objectName: "headline" });
-    text(s, bullets(["架空の運用担当者の一日（問い合わせから、一次確認・連絡、再発への備えまで）", "デモ動画は3章＋振り返り（3分35秒）"]), { x: 5.75, y: 3.75, w: 7.1, h: 0.9, fontSize: 15, objectName: "headline-points" });
+    text(s, bullets(["架空の運用担当者の一日（問い合わせから、一次確認・連絡、再発への備えまで）", "デモ動画は3章＋振り返り（3分34秒）"]), { x: 5.75, y: 3.75, w: 7.1, h: 0.9, fontSize: 15, objectName: "headline-points" });
     text(s, "テックタッチ株式会社\n2026年10月\n架空のシナリオの構想デモです。特定の企業や事案を題材にしたものではありません。", { x: 5.75, y: 5.5, w: 7.1, h: 0.9, fontSize: 12, color: C.accent5, objectName: "meta" });
     s.addNotes("デモ動画の前に、3枚で前提をご説明します。架空の運用担当者の一日を題材にした構想デモです。画面はすべてDynatraceの画面イメージで、実画面ではありません。");
   }
