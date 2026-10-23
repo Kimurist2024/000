@@ -145,3 +145,4 @@ button.sn-btn:hover { background: #f4f8f9; }
 
 .sn-form { position: relative; }
 .sn-cols .sn-col:last-child { padding-right: 0; }
+.sn-app { padding-bottom: 72px; }

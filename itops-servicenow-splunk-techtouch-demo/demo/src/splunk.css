@@ -252,3 +252,6 @@ button.spk-btn { cursor: pointer; }
 .fname-row .tt-ins { white-space: nowrap; }
 .spk-input.txt { min-width: 230px; }
 .rp-bar .sp-tp-menu { left: 0; right: auto; }
+/* 右下のテックタッチの表示（再生中）に隠れないよう、下に余白を取り、リンクは左に置く */
+.mn-page { padding-bottom: 96px; }
+.sr-foot { justify-content: flex-start; }
