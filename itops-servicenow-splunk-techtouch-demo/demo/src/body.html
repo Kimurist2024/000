@@ -1,0 +1,115 @@
+<div class="wrap" lang="ja">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name">IT運用 × テックタッチ　ServiceNow・Splunk（ITSI・サーチとレポート）をまたぐ手順のデモ（イメージ）</span>
+      <span class="brand-sub">架空のA社：監視はZabbix・JP1、起票と記録はServiceNow、影響と事実の確認はSplunk。夜間の一次切り分けと、月1回の稼働統計を、テックタッチのガイドで進めます。</span>
+    </div>
+    <div class="tools">
+      <button type="button" class="tool" id="notes-btn" aria-pressed="false" aria-controls="notes">進行メモ</button>
+      <button type="button" class="tool" id="reset-btn">この場面を最初から</button>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    <span>イメージデモです。企業・人物・サービス・ホスト・チケット番号・手順・数値はすべて架空で、特定の企業を題材にしたものではありません。ServiceNowとSplunkの画面は、公開されている画面構成を手本に組んだ画面イメージで、実画面の写しではありません（Splunkの画面の部品は Splunk公式のUIツールキット〈Apache-2.0〉）。テックタッチの表示は製品の見た目に合わせた案です。</span>
+    <span class="legend" aria-label="画面の区別">
+      <span><i class="l-sn"></i>ServiceNow（画面イメージ）</span>
+      <span><i class="l-sp"></i>Splunk（画面イメージ）</span>
+      <span><i class="l-tt"></i>テックタッチ（ガイド・注意書き・自動入力）</span>
+    </span>
+  </div>
+
+  <nav class="journey" id="journey" aria-label="デモの流れ"></nav>
+  <section class="story" id="story" aria-live="polite"></section>
+
+  <div class="window" id="window">
+    <div class="win-bar" id="win-bar"></div>
+    <div class="screen" id="screen">
+      <div class="viewport" id="viewport">
+        <div class="vp-inner" id="vp-inner">
+          <div id="app-root"></div>
+          <div id="tt-ring" class="tt-ring" hidden></div>
+          <div id="tt-balloon" class="tt-balloon" hidden></div>
+        </div>
+      </div>
+      <div id="tt-widget"></div>
+    </div>
+  </div>
+
+  <div class="ctrl" id="ctrl"></div>
+
+  <section class="ask" id="ask"><span class="ask-lab">伺いたいこと</span><p id="ask-text"></p></section>
+  <section class="summary" id="summary" hidden></section>
+
+  <section class="notes" id="notes" hidden aria-label="進行メモ">
+    <div>
+      <h3>この場面の進行</h3>
+      <ul data-for="1">
+        <li>目安2分。冒頭で「イメージデモです。企業・人物・手順・数値は架空で、ServiceNowとSplunkの実画面の写しではありません」とお伝えする。</li>
+        <li>話すこと：ツールは4つ（監視・ServiceNow・ITSI・サーチとレポート）。手順はツールの外（手順書・当番の経験）にある。テックタッチはツールを替えずに、手順を画面の上に置く。</li>
+        <li>Zabbix・JP1は図だけ。Web画面なら同じ仕組みで載る想定ですが、製品と画面の種類によるため要検証とお伝えする。</li>
+      </ul>
+      <ul data-for="2">
+        <li>目安3分。右下のテックタッチの一覧から「01. 夜間一次対応：受け取りと速報」を再生。</li>
+        <li>見せ場の一つ：「作業メモ」のチェックを忘れて投稿すると、顧客に見えるコメントになります。チェックの入れ忘れを入力チェックで止めます。</li>
+        <li>見せ場：ステータスで「保留中」を選ぶと入力チェック。「テンプレートの挿入」で速報の書き方がそろう。赤い枠は、テックタッチが画面に置く注意書き（顧客に見える欄の取り違え防止）。</li>
+        <li>最後に、テックタッチが画面の上に置いた「切り分けの手順」から、Splunkを開く。</li>
+      </ul>
+      <ul data-for="3">
+        <li>目安2分。リンクで開いた先で、続きのガイドを再生（ツールごとにガイドを分け、リンクで開いた先で再生する設定を想定。ドメインをまたぐ動きは要検証）。</li>
+        <li>画面は ITSI 5.0 と Splunk Cloud の新しいナビゲーション（左の縦のメニュー）に合わせています。お客様の ITSI の版によっては配置が違います。</li>
+        <li>見せ場：状態で「Resolved」「Closed」を選ぶと止める。記録の正はServiceNow。Events Timeline で、アラートが出た順番を見る（原因は決めない）。</li>
+        <li>ITSIの画面の表記は英語のまま（日本語表示の有無は実環境で要確認）。</li>
+      </ul>
+      <ul data-for="4">
+        <li>目安3分。見る順番（業務→基盤→連携）を固定する。赤が同時に並んでも原因を断定しない、という決まりを赤い枠で置く。</li>
+        <li>話すこと：「この画面は構築ベンダーが作ったもの。作った人の意図と、夜間に見る人の手順の間を埋める」。</li>
+      </ul>
+      <ul data-for="5">
+        <li>目安3分。時間範囲で「過去24時間」「過去15分間」を選ぶと、理由つきで止める。</li>
+        <li>見せ場：結果を時刻の早い順に読む。事実と判断を分ける。夜間当番はエクスポートしない（決まりを赤い枠で）。</li>
+      </ul>
+      <ul data-for="6">
+        <li>目安3分。「作業メモ」のチェックが無いまま投稿すると止める（「作業メモにチェックを入れる」で直す）。続けて、ひな型の「未確認のこと」が空なら止める（「記入例を入れる」で直す）。</li>
+        <li>アサイン先グループは「？」で基準を出してから選ぶ。「アプリ保守」を選ぶと理由つきで止める。</li>
+        <li>「通知先と担当を自動入力」で、テックタッチの自動処理を見せる。業務部門への連絡はインシデントコマンダー経由、ベンダーへの依頼は有識者の判断（赤い枠）。</li>
+      </ul>
+      <ul data-for="7">
+        <li>目安2分。後半は別の人・別の日。右下の一覧から「11. 月次稼働統計の作成」を選んで再生。</li>
+        <li>話すこと：月1回の作業は、手順を覚えていないのが普通。手順書の場所を探す時間と、前任者への問い合わせが減る。</li>
+      </ul>
+      <ul data-for="8">
+        <li>目安3分。「_旧」を開こうとすると止める。期間で「過去30日間」を選ぶと、抜ける日と入る日を示して止める。</li>
+        <li>ファイル名はテックタッチが決まった形で入れる（自動入力）。</li>
+      </ul>
+      <ul data-for="9">
+        <li>目安2分。添付 → 作業メモ（期間・レポート名・行数）→ 「クローズ（完了）」。</li>
+        <li>話すこと：「正しく終わった」の確かめ方（行数＝サービス数）を、手順の中に置く。</li>
+      </ul>
+      <ul data-for="10">
+        <li>目安3分。三者（現場・運用設計・情報システム部門）にとっての意味と、確かめ方。回数はこのデモを操作した回数で、効果の数値ではない。</li>
+        <li>「伺いたいこと」から一つ選び、直近の具体例を伺う。</li>
+      </ul>
+      <h3>全体</h3>
+      <ul>
+        <li>画面の区別を言い分ける：【ServiceNow】起票・記録・アサイン／【Splunk】ITSI（エピソード・Service Analyzer・Deep Dive）とサーチとレポート／【テックタッチ】吹き出し・赤い枠の注意書き・テンプレートの挿入・入力チェック・自動入力・再生中の表示。</li>
+        <li>「テックタッチで障害が減る」とは言わない。切り分けの順番・記録の形・渡す先の選び方をそろえ、辿れなかった箇所を運用設計の側に返す、までが範囲。</li>
+        <li>ドメインをまたぐガイドの続き方、本番端末への拡張機能の配布、ITSIの画面を安定して指せるかは、実環境で確かめる項目としてお伝えする。</li>
+      </ul>
+    </div>
+    <div>
+      <h3>想定問答</h3>
+      <ul>
+        <li>「ServiceNowとSplunkにも手順の機能はあるのでは」→ それぞれの製品の中の手順はあります。このデモの論点は、ツールをまたぐ社内の手順と、社内の決まり（閉じる場所・渡す先・連絡の経路）を、どの画面でも同じ形で置くことです。</li>
+        <li>「ITSIの画面は構築ベンダーが作ったもの。変えられない」→ 画面は変えません。画面の上に、見る順番と決まりを置きます。</li>
+        <li>「本番端末に拡張機能を入れられるか」→ 端末の種類、配布の手続き、ネットワークの条件を最初に確かめます。</li>
+        <li>「効果はどれくらいか」→ 数値はお約束しません。起票から有識者への割り当てまでの時間、再割り当ての件数、作業メモの書き漏れ、月次作業の手戻りを、一つの作業で測って確かめます。</li>
+        <li>「Zabbix・JP1でも使えるか」→ Web画面であれば同じ仕組みで載る想定です。製品と画面の種類によるため、実環境で確かめます。</li>
+      </ul>
+      <p class="kbd">キー操作：→ 次へ ／ ← 戻る ／ 1〜9 場面の切り替え（1=全体像） ／ 0 振り返り ／ N 進行メモ ／ R この場面を最初から</p>
+    </div>
+  </section>
+
+  <p class="foot">イメージデモ（IT運用版 1.0・2026年10月）　ServiceNow・Splunk × テックタッチ</p>
+</div>

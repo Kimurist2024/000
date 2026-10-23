@@ -1,0 +1,26 @@
+{
+  "name": "itops-servicenow-splunk-techtouch-demo-ui",
+  "private": true,
+  "description": "ServiceNow（画面イメージ）とSplunk公式UIツールキット（Apache-2.0）で組んだITSI・サーチとレポートの画面に、テックタッチのガイドを重ねたイメージデモを1ファイルのHTMLにまとめる",
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "node test_demo.js"
+  },
+  "dependencies": {
+    "@splunk/moment": "0.7.0",
+    "@splunk/react-icons": "5.16.0",
+    "@splunk/react-search": "8.0.0",
+    "@splunk/react-time-range": "12.1.1",
+    "@splunk/react-ui": "5.17.0",
+    "@splunk/splunk-utils": "4.0.1",
+    "@splunk/themes": "1.13.0",
+    "@splunk/time-range-utils": "3.4.1",
+    "@splunk/ui-utils": "1.14.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "styled-components": "5.3.11"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2"
+  }
+}
