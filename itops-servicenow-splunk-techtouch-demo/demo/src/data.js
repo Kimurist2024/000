@@ -99,10 +99,10 @@ export const TPL = {
 
 /* ---------- Splunk ITSI（架空のサービス・エピソード） ---------- */
 // 重大度の色は ITSI の既定の配色に合わせる（実画面で要確認）
-// 重大度の色：ITSI 5.0 の画面写真（ダーク）から測った値。Info は画面写真に無く、未確認
+// 重大度の色：ITSI の既定の配色（公式ドキュメント）。ライト表示の画面写真で High・Critical・Normal の値が一致することを確認
 export const SEV = {
-  critical: ["Critical", "#9e2520"], high: ["High", "#fd524a"], medium: ["Medium", "#ee9632"],
-  low: ["Low", "#fcd657"], normal: ["Normal", "#5fbe81"], info: ["Info", "#6ab7c7"]
+  critical: ["Critical", "#b50101"], high: ["High", "#f26a35"], medium: ["Medium", "#fcb64e"],
+  low: ["Low", "#ffe98c"], normal: ["Normal", "#99d18b"], info: ["Info", "#aed3e5"]
 };
 export const SERVICES = [
   ["online", "契約照会オンライン", 31, "critical"],

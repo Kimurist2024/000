@@ -22,7 +22,7 @@ function Stage({ ch, c }) {
   if (c.app === "overview") return <Overview />;
   if (c.app === "snow") return <SnowApp c={c} ch={ch} texts={TEXTS} />;
   return (
-    <SplunkThemeProvider family="enterprise" colorScheme="dark" density="comfortable">
+    <SplunkThemeProvider family="enterprise" colorScheme="light" density="comfortable">
       {c.app === "itsi" ? <ItsiApp c={c} /> : <SearchApp c={c} />}
     </SplunkThemeProvider>
   );

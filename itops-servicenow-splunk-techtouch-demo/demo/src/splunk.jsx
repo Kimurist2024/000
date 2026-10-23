@@ -42,15 +42,16 @@ const D = {
 
 /* ---------- Modern navigation：ヘッダーと左のメニュー ---------- */
 function Header({ user }) {
+  // 実画面（Splunk Cloud・ja-JP・ライト表示）の並び：ロゴ、クイックメニュー、？、サーチ、アクティビティ、設定、通知、ヘルプ、｜、利用者、アプリ
   return (
     <div className="mn-header">
-      <span className="mn-logo" aria-label="splunk>Cloud"><b>splunk</b><i>&gt;</i><em>Cloud</em></span>
+      <span className="mn-left"><span className="mn-logo" aria-label="splunk>Cloud"><b>splunk</b><i>&gt;</i><em>Cloud</em></span><span className="mn-quick">💻クイックメニュー▼</span></span>
       <span className="mn-right">
-        <span className="mn-ok"><Ic d={D.check} s={22} /></span>
+        <span className="mn-ic dim"><Ic d={D.help} s={22} /></span>
         <span className="mn-ic"><Ic d={D.search} s={22} /></span>
         <span className="mn-ic"><Ic d={D.pulse} s={22} /></span>
         <span className="mn-ic"><Ic d={D.gear} s={22} /></span>
-        <span className="mn-ic bell"><Ic d={D.bell} s={22} /><span className="mn-badge">2</span></span>
+        <span className="mn-ic bell"><Ic d={D.bell} s={22} /></span>
         <span className="mn-ic"><Ic d={D.help} s={22} /></span>
         <span className="mn-sep" />
         <span className="mn-user"><Ic d={D.user} s={20} />{user}<span className="cr">▾</span></span>
@@ -60,13 +61,13 @@ function Header({ user }) {
   );
 }
 function Rail({ app, items, active }) {
+  // 左のパネル：実画面のホームの「App」パネル（ライト・名前つき）に合わせる。アプリの中の表示は要確認
   return (
     <nav className="mn-rail" aria-label="ナビゲーション">
-      <span className="mn-rail-i"><Ic d={D.menu} s={20} /></span>
-      <span className={"mn-appbadge " + app}>{app === "itsi" ? "ITSI" : "S&R"}</span>
+      <div className="mn-rail-head"><b>{app === "itsi" ? "IT Service Intelligence" : "Search & Reporting"}</b><span className="mn-collapse" aria-hidden="true">‹</span></div>
       {items.map(([key, icon, label]) => (
-        <button type="button" key={key} id={"nav-" + key} data-id={"nav-" + key} className={"mn-rail-i" + (active === key ? " on" : "")} aria-label={label} title={label}>
-          <Ic d={D[icon]} s={21} /><span className="mn-tip">{label}</span>
+        <button type="button" key={key} id={"nav-" + key} data-id={"nav-" + key} className={"mn-rail-i" + (active === key ? " on" : "")}>
+          <Ic d={D[icon]} s={18} /><span className="mn-rail-l">{label}</span>
         </button>
       ))}
     </nav>
@@ -204,7 +205,7 @@ function CountBar({ list, total }) {
 }
 const KPI_TILES = [["オンライン滞留件数", "契約照会オンライン", "1,842", "critical"], ["MQ連携エラー率", "連携基盤（MQ）", "12.7", "critical"], ["応答時間（p95）", "契約照会オンライン", "8.4", "high"], ["パケット損失率", "ネットワーク（DC間）", "2.4", "high"], ["再送数", "ネットワーク（DC間）", "512", "high"], ["エラー率", "代理店ポータル", "6.2", "high"], ["CPU使用率", "AP基盤", "92", "medium"], ["処理件数の遅れ", "帳票出力", "3", "low"], ["DB応答時間", "DB基盤", "12", "normal"], ["認証成功率", "認証基盤", "99.9", "normal"], ["ジョブ遅延件数", "ジョブ管理", "0", "normal"], ["支払処理件数", "支払バッチ", "1,204", "normal"]];
 function Tiles() {
-  const fg = (s) => (s === "low" ? "#1f2329" : "#fff");
+  const fg = (s) => (s === "critical" ? "#fff" : "#1f2329"); // ライト表示：Critical だけ白い文字（公式の画面写真）
   return (
     <div className="sa-tiles" id="sa-tiles">
       <p className="sa-sec">Top 50 Services <Ic d={D.gear} s={14} w={2.4} /></p>
@@ -240,11 +241,11 @@ function TreeView({ c }) {
       </div>
       {c.node && (
         <aside className="sa-side" id="sa-side">
-          <div className="sa-side-head" style={{ background: sevColor("critical") }}><span className="t"><b>契約照会オンライン</b><span className="k">⋮ ▾</span></span><span className="x" aria-hidden="true">✕</span><span className="sa-side-val"><Spark w={150} /><b>31</b></span></div>
+          <div className="sa-side-head" style={{ background: sevColor("critical"), color: "#fff" }}><span className="t"><b>契約照会オンライン</b><span className="k">⋮ ▾</span></span><span className="x" aria-hidden="true">✕</span><span className="sa-side-val"><Spark w={150} color="#fff" /><b>31</b></span></div>
           <div className="ep-tabs sm"><button type="button" className="on">KPIs &amp; Episodes</button><button type="button">Service impact analysis</button></div>
           <p className="sa-kcount"><b>4 KPIs</b><button type="button" className="lnk btnlink" id="sa-deepdive" data-id="sa-deepdive">{I.deep} <ExtIc /></button></p>
           <table className="itsi-table sm"><thead><tr><th>Severity ⌄</th><th>KPI Name ⇅</th><th>Value ⇅</th></tr></thead>
-            <tbody>{KPIS.online.map((k) => <tr key={k[0]}><td className="sv"><span className="stripe" style={{ background: sevColor(k[2]) }} /><span className="lnk">{SEV[k[2]][0]}</span></td><td><span className="lnk">{k[0]}</span></td><td className="nw"><Spark up={k[2] !== "normal"} w={64} h={16} color="#5fbe81" /> <span className="lnk">{k[1]}</span></td></tr>)}</tbody></table>
+            <tbody>{KPIS.online.map((k) => <tr key={k[0]}><td className="sv"><span className="stripe" style={{ background: sevColor(k[2]) }} /><span className="lnk">{SEV[k[2]][0]}</span></td><td><span className="lnk">{k[0]}</span></td><td className="nw"><Spark up={k[2] !== "normal"} w={64} h={16} color="#3c444d" /> <span className="lnk">{k[1]}</span></td></tr>)}</tbody></table>
           <div className="ep-tabs sm"><button type="button" className="on">Episode Review (1)</button><button type="button">Drift Review (0)</button></div>
           <p className="sa-kcount">ⓘ <b>1 Critical and High Episodes</b><span className="lnk">View All <ExtIc /></span></p>
           <p className="sa-ep"><span className="stripe" style={{ background: sevColor("critical") }} />{EPISODES[0][2]}</p>
@@ -277,7 +278,7 @@ function Lane({ name, s, data, th }) {
         <rect x="0" y="0" width={W} height={Math.max(0, y2)} fill={sevColor("critical")} opacity="0.25" />
         <rect x="0" y={y2} width={W} height={Math.max(0, y1 - y2)} fill={sevColor("high")} opacity="0.2" />
         <rect x="0" y={y1} width={W} height={H - y1} fill={sevColor("normal")} opacity="0.16" />
-        <polyline points={pts} fill="none" stroke="#e8edf2" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
+        <polyline points={pts} fill="none" stroke="#3c444d" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
       </svg>
     </div>
   );
